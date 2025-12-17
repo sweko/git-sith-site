@@ -21,6 +21,7 @@ docs
 .vscode
 .git
 .github
+.gitignore
 
 # OS files
 .DS_Store
