@@ -87,7 +87,7 @@ Download the latest release from [GitHub Releases](https://github.com/sweko/git-
 ### As a .NET Global Tool
 
 ```bash
-# Install from NuGet (once published)
+# Install from NuGet
 dotnet tool install --global GitSith
 
 # Or build and install locally
