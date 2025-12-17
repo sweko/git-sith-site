@@ -65,7 +65,7 @@ I used Claude to fetch the specific PDF from Project Gutenberg to ensure I had t
 
 **Result:** `HMDSECTCPSUDPTECMC`
 
-**Important gotcha:** When I first decrypted this, I (well, Claude) got confused because the result doesn't look like readable English. But that's the point — it's a *password*, not a message. Passwords are supposed to look like gibberish. Don't second-guess a successful decryption just because the plaintext isn't a coherent sentence.
+**Important gotcha:** When I first decrypted this, Claude got confused because the result doesn't look like readable English. But that's the point — it's a *password*, not a message. Passwords are supposed to look like gibberish. Don't second-guess a successful decryption just because the plaintext isn't a coherent sentence.
 
 ---
 
@@ -130,13 +130,96 @@ Next Token: http://shai-hulud.yieldcat.com
 
 **🎯 Token 2: Threshold_of_Antiquity**
 
-Another science fiction reference in the URL: **Shai-Hulud** is the Fremen name for the giant sandworms in Frank Herbert's *Dune*.
+The next URL contains another science fiction reference: **Shai-Hulud** is the Fremen name for the giant sandworms in Frank Herbert's *Dune*.
 
 ---
 
-## Stage 6: Shai-Hulud
+## Stage 6: Shai-Hulud (The Supply Chain Attack)
 
 **URL:** http://shai-hulud.yieldcat.com
+
+This page describes a supply chain attack — and it's not fictional. The **Shai-Hulud worm** was a real, devastating npm supply chain attack that occurred in September and November 2025:
+
+- First wave (September 2025): ~500 packages compromised, ~$50 million in cryptocurrency stolen
+- Second wave (November 2025): 700+ additional packages, 25,000+ malicious GitHub repositories
+- Victims included packages from Zapier, PostHog, Postman, and ENS Domains
+- The malware exfiltrated credentials to public GitHub repos labeled "Sha1-Hulud: The Second Coming"
+
+The page itself contained obfuscated JavaScript. Viewing source revealed:
+
+```javascript
+const _0x2d381a = _0x5a27;
+function _0x5690() {
+    const _0x5b7bc3 = [
+        'load\x20local',
+        'om:',
+        'sYqne',
+        'render.jss',
+        // ... many more shuffled strings
+    ];
+    // ...
+}
+```
+
+This is a common obfuscation pattern: strings are stored in an array that gets shuffled at runtime, making static analysis difficult.
+
+### The Console Hint
+
+Opening the browser console revealed an error message:
+
+```
+Failed to load local script from: http://shai-hulud.yieldcat.com/render.jss
+Maybe you need the remote_url version?
+```
+
+This hints that there's a `remote_url` variable containing the real destination.
+
+### Failed Approach: Static Deobfuscation
+
+I tried using Claude to deobfuscate the JavaScript statically, but it produced an incorrect Google Drive URL. The problem: the array shuffling happens at runtime, and static analysis can't predict the final order.
+
+### Successful Approach: Browser Debugger
+
+Instead of fighting the obfuscation, I let the browser do the work:
+
+1. Open Developer Tools (F12)
+2. Go to the Console tab
+3. After the page loads, type `remote_url` and press Enter
+4. The browser returns the fully-constructed URL
+
+**Result:** `https://drive.google.com/uc?export=download&id=1QPWq3fQbDXTTBfBcb3I2E2qMslm3WEFV`
+
+### The Google Drive File
+
+The link downloaded a file named `render.js` (note: `.js` not `.jss`) containing:
+
+```html
+<p><strong>Token 3: Trajectory_Uncertain</strong></p>
+<p><strong>Next Token: https://github.com/BeyondMachines/secondary-case-for-sanity</strong></p>
+```
+
+**🎯 Token 3: Trajectory_Uncertain**
+
+**Lesson learned:** When dealing with runtime obfuscation, don't waste time on static analysis. Use the debugger — let the JavaScript engine do the deobfuscation for you, then inspect the result.
+
+---
+
+## Stage 7: The GitHub Repository
+
+**URL:** https://github.com/BeyondMachines/secondary-case-for-sanity
+
+The repository contains a single README.md with a dismissive message:
+
+> "This repo is going nowhere fast. We are abandoning it."
+> "The latest code is published on codeonion subdomain. Whoever wants to be bothered, go there."
+
+This hints at another `codeonion.net` subdomain. With GitHub repos, there are several places to investigate:
+
+- Commit history
+- Other branches
+- Issues and Pull Requests
+- Actions
+- Forks
 
 *[To be continued...]*
 
@@ -150,8 +233,11 @@ The eight token names follow a very distinctive naming pattern:
 |-------|-------|
 | Calibrated_Absence | [Abstract noun] + [Abstract noun] |
 | Threshold_of_Antiquity | X of Y construction |
+| Trajectory_Uncertain | Physics/motion reference |
 | Requiem_for_Velocity | Melancholic + Physics reference |
 | Relativistic_Records | Physics/spaceflight theme |
+| Testament_to_Darker_Hours | Poetic, melancholic |
+| Paradox_Deferred | Philosophical |
 | Doctrine_of_Receding_Light | Cosmic, philosophical |
 
 This is the signature naming convention of **lighthugger starships** from Alastair Reynolds' *Revelation Space* universe. Compare to canonical ship names like:
@@ -169,8 +255,8 @@ Bozidar Spirovski is clearly a fan. The token names aren't just identifiers — 
 
 ## Tools Used
 
-- Browser developer tools (View Source, Inspect Element)
-- Claude (for OTP decryption and research)
+- Browser developer tools (View Source, Inspect Element, Console, Debugger)
+- Claude (for OTP decryption, research, and attempted JS deobfuscation)
 - Basic knowledge of AWS S3 URL structure
 - Google Translate (for the Arabic red herring)
 - A reading knowledge of Macedonian Cyrillic
@@ -187,7 +273,11 @@ Bozidar Spirovski is clearly a fan. The token names aren't just identifiers — 
 
 4. **Read the actual content** — In the wall of text challenge, the clue wasn't hidden in the HTML structure; it was in the text itself. Sometimes you have to actually read things.
 
-5. **Cultural/language knowledge helps** — Macedonian Cyrillic, Dune references, Cicada 3301 lore, Alastair Reynolds... CTFs reward broad curiosity.
+5. **Use the debugger for runtime obfuscation** — LLMs can help with static analysis, but when arrays are shuffled at runtime, let the browser do the work. Inspect variables after execution.
+
+6. **Cultural/language knowledge helps** — Macedonian Cyrillic, Dune references, Cicada 3301 lore, Alastair Reynolds, real-world security incidents... CTFs reward broad curiosity.
+
+7. **Check multiple angles on GitHub** — Repos can hide secrets in commit history, branches, issues, actions, and more.
 
 ---
 

@@ -21,7 +21,7 @@
     <div class="article-container container">
       <header class="article-header">
         <h1>ByteBreach 2025.2 Writeup</h1>
-        <div class="article-meta"><time datetime="2025-12-17">2025-12-17</time> · 5 min read</div>
+        <div class="article-meta"><time datetime="2025-12-17">2025-12-17</time> · 8 min read</div>
         <p class="article-description">Writeup of the ByteBreach 2025.2 cybersecurity challenge</p>
       </header>
       <div class="article-content">
@@ -95,7 +95,7 @@ You need the first paragraph of a book about Ana by Tolstoy, translated by Const
 </blockquote>
 <p>I used Claude to fetch the specific PDF from Project Gutenberg to ensure I had the exact Constance Garnett translation, then applied OTP decryption using the first paragraph as the key.</p>
 <p><strong>Result:</strong> <code>HMDSECTCPSUDPTECMC</code></p>
-<p><strong>Important gotcha:</strong> When I first decrypted this, I (well, Claude) got confused because the result doesn&#39;t look like readable English. But that&#39;s the point — it&#39;s a <em>password</em>, not a message. Passwords are supposed to look like gibberish. Don&#39;t second-guess a successful decryption just because the plaintext isn&#39;t a coherent sentence.</p>
+<p><strong>Important gotcha:</strong> When I first decrypted this, Claude got confused because the result doesn&#39;t look like readable English. But that&#39;s the point — it&#39;s a <em>password</em>, not a message. Passwords are supposed to look like gibberish. Don&#39;t second-guess a successful decryption just because the plaintext isn&#39;t a coherent sentence.</p>
 <hr>
 <h2>Stage 3: The CryptPad Document</h2>
 <p><strong>URL:</strong> <a href="https://cryptpad.fr/pad/#/2/pad/view/y77PNt4ibX8k97GA+8T4bqOFI49w7wbcehNS0DFn1Ag/p/embed/">https://cryptpad.fr/pad/#/2/pad/view/y77PNt4ibX8k97GA+8T4bqOFI49w7wbcehNS0DFn1Ag/p/embed/</a><br><strong>Password:</strong> <code>HMDSECTCPSUDPTECMC</code></p>
@@ -137,10 +137,71 @@ Next Token: http://walloftext.codeonion.net
 Next Token: http://shai-hulud.yieldcat.com
 </code></pre>
 <p><strong>🎯 Token 2: Threshold_of_Antiquity</strong></p>
-<p>Another science fiction reference in the URL: <strong>Shai-Hulud</strong> is the Fremen name for the giant sandworms in Frank Herbert&#39;s <em>Dune</em>.</p>
+<p>The next URL contains another science fiction reference: <strong>Shai-Hulud</strong> is the Fremen name for the giant sandworms in Frank Herbert&#39;s <em>Dune</em>.</p>
 <hr>
-<h2>Stage 6: Shai-Hulud</h2>
+<h2>Stage 6: Shai-Hulud (The Supply Chain Attack)</h2>
 <p><strong>URL:</strong> <a href="http://shai-hulud.yieldcat.com">http://shai-hulud.yieldcat.com</a></p>
+<p>This page describes a supply chain attack — and it&#39;s not fictional. The <strong>Shai-Hulud worm</strong> was a real, devastating npm supply chain attack that occurred in September and November 2025:</p>
+<ul>
+<li>First wave (September 2025): ~500 packages compromised, ~$50 million in cryptocurrency stolen</li>
+<li>Second wave (November 2025): 700+ additional packages, 25,000+ malicious GitHub repositories</li>
+<li>Victims included packages from Zapier, PostHog, Postman, and ENS Domains</li>
+<li>The malware exfiltrated credentials to public GitHub repos labeled &quot;Sha1-Hulud: The Second Coming&quot;</li>
+</ul>
+<p>The page itself contained obfuscated JavaScript. Viewing source revealed:</p>
+<pre><code class="language-javascript">const _0x2d381a = _0x5a27;
+function _0x5690() {
+    const _0x5b7bc3 = [
+        &#39;load\x20local&#39;,
+        &#39;om:&#39;,
+        &#39;sYqne&#39;,
+        &#39;render.jss&#39;,
+        // ... many more shuffled strings
+    ];
+    // ...
+}
+</code></pre>
+<p>This is a common obfuscation pattern: strings are stored in an array that gets shuffled at runtime, making static analysis difficult.</p>
+<h3>The Console Hint</h3>
+<p>Opening the browser console revealed an error message:</p>
+<pre><code>Failed to load local script from: http://shai-hulud.yieldcat.com/render.jss
+Maybe you need the remote_url version?
+</code></pre>
+<p>This hints that there&#39;s a <code>remote_url</code> variable containing the real destination.</p>
+<h3>Failed Approach: Static Deobfuscation</h3>
+<p>I tried using Claude to deobfuscate the JavaScript statically, but it produced an incorrect Google Drive URL. The problem: the array shuffling happens at runtime, and static analysis can&#39;t predict the final order.</p>
+<h3>Successful Approach: Browser Debugger</h3>
+<p>Instead of fighting the obfuscation, I let the browser do the work:</p>
+<ol>
+<li>Open Developer Tools (F12)</li>
+<li>Go to the Console tab</li>
+<li>After the page loads, type <code>remote_url</code> and press Enter</li>
+<li>The browser returns the fully-constructed URL</li>
+</ol>
+<p><strong>Result:</strong> <code>https://drive.google.com/uc?export=download&amp;id=1QPWq3fQbDXTTBfBcb3I2E2qMslm3WEFV</code></p>
+<h3>The Google Drive File</h3>
+<p>The link downloaded a file named <code>render.js</code> (note: <code>.js</code> not <code>.jss</code>) containing:</p>
+<pre><code class="language-html">&lt;p&gt;&lt;strong&gt;Token 3: Trajectory_Uncertain&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Next Token: https://github.com/BeyondMachines/secondary-case-for-sanity&lt;/strong&gt;&lt;/p&gt;
+</code></pre>
+<p><strong>🎯 Token 3: Trajectory_Uncertain</strong></p>
+<p><strong>Lesson learned:</strong> When dealing with runtime obfuscation, don&#39;t waste time on static analysis. Use the debugger — let the JavaScript engine do the deobfuscation for you, then inspect the result.</p>
+<hr>
+<h2>Stage 7: The GitHub Repository</h2>
+<p><strong>URL:</strong> <a href="https://github.com/BeyondMachines/secondary-case-for-sanity">https://github.com/BeyondMachines/secondary-case-for-sanity</a></p>
+<p>The repository contains a single README.md with a dismissive message:</p>
+<blockquote>
+<p>&quot;This repo is going nowhere fast. We are abandoning it.&quot;
+&quot;The latest code is published on codeonion subdomain. Whoever wants to be bothered, go there.&quot;</p>
+</blockquote>
+<p>This hints at another <code>codeonion.net</code> subdomain. With GitHub repos, there are several places to investigate:</p>
+<ul>
+<li>Commit history</li>
+<li>Other branches</li>
+<li>Issues and Pull Requests</li>
+<li>Actions</li>
+<li>Forks</li>
+</ul>
 <p><em>[To be continued...]</em></p>
 <hr>
 <h2>Easter Egg: The Token Names</h2>
@@ -161,12 +222,24 @@ Next Token: http://shai-hulud.yieldcat.com
 <td>X of Y construction</td>
 </tr>
 <tr>
+<td>Trajectory_Uncertain</td>
+<td>Physics/motion reference</td>
+</tr>
+<tr>
 <td>Requiem_for_Velocity</td>
 <td>Melancholic + Physics reference</td>
 </tr>
 <tr>
 <td>Relativistic_Records</td>
 <td>Physics/spaceflight theme</td>
+</tr>
+<tr>
+<td>Testament_to_Darker_Hours</td>
+<td>Poetic, melancholic</td>
+</tr>
+<tr>
+<td>Paradox_Deferred</td>
+<td>Philosophical</td>
 </tr>
 <tr>
 <td>Doctrine_of_Receding_Light</td>
@@ -185,8 +258,8 @@ Next Token: http://shai-hulud.yieldcat.com
 <hr>
 <h2>Tools Used</h2>
 <ul>
-<li>Browser developer tools (View Source, Inspect Element)</li>
-<li>Claude (for OTP decryption and research)</li>
+<li>Browser developer tools (View Source, Inspect Element, Console, Debugger)</li>
+<li>Claude (for OTP decryption, research, and attempted JS deobfuscation)</li>
 <li>Basic knowledge of AWS S3 URL structure</li>
 <li>Google Translate (for the Arabic red herring)</li>
 <li>A reading knowledge of Macedonian Cyrillic</li>
@@ -202,7 +275,11 @@ Next Token: http://shai-hulud.yieldcat.com
 </li>
 <li><p><strong>Read the actual content</strong> — In the wall of text challenge, the clue wasn&#39;t hidden in the HTML structure; it was in the text itself. Sometimes you have to actually read things.</p>
 </li>
-<li><p><strong>Cultural/language knowledge helps</strong> — Macedonian Cyrillic, Dune references, Cicada 3301 lore, Alastair Reynolds... CTFs reward broad curiosity.</p>
+<li><p><strong>Use the debugger for runtime obfuscation</strong> — LLMs can help with static analysis, but when arrays are shuffled at runtime, let the browser do the work. Inspect variables after execution.</p>
+</li>
+<li><p><strong>Cultural/language knowledge helps</strong> — Macedonian Cyrillic, Dune references, Cicada 3301 lore, Alastair Reynolds, real-world security incidents... CTFs reward broad curiosity.</p>
+</li>
+<li><p><strong>Check multiple angles on GitHub</strong> — Repos can hide secrets in commit history, branches, issues, actions, and more.</p>
 </li>
 </ol>
 <hr>
