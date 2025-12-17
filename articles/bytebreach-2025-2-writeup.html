@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ByteBreach 2025.2 Writeup — GitSith - Articles</title>
+  <meta name="description" content="Writeup of the ByteBreach 2025.2 cybersecurity challenge">
+  <meta property="og:title" content="ByteBreach 2025.2 Writeup">
+  <meta property="og:description" content="Writeup of the ByteBreach 2025.2 cybersecurity challenge">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/index.html">Articles</a>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>ByteBreach 2025.2 Writeup</h1>
+        <div class="article-meta"><time datetime="2025-12-17">2025-12-17</time> · 5 min read</div>
+        <p class="article-description">Writeup of the ByteBreach 2025.2 cybersecurity challenge</p>
+      </header>
+      <div class="article-content">
+        <h1>ByteBreach 2025.2 Writeup</h1>
+<p><strong>Challenge:</strong> ByteBreach 2025.2<br><strong>Organizer:</strong> BeyondMachines (Bozidar Spirovski)<br><strong>Duration:</strong> December 15, 2025 – January 2, 2026<br><strong>URL:</strong> <a href="https://challenge.beyondmachines.net/">https://challenge.beyondmachines.net/</a></p>
+<h2>Overview</h2>
+<p>ByteBreach 2025.2 is a multi-stage cybersecurity challenge involving OSINT, cryptography, web security, and good old-fashioned detective work. The goal is to collect 8 tokens, each leading to the next challenge. The token names follow a distinctive pattern — more on that Easter egg at the end.</p>
+<h2>Tokens Collected</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Token Name</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Calibrated_Absence</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Threshold_of_Antiquity</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Trajectory_Uncertain</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Requiem_for_Velocity</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Relativistic_Records</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Testament_to_Darker_Hours</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Paradox_Deferred</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Doctrine_of_Receding_Light</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Stage 1: The Starting Point</h2>
+<p><strong>URL:</strong> <a href="https://challenge.beyondmachines.net/">https://challenge.beyondmachines.net/</a></p>
+<p>The challenge page looks like a standard CTF landing page with rules, prizes, and timeline information. The first instinct in any web challenge: <strong>view the page source</strong>.</p>
+<p>Scanning through the HTML, I found a clue hiding in an unexpected place — the <code>alt</code> attribute of the main challenge image:</p>
+<pre><code>I&#39;ve added something in this site: https://cryptpad.fr/pad/#/2/pad/view/y77PNt4ibX8k97GA+8T4bqOFI49w7wbcehNS0DFn1Ag/p/embed/
+You need a password. So here&#39;s a password, but it&#39;s also encrypted.
+OMSHCHTOXDCHHTVGMN
+Decrypt the password first. I&#39;ve used a one-time pad. Because of course.
+You need the first paragraph of a book about Ana by Tolstoy, translated by Constance Garnett. PDF.
+</code></pre>
+<p><strong>Lesson learned:</strong> Don&#39;t just look for HTML comments or hidden divs. Alt text, title attributes, and other metadata are fair game.</p>
+<hr>
+<h2>Stage 2: One-Time Pad Decryption</h2>
+<p>The clue specifies:</p>
+<ul>
+<li>Encryption method: One-Time Pad (OTP)</li>
+<li>Key source: First paragraph of Anna Karenina, Constance Garnett translation, PDF format</li>
+<li>Ciphertext: <code>OMSHCHTOXDCHHTVGMN</code></li>
+</ul>
+<p>The opening of Anna Karenina is one of the most famous in all of literature:</p>
+<blockquote>
+<p>&quot;Happy families are all alike; every unhappy family is unhappy in its own way.&quot;</p>
+</blockquote>
+<p>I used Claude to fetch the specific PDF from Project Gutenberg to ensure I had the exact Constance Garnett translation, then applied OTP decryption using the first paragraph as the key.</p>
+<p><strong>Result:</strong> <code>HMDSECTCPSUDPTECMC</code></p>
+<p><strong>Important gotcha:</strong> When I first decrypted this, I (well, Claude) got confused because the result doesn&#39;t look like readable English. But that&#39;s the point — it&#39;s a <em>password</em>, not a message. Passwords are supposed to look like gibberish. Don&#39;t second-guess a successful decryption just because the plaintext isn&#39;t a coherent sentence.</p>
+<hr>
+<h2>Stage 3: The CryptPad Document</h2>
+<p><strong>URL:</strong> <a href="https://cryptpad.fr/pad/#/2/pad/view/y77PNt4ibX8k97GA+8T4bqOFI49w7wbcehNS0DFn1Ag/p/embed/">https://cryptpad.fr/pad/#/2/pad/view/y77PNt4ibX8k97GA+8T4bqOFI49w7wbcehNS0DFn1Ag/p/embed/</a><br><strong>Password:</strong> <code>HMDSECTCPSUDPTECMC</code></p>
+<p>The password-protected CryptPad document contained:</p>
+<pre><code>Token 1: Calibrated_Absence
+
+Next Token: http://walloftext.codeonion.net
+</code></pre>
+<p><strong>🎯 Token 1: Calibrated_Absence</strong></p>
+<hr>
+<h2>Stage 4: The Wall of Text</h2>
+<p><strong>URL:</strong> <a href="http://walloftext.codeonion.net">http://walloftext.codeonion.net</a></p>
+<p>The URL name was apt — the page contained a babel of text in multiple languages. The natural first move: inspect the HTML for hidden elements.</p>
+<h3>Red Herring</h3>
+<p>I quickly spotted a CSS class named <code>hidden</code> and found Arabic text:</p>
+<blockquote>
+<p>هل كنت تعتقد أن الأمر سيكون بهذه السهولة؟</p>
+</blockquote>
+<p>Translation: <em>&quot;Did you think it would be this easy?&quot;</em></p>
+<p>Well played, Bozidar. Well played.</p>
+<h3>The Real Clue</h3>
+<p>The actual clue wasn&#39;t hidden in the HTML structure — it was hiding in plain sight within the multilingual text itself. Reading through the different language blocks, I found Portuguese text that mentioned:</p>
+<ul>
+<li>An S3 bucket on <code>eu-central</code></li>
+<li>Bucket name: <code>cicadoidea6699</code></li>
+<li>A file called &quot;configuration.txt&quot; but written in Macedonian Cyrillic: <code>конфигурација.txt</code></li>
+</ul>
+<p><strong>Notes:</strong></p>
+<ul>
+<li><strong>Cicadoidea</strong> is the superfamily of cicadas — a clear nod to the famous <a href="https://en.wikipedia.org/wiki/Cicada_3301">Cicada 3301</a> internet puzzle</li>
+<li>Using Macedonian Cyrillic for the filename filters out anyone just brute-forcing common filenames</li>
+</ul>
+<hr>
+<h2>Stage 5: The S3 Bucket</h2>
+<p><strong>URL:</strong> <code>https://cicadoidea6699.s3.eu-central-1.amazonaws.com/конфигурација.txt</code></p>
+<p>Accessing the configuration file revealed:</p>
+<pre><code>Token 2: Threshold_of Antiquity
+
+Next Token: http://shai-hulud.yieldcat.com
+</code></pre>
+<p><strong>🎯 Token 2: Threshold_of_Antiquity</strong></p>
+<p>Another science fiction reference in the URL: <strong>Shai-Hulud</strong> is the Fremen name for the giant sandworms in Frank Herbert&#39;s <em>Dune</em>.</p>
+<hr>
+<h2>Stage 6: Shai-Hulud</h2>
+<p><strong>URL:</strong> <a href="http://shai-hulud.yieldcat.com">http://shai-hulud.yieldcat.com</a></p>
+<p><em>[To be continued...]</em></p>
+<hr>
+<h2>Easter Egg: The Token Names</h2>
+<p>The eight token names follow a very distinctive naming pattern:</p>
+<table>
+<thead>
+<tr>
+<th>Token</th>
+<th>Style</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Calibrated_Absence</td>
+<td>[Abstract noun] + [Abstract noun]</td>
+</tr>
+<tr>
+<td>Threshold_of_Antiquity</td>
+<td>X of Y construction</td>
+</tr>
+<tr>
+<td>Requiem_for_Velocity</td>
+<td>Melancholic + Physics reference</td>
+</tr>
+<tr>
+<td>Relativistic_Records</td>
+<td>Physics/spaceflight theme</td>
+</tr>
+<tr>
+<td>Doctrine_of_Receding_Light</td>
+<td>Cosmic, philosophical</td>
+</tr>
+</tbody></table>
+<p>This is the signature naming convention of <strong>lighthugger starships</strong> from Alastair Reynolds&#39; <em>Revelation Space</em> universe. Compare to canonical ship names like:</p>
+<ul>
+<li><em>Nostalgia for Infinity</em></li>
+<li><em>Melancholia of Departure</em></li>
+<li><em>Silence Under Snow</em></li>
+<li><em>Accompaniment of Shadows</em></li>
+</ul>
+<p>Lighthuggers are massive interstellar spacecraft that travel at relativistic speeds (hence &quot;light-huggers&quot; — they hug close to the speed of light). The poetic, melancholic names reflect the existential weight of centuries-long journeys and the time dilation that separates crews from everyone they ever knew.</p>
+<p>Bozidar Spirovski is clearly a fan. The token names aren&#39;t just identifiers — they&#39;re a love letter to hard science fiction.</p>
+<hr>
+<h2>Tools Used</h2>
+<ul>
+<li>Browser developer tools (View Source, Inspect Element)</li>
+<li>Claude (for OTP decryption and research)</li>
+<li>Basic knowledge of AWS S3 URL structure</li>
+<li>Google Translate (for the Arabic red herring)</li>
+<li>A reading knowledge of Macedonian Cyrillic</li>
+</ul>
+<hr>
+<h2>Key Takeaways</h2>
+<ol>
+<li><p><strong>Always view source</strong> — but don&#39;t just look for comments. Check alt text, title attributes, data attributes, everything.</p>
+</li>
+<li><p><strong>Red herrings are real</strong> — Just because something has a <code>hidden</code> class doesn&#39;t mean it&#39;s <em>the</em> hidden thing. Sometimes it&#39;s bait.</p>
+</li>
+<li><p><strong>Decrypted passwords look like gibberish</strong> — Don&#39;t second-guess a successful decryption because the output isn&#39;t readable English.</p>
+</li>
+<li><p><strong>Read the actual content</strong> — In the wall of text challenge, the clue wasn&#39;t hidden in the HTML structure; it was in the text itself. Sometimes you have to actually read things.</p>
+</li>
+<li><p><strong>Cultural/language knowledge helps</strong> — Macedonian Cyrillic, Dune references, Cicada 3301 lore, Alastair Reynolds... CTFs reward broad curiosity.</p>
+</li>
+</ol>
+<hr>
+<p><em>Writeup in progress. More stages to be documented as the challenge continues.</em></p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Originally published on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

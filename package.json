@@ -1,0 +1,17 @@
+{
+  "name": "git-sith-site",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build:articles": "ts-node scripts/build-articles.ts"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "marked": "^9.0.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^5.4.0",
+    "@types/node": "^20.4.2"
+  }
+}

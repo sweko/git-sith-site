@@ -1,0 +1,36 @@
+# Cloudflare Pages ignore file
+# Exclude development-only files and folders not needed when deploying the built static site
+
+# Node / package artifacts
+node_modules/
+package.json
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# TypeScript / source files and build scripts
+tsconfig.json
+*.ts
+scripts/
+src/
+
+# Docs, tests, and editorial content (source markdown) — if you commit generated HTML, content/ and docs/ aren't needed for deploy
+content/
+docs/
+
+# Editor and git metadata
+.vscode/
+.git/
+.github/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.*
+
+
+# Keep the site output and static assets
+# (do NOT add `index.html`, `assets/`, or `articles/` here)
