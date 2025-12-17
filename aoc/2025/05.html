@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 5/2025 - Cafeteria Ingredients — AoC 2025 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Checking ingredient freshness and merging overlapping intervals. The classic scheduling problem in disguise.">
+  <link rel="canonical" href="/aoc/2025/05/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 5/2025 - Cafeteria Ingredients</h1>
+        <div class="article-meta"><time datetime="2025">2025</time> · 5 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day five of AoC 2025 (available at <a href="https://adventofcode.com/2025/day/5">https://adventofcode.com/2025/day/5</a>) takes us to a cafeteria where we need to check ingredient freshness. No idea what <a href="https://www.youtube.com/watch?v=CSvFpBOe8eY" target="_blank">dish</a> they&#39;re preparing, but we&#39;re here to help.</p>
+<p>The input has two sections: ranges defining &quot;fresh&quot; ingredient IDs, and a list of ingredient IDs to check.</p>
+<h2>Parsing the Input</h2>
+<p>The input format is slightly awkward — ranges first, blank line, then ingredients:</p>
+<pre><code class="language-typescript">type Range = [number, number];
+type Input = {
+    ranges: Range[];
+    ingredients: number[];
+};
+
+const processInput = (day: number): Input =&gt; {
+    const lines = readInputLines(day);
+    const ranges: Range[] = [];
+    const ingredients: number[] = [];
+    
+    let line = lines.shift();
+    while (line !== &quot;&quot;) {
+        const match = line!.match(/(\d+)-(\d+)/);
+        if (match) {
+            ranges.push([parseInt(match[1], 10), parseInt(match[2], 10)]);
+        }
+        line = lines.shift();
+    }
+    
+    ingredients.push(...lines.map(l =&gt; parseInt(l, 10)));
+    
+    return { ranges, ingredients };
+};
+</code></pre>
+<p>A simple loop-and-shift approach. We consume lines until we hit the empty separator, parsing ranges as we go. Everything after becomes ingredients.</p>
+<p>One gotcha: <code>parseInt</code> as a direct callback to <code>map</code> doesn&#39;t work as expected because <code>map</code> passes three arguments (value, index, array) and <code>parseInt</code> interprets the second as the radix. Always wrap it: <code>line =&gt; parseInt(line, 10)</code>.</p>
+<h2>Part One: Fresh or Spoiled?</h2>
+<p>For part one, we check each ingredient against the ranges. If it falls within any range, it&#39;s fresh.</p>
+<pre><code class="language-typescript">const isInRange = (ingredient: number, [min, max]: Range): boolean =&gt; {
+    return ingredient &gt;= min &amp;&amp; ingredient &lt;= max;
+};
+
+const partOne = (input: Input, debug: boolean) =&gt; {
+    const { ranges, ingredients } = input;
+    let freshCount = 0;
+    
+    for (const ingredient of ingredients) {
+        const isFresh = ranges.some(range =&gt; isInRange(ingredient, range));
+        if (isFresh) {
+            freshCount++;
+        }
+    }
+    
+    return freshCount;
+};
+</code></pre>
+<p>Using <code>some()</code> here is important — it short-circuits on the first match. If an ingredient matches the first range out of 10,000, we don&#39;t waste time checking the other 9,999.</p>
+<h2>Part Two: Counting All Fresh IDs</h2>
+<p>Part two changes the question: how many total ingredient IDs are considered fresh? We need to count all integers covered by at least one range.</p>
+<p>This is the classic interval merging problem. It appears everywhere — scheduling, time zones, resource allocation. It&#39;s conceptually simple but notoriously easy to get wrong with off-by-one errors.</p>
+<p>The algorithm:</p>
+<ol>
+<li>Sort ranges by start value</li>
+<li>For each range, check if any previous range extends past our start</li>
+<li>If so, adjust our start to avoid double-counting</li>
+<li>Sum up the lengths</li>
+</ol>
+<pre><code class="language-typescript">const partTwo = (input: Input, debug: boolean) =&gt; {
+    const { ranges } = input;
+    
+    const sortedRanges = ranges
+        .map(range =&gt; range.slice() as Range)
+        .toSorted((a, b) =&gt; a[0] - b[0]);
+    
+    let totalCount = 0;
+    
+    for (let index = 0; index &lt; sortedRanges.length; index++) {
+        const currentRange = sortedRanges[index];
+        
+        // Find the maximum end value of all previous ranges
+        const previousMaximums = sortedRanges
+            .slice(0, index)
+            .map(([_, max]) =&gt; max);
+        const previousMax = Math.max(-Infinity, ...previousMaximums);
+        
+        // If previous ranges overlap, adjust our start
+        if (previousMax &gt;= currentRange[0]) {
+            currentRange[0] = previousMax + 1;
+        }
+        
+        // Only count if we have a valid range left
+        if (currentRange[0] &lt;= currentRange[1]) {
+            totalCount += currentRange[1] - currentRange[0] + 1;
+        }
+    }
+    
+    return totalCount;
+};
+</code></pre>
+<p>The key insight: by sorting first, we guarantee all previous ranges started before (or at) our start. We only need to check if any of them <em>end</em> after our start — that&#39;s the overlap.</p>
+<p>When we find an overlap, we adjust our start to <code>previousMax + 1</code>. If that pushes our start past our end, the range is fully subsumed and contributes zero.</p>
+<h3>Why This Works</h3>
+<p>Consider ranges <code>[3,5]</code>, <code>[10,14]</code>, <code>[12,18]</code>, <code>[16,20]</code>:</p>
+<ul>
+<li><code>[3,5]</code>: No previous ranges. Count = 3 (IDs 3,4,5)</li>
+<li><code>[10,14]</code>: Previous max is 5 &lt; 10. No overlap. Count = 5</li>
+<li><code>[12,18]</code>: Previous max is 14 ≥ 12. Adjust to <code>[15,18]</code>. Count = 4</li>
+<li><code>[16,20]</code>: Previous max is 18 ≥ 16. Adjust to <code>[19,20]</code>. Count = 2</li>
+</ul>
+<p>Total: 14 fresh ingredient IDs.</p>
+<h2>Performance</h2>
+<p>Part one is O(n×m) where n is ingredients and m is ranges. Part two is O(m² log m) due to the nested slice operations inside the loop. For the puzzle input sizes, both run in milliseconds.</p>
+<p>A more efficient part two would track <code>previousMax</code> as a running maximum rather than recalculating from scratch each iteration. But premature optimization, etc.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Interval merging is everywhere</strong>: This pattern shows up constantly in real-world scheduling problems. Worth having a solid implementation in your toolkit.</p>
+</li>
+<li><p><strong>Off-by-one errors are the enemy</strong>: The <code>+1</code> in <code>previousMax + 1</code> and the inclusive range counting (<code>max - min + 1</code>) are easy to get wrong. Work through examples on paper first.</p>
+</li>
+<li><p><strong><code>some()</code> short-circuits</strong>: When checking if <em>any</em> condition matches, <code>some()</code> is both cleaner and more efficient than a manual loop with early return.</p>
+</li>
+<li><p><strong><code>toSorted()</code> preserves the original</strong>: Unlike <code>sort()</code>, <code>toSorted()</code> returns a new array. Essential when you need the original order elsewhere (or just want to avoid mutation surprises).</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2025/day-05">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2025 — Day 5</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="04.html" rel="prev" aria-label="Previous: Day 4 — Paper Rolls and Forklifts">← Day 4 — Paper Rolls and Forklifts</a>
+<a class="next" href="06.html" rel="next" aria-label="Next: Day 6 — Trash Compactor">Day 6 — Trash Compactor →</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

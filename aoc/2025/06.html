@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 6/2025 - Trash Compactor — AoC 2025 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Cephalopod math homework and the perils of destructive input parsing. Sometimes you have to go back to the drawing board.">
+  <link rel="canonical" href="/aoc/2025/06/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 6/2025 - Trash Compactor</h1>
+        <div class="article-meta"><time datetime="2025">2025</time> · 5 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day six of AoC 2025 (available at <a href="https://adventofcode.com/2025/day/6">https://adventofcode.com/2025/day/6</a>) — we&#39;re <a href="https://www.youtube.com/watch?v=lDK9QqIzhwk" target="_blank">halfway there</a>! We&#39;ve fallen through a garbage chute and landed in a trash compactor. A family of cephalopods offers to help us escape, but first we need to help their kid with math homework.</p>
+<p>The worksheet has problems arranged in columns:</p>
+<pre><code>123 328  51 64 
+ 45 64  387 23 
+  6 98  215 314
+*   +   *   +
+</code></pre>
+<p>Each column is a separate problem. The bottom row shows the operation. So <code>123 * 45 * 6 = 33210</code>, <code>328 + 64 + 98 = 490</code>, etc.</p>
+<h2>Parsing the Input (Round One)</h2>
+<p>The format is tricky — multiple spaces separate problems, single spaces might appear within numbers due to alignment. The operation line at the bottom gives us the column boundaries.</p>
+<pre><code class="language-typescript">type Input = {
+    numbers: number[][];
+    operations: string[];
+};
+</code></pre>
+<p>My first approach: split on whitespace, filter empty strings, parse numbers. It worked for part one:</p>
+<pre><code class="language-typescript">const lines = readInputLines(day);
+const opsLine = lines.pop()!;
+
+const numbers = lines.map(line =&gt; 
+    line.split(&quot; &quot;)
+        .filter(token =&gt; token !== &quot;&quot;)
+        .map(n =&gt; parseInt(n, 10))
+);
+
+const operations = opsLine.split(&quot; &quot;)
+    .filter(token =&gt; token !== &quot;&quot;)
+    .map(op =&gt; op as &quot;+&quot; | &quot;*&quot;);
+</code></pre>
+<h2>Part One: Column Operations</h2>
+<p>With the input parsed, part one is straightforward. For each column, apply the operation to all numbers:</p>
+<pre><code class="language-typescript">const sum = (nums: number[]) =&gt; nums.reduce((a, b) =&gt; a + b, 0);
+const product = (nums: number[]) =&gt; nums.reduce((a, b) =&gt; a * b, 1);
+
+const partOne = (input: Input, debug: boolean) =&gt; {
+    const { numbers, operations } = input;
+    let total = 0;
+    
+    for (let index = 0; index &lt; operations.length; index++) {
+        const op = operations[index];
+        const nums = numbers.map(row =&gt; row[index]);
+        const operation = op === &quot;+&quot; ? sum : product;
+        total += operation(nums);
+    }
+    
+    return total;
+};
+</code></pre>
+<p>Clean and simple. Too bad part two ruins everything.</p>
+<h2>Part Two: Cephalopod Math</h2>
+<p>Here&#39;s where it gets interesting. Cephalopods don&#39;t read numbers the way we do. They read <em>right-to-left, top-to-bottom</em>. Those aren&#39;t three separate numbers <code>64</code>, <code>23</code>, <code>314</code> in a column — they&#39;re the <em>digits</em> of numbers read vertically.</p>
+<pre><code>64 
+23 
+314
+</code></pre>
+<p>Reading top-to-bottom, right-to-left: <code>4</code>, <code>3</code>, <code>4</code> forms <code>434</code>. Then <code>6</code>, <code>2</code>, <code>1</code> forms <code>621</code>. Then just <code>3</code>. So the numbers are <code>434</code>, <code>621</code>, and <code>3</code>.</p>
+<p>And here&#39;s the problem: my part one parsing <em>destroyed</em> this information. By splitting on whitespace, I lost track of which column each digit occupied.</p>
+<h2>Parsing the Input (Round Two)</h2>
+<p>Back to the drawing board. This time, preserve the exact character positions.</p>
+<p>The key insight: the operations line tells us where each problem starts and ends. Each operation plus its trailing spaces defines a column width.</p>
+<pre><code class="language-typescript">const processInput = (day: number): Input =&gt; {
+    const lines = readInputLines(day);
+    const opsLine = lines.pop()! + &quot; &quot;; // Add trailing space for consistency
+    
+    // Use regex to find each operation with its spacing
+    const match = opsLine.match(/[+*]\s*/g)!;
+    const operations: string[] = [];
+    
+    for (const op of match) {
+        operations.push(op.trim() as &quot;+&quot; | &quot;*&quot;);
+    }
+    
+    // Parse each line using the same column widths
+    const numbers = lines.map(line =&gt; {
+        const values = line + &quot; &quot;;
+        const nums: string[] = [];
+        let startIndex = 0;
+        
+        for (const op of match) {
+            const chunk = values.slice(startIndex, startIndex + op.length);
+            nums.push(chunk);
+            startIndex += op.length;
+        }
+        
+        return nums;
+    });
+    
+    return { numbers, operations };
+};
+</code></pre>
+<p>Now <code>numbers</code> is an array of string chunks that preserve spacing. For part one, just parse them as integers. For part two, we need to transpose and reconstruct.</p>
+<h2>Part Two: Matrix Transposition</h2>
+<p>Each &quot;chunk&quot; needs to be split into individual characters, then read column-by-column (transposed) to form the actual numbers:</p>
+<pre><code class="language-typescript">const partTwo = (input: Input, debug: boolean) =&gt; {
+    const { numbers, operations } = input;
+    let total = 0;
+    
+    for (let index = 0; index &lt; operations.length; index++) {
+        const op = operations[index];
+        const chunks = numbers.map(row =&gt; row[index]);
+        
+        // Split each chunk into characters
+        const chars = chunks.map(chunk =&gt; chunk.split(&quot;&quot;));
+        
+        // Transpose: read columns instead of rows
+        const maxLen = Math.max(...chars.map(c =&gt; c.length));
+        const reconstructed: number[] = [];
+        
+        for (let col = 0; col &lt; maxLen; col++) {
+            let numStr = &quot;&quot;;
+            for (let row = 0; row &lt; chars.length; row++) {
+                const char = chars[row][col];
+                if (char &amp;&amp; char !== &quot; &quot;) {
+                    numStr += char;
+                }
+            }
+            if (numStr) {
+                reconstructed.push(parseInt(numStr, 10));
+            }
+        }
+        
+        const operation = op === &quot;+&quot; ? sum : product;
+        total += operation(reconstructed);
+    }
+    
+    return total;
+};
+</code></pre>
+<p>The transposition is the tricky part. We&#39;re flipping rows into columns — each vertical slice of digits becomes a number.</p>
+<h2>Performance</h2>
+<p>Both parts run in under 10 milliseconds. The input is wide (thousands of characters per line) but not deep, so the matrix operations are fast.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Don&#39;t destroy information during parsing</strong>: My part one parser worked great — until part two revealed I&#39;d thrown away crucial positional data. When in doubt, preserve more than you think you need.</p>
+</li>
+<li><p><strong>The operations line is the key</strong>: Using the operators and their spacing as a template for parsing the number rows was the breakthrough insight.</p>
+</li>
+<li><p><strong>Matrix transposition is a common pattern</strong>: Reading columns instead of rows comes up frequently. The pattern <code>for (col) { for (row) { ... } }</code> instead of <code>for (row) { for (col) { ... } }</code> is worth having in your toolkit.</p>
+</li>
+<li><p><strong>Test with the example first</strong>: The small input made the transposition logic much easier to debug. Switching between small and large inputs during development saved a lot of time.</p>
+</li>
+<li><p><strong>Regex for structured text</strong>: The pattern <code>[+*]\s*</code> elegantly captured each operation plus its trailing spaces, giving us exact column widths.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2025/day-06">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2025 — Day 6</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="05.html" rel="prev" aria-label="Previous: Day 5 — Cafeteria Ingredients">← Day 5 — Cafeteria Ingredients</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
