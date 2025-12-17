@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Introducing GitSith — GitSith - Articles</title>
-  <meta name="description" content="A short intro to the GitSith project">
+  <meta name="description" content="A developer-oriented Git power tool for common tasks. Because the dark side has better tools.">
   <meta property="og:title" content="Introducing GitSith">
-  <meta property="og:description" content="A short intro to the GitSith project">
+  <meta property="og:description" content="A developer-oriented Git power tool for common tasks. Because the dark side has better tools.">
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/article.css">
   <script src="/assets/js/theme-switcher.js" defer></script>
@@ -21,18 +21,100 @@
     <div class="article-container container">
       <header class="article-header">
         <h1>Introducing GitSith</h1>
-        <div class="article-meta"><time datetime="2025-12-17">2025-12-17</time> · 1 min read</div>
-        <p class="article-description">A short intro to the GitSith project</p>
+        <div class="article-meta"><time datetime="2025-12-17">2025-12-17</time> · 3 min read</div>
+        <p class="article-description">A developer-oriented Git power tool for common tasks. Because the dark side has better tools.</p>
       </header>
       <div class="article-content">
-        <p>Welcome to GitSith — a small set of dev tools and UI helpers for GitHub workflows.</p>
-<h2>What to expect</h2>
+        <p>Welcome to GitSith — a developer-oriented Git power tool for common tasks. Because the dark side has better tools. ⚔️</p>
+<p>GitSith is a .NET global tool that extends Git with powerful commands for everyday workflows. By leveraging Git&#39;s subcommand discovery (any <code>git-&lt;name&gt;</code> executable in your PATH becomes <code>git &lt;name&gt;</code>), GitSith integrates seamlessly into your existing workflow.</p>
+<h2>Features</h2>
+<h3><code>git sith ignore</code></h3>
+<p>Easily add <code>.gitignore</code> templates to your repository using GitHub&#39;s official template collection.</p>
+<pre><code class="language-bash"># Add a single template
+git sith ignore node
+
+# Add multiple templates
+git sith ignore node python visualstudio
+
+# Use aliases (csharp → Dotnet, js → Node, etc.)
+git sith ignore csharp js
+
+# List all available templates
+git sith ignore --list
+
+# Show available aliases
+git sith ignore --aliases
+
+# Embrace the dark side (ignore everything)
+git sith ignore
+</code></pre>
+<h3><code>git sith force-push</code> / <code>git sith push</code></h3>
+<p>Stage all changes, commit with a message, and push to remote in one command. Perfect for quick iterations.</p>
+<pre><code class="language-bash"># Commit with a custom message and push
+git sith push &quot;Fixed the bug&quot;
+
+# Let the dark side choose your commit message
+git sith push
+# Uses random Sith quotes like &quot;Peace is a lie, there is only passion.&quot;
+</code></pre>
+<h3><code>git sith purge</code> / <code>git sith order-66</code></h3>
+<p>Remove a file from git history completely — the nuclear option. Rewrites history to eliminate all traces of a file.</p>
+<pre><code class="language-bash"># Purge a file from all history
+git sith purge secrets.txt
+
+# Use the Order 66 alias
+git sith order-66 passwords.env
+
+# With confirmation prompt
+git sith purge secrets.txt --confirm
+</code></pre>
+<p>⚠️ <strong>Warning:</strong> This rewrites git history. After purging, you&#39;ll need to force push and collaborators will need to re-clone.</p>
+<h3><code>git sith help</code></h3>
+<p>Show help for git-sith commands. Works around the issue where <code>git sith --help</code> is intercepted by Git itself.</p>
+<pre><code class="language-bash"># Show all commands
+git sith help
+
+# Show help for a specific command
+git sith help ignore
+</code></pre>
+<h2>Installation</h2>
+<h3>From GitHub Releases</h3>
+<p>Download the latest release from <a href="https://github.com/sweko/git-sith-command/releases">GitHub Releases</a>. Pre-built binaries are available for Windows, Linux, and macOS — just download, extract, and add to your PATH.</p>
+<h3>As a .NET Global Tool</h3>
+<pre><code class="language-bash"># Install from NuGet (once published)
+dotnet tool install --global GitSith
+
+# Or build and install locally
+dotnet pack
+dotnet tool install --global --add-source ./nupkg GitSith
+</code></pre>
+<h3>Build from Source</h3>
+<pre><code class="language-bash">dotnet build -c Release
+
+# On Windows:
+copy bin\Release\net8.0\git-sith.exe C:\YourPathDirectory\
+
+# On Linux/macOS:
+cp bin/Release/net8.0/git-sith /usr/local/bin/
+chmod +x /usr/local/bin/git-sith
+</code></pre>
+<h2>Requirements</h2>
 <ul>
-<li>Lightweight utilities</li>
-<li>Simple, accessible UI</li>
-<li>Thoughtful defaults</li>
+<li>.NET 8.0 SDK or later</li>
+<li>Git</li>
 </ul>
-<p>Stay tuned for more updates!</p>
+<h2>Roadmap</h2>
+<p>Future commands being considered:</p>
+<ul>
+<li><code>git sith wip</code> — Quick WIP commits</li>
+<li><code>git sith undo</code> — Safe undo operations  </li>
+<li><code>git sith clean</code> — Interactive cleanup</li>
+<li><code>git sith stats</code> — Repository statistics</li>
+<li><code>git sith alias</code> — Manage git aliases with Sith flair</li>
+</ul>
+<h2>Get Involved</h2>
+<p>Ideas and contributions are welcome! The project is MIT licensed.</p>
+<p>May the Force serve you well. 🌑</p>
 
       </div>
       <footer class="article-footer">
