@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build:articles": "ts-node scripts/build-articles.ts"
+    "build": "npm run build:articles && npm run build:aoc",
+    "build:articles": "ts-node scripts/build-articles.ts",
+    "build:aoc": "ts-node scripts/build-aoc.ts"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

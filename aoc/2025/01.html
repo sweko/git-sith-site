@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 1/2025 - Safe Cracking — AoC 2025 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Elves discover project management, and we discover JavaScript&#39;s quirky modulo behavior while cracking a safe.">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 1/2025 - Safe Cracking</h1>
+        <div class="article-meta"><time datetime="2025">2025</time> · 4 min read</div>
+      </header>
+      <div class="article-content">
+        <p>The first puzzle of 2025&#39;s AoC (available at <a href="https://adventofcode.com/2025/day/1">https://adventofcode.com/2025/day/1</a>) introduces us to a story where elves have discovered project management. Good for them. Now we need to help open a safe.</p>
+<p>The safe has a dial that starts at position 50, and we need to count the number of times the dial points at zero after processing a sequence of rotations. The dial has 100 positions (0-99) and wraps around.</p>
+<h2>Parsing the Input</h2>
+<p>The input consists of instructions in the format <code>L68</code> or <code>R30</code>, where:</p>
+<ul>
+<li><code>R</code> means rotate right (toward higher numbers: 1, 2, 3, 4...)</li>
+<li><code>L</code> means rotate left (toward lower numbers: 49, 48... 1, 0, 99, 98...)</li>
+</ul>
+<p>As always, I start by defining proper types for the data:</p>
+<pre><code class="language-typescript">type Instruction = {
+    direction: &quot;R&quot; | &quot;L&quot;;
+    steps: number;
+};
+</code></pre>
+<p>The parsing is straightforward - extract the first character as the direction and parse the rest as a number:</p>
+<pre><code class="language-typescript">const processInput = (day: number): Instruction[] =&gt; {
+    const lines = readInputLines(day);
+    const instructions = lines.map(line =&gt; {
+        const direction = line.charAt(0) as &quot;R&quot; | &quot;L&quot;;
+        const steps = parseInt(line.slice(1), 10);
+        return { direction, steps };
+    });
+    return instructions;
+};
+</code></pre>
+<h2>Part One: Counting Zero Landings</h2>
+<p>For part one, we need to count how many times the dial lands exactly on zero after applying each instruction. The naive approach would be:</p>
+<pre><code class="language-typescript">let position = 50;
+let result = 0;
+for (const instruction of input) {
+    if (instruction.direction === &quot;R&quot;) {
+        position += instruction.steps;
+    } else {
+        position -= instruction.steps;
+    }
+    position = position % 100;
+    if (position === 0) {
+        result += 1;
+    }
+}
+</code></pre>
+<p>But this doesn&#39;t work. Why? Because JavaScript&#39;s modulo operator behaves differently than in some other languages when dealing with negative numbers:</p>
+<pre><code class="language-javascript">-1 % 100   // returns -1, not 99
+-300 % 100 // returns -0 (yes, negative zero is a thing in JavaScript!)
+</code></pre>
+<h3>The <code>toLock</code> Function</h3>
+<p>We need a proper modulo function that always returns a value between 0 and 99:</p>
+<pre><code class="language-typescript">const toLock = (n: number) =&gt; (n % 100 + 100) % 100;
+</code></pre>
+<p>This works by:</p>
+<ol>
+<li>First applying <code>% 100</code>, which gives us a number between -99 and +99</li>
+<li>Adding 100 to guarantee a positive number (between 1 and 199)</li>
+<li>Applying <code>% 100</code> again to get back to the 0-99 range</li>
+</ol>
+<p>With this fix, part one returns <strong>141</strong> for my input.</p>
+<h2>Part Two: Counting Zero Crossings</h2>
+<p>Part two changes the requirement - now we need to count every time the dial <em>passes through</em> zero during rotation, not just when it lands on zero at the end.</p>
+<p>For example, starting at position 50 and rotating left 68 steps means we pass through zero once on our way to position 82.</p>
+<p>The mathematically elegant solution would be to calculate how many times we cross zero based on the start position, end position, and direction. But I chose the simpler (and admittedly less efficient) approach: simulate every single click.</p>
+<pre><code class="language-typescript">let position = 50;
+let result = 0;
+for (const instruction of input) {
+    if (instruction.direction === &quot;R&quot;) {
+        let clicks = instruction.steps;
+        while (clicks &gt; 0) {
+            position += 1;
+            position = toLock(position);
+            if (position === 0) {
+                result += 1;
+            }
+            clicks -= 1;
+        }
+    } else {
+        let clicks = instruction.steps;
+        while (clicks &gt; 0) {
+            position -= 1;
+            position = toLock(position);
+            if (position === 0) {
+                result += 1;
+            }
+            clicks -= 1;
+        }
+    }
+}
+</code></pre>
+<h3>Performance Considerations</h3>
+<p>This simulation approach is wasteful. If we rotate 200 times, we&#39;re doing 200 loop iterations when we could just calculate that we pass zero twice (200 / 100 = 2).</p>
+<p>However, a quick analysis of the input shows:</p>
+<ul>
+<li>Maximum steps per instruction: 999</li>
+<li>Total instructions: ~4,500</li>
+</ul>
+<p>That&#39;s a few million iterations at worst - child&#39;s play for modern hardware. Part two runs in about 14 milliseconds compared to 1 millisecond for part one.</p>
+<p>The answer for part two is <strong>6,634</strong>.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Know your language&#39;s quirks</strong>: JavaScript&#39;s modulo behavior with negative numbers catches many developers off guard. The pattern <code>(n % m + m) % m</code> is a common fix.</p>
+</li>
+<li><p><strong>Simple solutions are often good enough</strong>: The brute-force simulation for part two is inefficient but perfectly adequate. Premature optimization is the root of all evil, and this code is readable and obviously correct.</p>
+</li>
+<li><p><strong>Type your data early</strong>: Defining the <code>Instruction</code> type immediately makes the rest of the code cleaner and catches errors at compile time rather than runtime.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2025/day-01">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2025 — Day 1</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

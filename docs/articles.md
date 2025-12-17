@@ -28,6 +28,6 @@ npm install
 npm run build:articles
 ```
 
-Note: the build script is written in **TypeScript** and uses `ts-node`. Running `npm install` will install `ts-node` (dev dependency) so the script can run. The script will output HTML files into an `articles/` folder and generate an `articles/index.html` listing.
+Note: the build script is written in **TypeScript** and uses `ts-node`. Running `npm install` will install `ts-node` (dev dependency) so the script can run. The script will output HTML files into an `articles/` folder and generate an `articles/index.html` listing (accessible as `/articles/`).
 
 For static deployments (e.g., Cloudflare Pages), prefer committing the generated `articles/`, `assets/`, and site `index.html` to the repository so the site can be served as static files. This repo includes a `.cfignore` which excludes development-only files (TypeScript sources, scripts, node_modules, docs, source `content/`, etc.) so only the built static site files are uploaded for deployment.

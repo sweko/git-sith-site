@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Contrast Test — GitSith</title>
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <style>
+    body { padding: 2rem; align-items: stretch; display: block; }
+    .panel { background: rgba(0,0,0,0.04); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    .controls { display:flex; gap:0.75rem; align-items:center; margin-bottom:1rem }
+    table { width:100%; border-collapse: collapse; margin-top: 1rem }
+    th, td { text-align:left; padding:0.5rem; border-bottom: 1px solid rgba(0,0,0,0.06) }
+    .pass { color: green; font-weight:700 }
+    .fail { color: #b02a37; font-weight:700 }
+    .sample { padding: 1rem; border-radius: 6px; margin: 0.5rem 0; }
+    .code-sample pre { max-height: 200px; overflow:auto }
+  </style>
+</head>
+<body>
+  <h1>Contrast & Accessibility Test</h1>
+  <p class="panel">This page checks contrast ratios for several site elements under each theme (normal, light, dark). Use the controls below to run the tests. A small code sample is included to check code block contrast.</p>
+
+  <div class="controls">
+    <label>Theme:
+      <select id="themeSelect">
+        <option value="normal">Normal</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </label>
+    <button id="runBtn">Run checks</button>
+    <div id="summary" style="margin-left:auto; font-weight:700"></div>
+  </div>
+
+  <section class="panel">
+    <h2>Samples</h2>
+    <div class="sample" id="siteNavSample">
+      <nav class="site-nav" style="position:static; height:auto; padding:0.5rem;">
+        <a href="/">Home</a>
+        <a href="/articles/">Articles</a>
+        <a href="/aoc/">Advent Of Code</a>
+        <button class="theme-toggle">Theme</button>
+      </nav>
+    </div>
+
+    <div class="sample" id="articleSample">
+      <div class="article-container container">
+        <header class="article-header">
+          <h1>Day 1/2025 - Safe Cracking</h1>
+          <div class="article-meta">2025 · 4 min read</div>
+          <p class="article-description">Elves discover project management, and we discover JS modulo quirks.</p>
+        </header>
+        <div class="article-content">
+          <p>Paragraph sample content to check contrast and reading color.</p>
+          <pre><code>const example = (n) => (n % 100 + 100) % 100;</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="sample" id="cardsSample">
+      <ul class="post-list">
+        <li class="post-card"><h3>Example</h3><p class="excerpt">Excerpt text</p></li>
+      </ul>
+    </div>
+
+    <div class="sample coming-soon">
+      <strong>Coming Soon</strong>
+      <p>Preview of the coming-soon panel used on the homepage.</p>
+    </div>
+
+    <div class="sample code-sample">
+      <h3>Code view</h3>
+      <pre><code class="language-typescript">// Example code to check code block contrast
+function toLock(n: number) { return (n % 100 + 100) % 100; }</code></pre>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Results</h2>
+    <div id="results"></div>
+  </section>
+
+  <script src="/assets/js/contrast-test.js"></script>
+</body>
+</html>
