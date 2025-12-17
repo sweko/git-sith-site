@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 3/2025 - Battery Banks — AoC 2025 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Greedy digit selection from battery banks, and a lesson in not leaving ugly code behind.">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 3/2025 - Battery Banks</h1>
+        <div class="article-meta"><time datetime="2025">2025</time> · 4 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day three of AoC 2025 (available at <a href="https://adventofcode.com/2025/day/3">https://adventofcode.com/2025/day/3</a>) has us fixing an escalator by selecting batteries from banks to <a href="https://www.youtube.com/watch?v=Nnjh-zp6pP4" target="_blank">maximize joltage</a>. Each line of input represents a bank of single-digit batteries, and we need to select digits to form the largest possible number.</p>
+<h2>Parsing the Input</h2>
+<p>Each line is a sequence of digits representing a battery bank:</p>
+<pre><code class="language-typescript">type Bank = number[];
+
+const processInput = (day: number): Bank[] =&gt; {
+    const lines = readInputLines(day);
+    const banks = lines.map(line =&gt; 
+        line.split(&quot;&quot;).map(c =&gt; Number(c))
+    );
+    return banks;
+};
+</code></pre>
+<p>We split each line into individual characters and convert to numbers. Using a <code>Bank</code> type alias makes the code more semantic than <code>number[][]</code>.</p>
+<h2>Part One: Two Batteries</h2>
+<p>For part one, we need to select exactly two batteries from each bank to form a two-digit number, maximizing the result.</p>
+<p>The greedy insight: pick the largest digit that&#39;s not in the last position (so we have room for a second digit), then pick the largest digit after it.</p>
+<p>Why greedy works: <code>91</code> is always larger than <code>89</code>, regardless of what other digits are available. The first digit dominates.</p>
+<pre><code class="language-typescript">const getBankValue = (bank: Bank): number =&gt; {
+    let first = 0;
+    let firstIndex = -1;
+    
+    // Find biggest digit not in last place
+    for (let index = 0; index &lt; bank.length - 1; index++) {
+        if (bank[index] &gt; first) {
+            first = bank[index];
+            firstIndex = index;
+        }
+    }
+    
+    // Find biggest digit after the first
+    let second = 0;
+    for (let index = firstIndex + 1; index &lt; bank.length; index++) {
+        if (bank[index] &gt; second) {
+            second = bank[index];
+        }
+    }
+    
+    return 10 * first + second;
+};
+</code></pre>
+<p>One subtlety: we use strictly greater than (<code>&gt;</code>) when searching. If there are multiple 9s, we want the <em>first</em> one — that leaves more options for the second digit.</p>
+<h2>Part Two: Twelve Batteries</h2>
+<p>Part two scales up: now we need 12 digits to form a 12-digit number.</p>
+<p>The algorithm is the same, just repeated. The first digit must leave room for 11 more, the second must leave room for 10 more, and so on.</p>
+<h3>The Ugly First Attempt</h3>
+<p>My first implementation was... not pretty:</p>
+<pre><code class="language-typescript">const [first, i1] = getNextBiggest(bank, 0, 11);
+const [second, i2] = getNextBiggest(bank, i1 + 1, 10);
+const [third, i3] = getNextBiggest(bank, i2 + 1, 9);
+const [fourth, i4] = getNextBiggest(bank, i3 + 1, 8);
+// ... eight more lines ...
+const [twelfth, i12] = getNextBiggest(bank, i11 + 1, 0);
+</code></pre>
+<p>This works. It&#39;s correct. Copilot happily generated all 12 lines. But it&#39;s ugly and doesn&#39;t scale — what if we needed 20 digits?</p>
+<h3>The Refactored Version</h3>
+<p>After getting the star, I went back and fixed it:</p>
+<pre><code class="language-typescript">const getNextBiggest = (bank: Bank, startIndex: number, endOffset: number): [number, number] =&gt; {
+    let biggest = 0;
+    let biggestIndex = startIndex;
+    
+    for (let index = startIndex; index &lt; bank.length - endOffset; index++) {
+        if (bank[index] &gt; biggest) {
+            biggest = bank[index];
+            biggestIndex = index;
+        }
+    }
+    
+    return [biggest, biggestIndex];
+};
+
+const getBankValueTwo = (bank: Bank): number =&gt; {
+    let result = 0;
+    let startIndex = 0;
+    
+    for (let remaining = 11; remaining &gt;= 0; remaining--) {
+        const [biggest, index] = getNextBiggest(bank, startIndex, remaining);
+        result = result * 10 + biggest;
+        startIndex = index + 1;
+    }
+    
+    return result;
+};
+</code></pre>
+<p>The <code>endOffset</code> parameter controls how many positions we need to reserve for remaining digits. Starting at 11 (need room for 11 more), decreasing to 0 (last digit, can pick from anywhere remaining).</p>
+<h2>Performance</h2>
+<p>Both parts run in 1-2 milliseconds. The greedy approach is O(n) per bank, and we have a fixed number of banks.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Greedy works when the first choice dominates</strong>: In positional number systems, earlier digits matter exponentially more than later ones. This makes greedy selection optimal.</p>
+</li>
+<li><p><strong>Don&#39;t leave ugly code behind</strong>: The 12-line copy-paste version worked, but it was embarrassing. Taking five minutes to refactor it into a loop made the code maintainable and scalable.</p>
+</li>
+<li><p><strong>Get it working, then make it right</strong>: There&#39;s value in getting a working solution first, especially in a timed context like AoC. But don&#39;t commit the ugly version — refactor before you move on.</p>
+</li>
+<li><p><strong>Helper functions with clear contracts</strong>: <code>getNextBiggest(bank, startIndex, endOffset)</code> encapsulates the search logic cleanly. The caller just needs to track where to start and how many positions to reserve.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2025/day-03">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2025 — Day 3</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

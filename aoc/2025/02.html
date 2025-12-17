@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 2/2025 - Repeated Sequences — AoC 2025 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Finding numbers with repeated digit patterns. Sometimes brute force is the elegant solution.">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 2/2025 - Repeated Sequences</h1>
+        <div class="article-meta"><time datetime="2025">2025</time> · 4 min read</div>
+      </header>
+      <div class="article-content">
+        <p>The second puzzle of 2025&#39;s AoC (available at <a href="https://adventofcode.com/2025/day/2">https://adventofcode.com/2025/day/2</a>) has us searching through ranges of numbers for those with repeated digit patterns.</p>
+<p>The input is a single line containing comma-separated ranges like <code>11-99,100-200</code>. For each range, we need to find numbers with specific repetition properties.</p>
+<h2>Parsing the Input</h2>
+<p>The input format requires a bit of nested splitting:</p>
+<pre><code class="language-typescript">type Range = [number, number];
+
+const processInput = (day: number): Range[] =&gt; {
+    const line = readInput(day);
+    return line.split(&quot;,&quot;).map(part =&gt; 
+        part.split(&quot;-&quot;).map(s =&gt; Number(s)) as Range
+    );
+};
+</code></pre>
+<p>We split on commas to get individual ranges, then split each range on the dash to get start and end values. The <code>as Range</code> assertion tells TypeScript this is a tuple of exactly two numbers. In production code I&#39;d add validation, but for AoC we trust the input.</p>
+<h2>Part One: Finding Doubles</h2>
+<p>For part one, we need to find numbers where the <a href="https://www.youtube.com/watch?v=dD-SpHH7qDA" target="_blank">first half of digits equals the second half</a>, then sum them. Numbers like <code>1212</code>, <code>5555</code>, or <code>123123</code> qualify.</p>
+<p>The approach is straightforward:</p>
+<pre><code class="language-typescript">const checkDouble = (value: string): boolean =&gt; {
+    if (value.length % 2 !== 0) {
+        return false; // Odd length can never be a &quot;double&quot;
+    }
+    const half = value.length / 2;
+    const firstHalf = value.substring(0, half);
+    const secondHalf = value.substring(half);
+    return firstHalf === secondHalf;
+};
+
+const partOne = (input: Range[], debug: boolean) =&gt; {
+    let total = 0;
+    for (const [start, end] of input) {
+        for (let nValue = start; nValue &lt;= end; nValue++) {
+            const value = nValue.toString();
+            if (checkDouble(value)) {
+                total += nValue;
+            }
+        }
+    }
+    return total;
+};
+</code></pre>
+<p>A few notes:</p>
+<ul>
+<li>Odd-length numbers are immediately skipped — you can&#39;t split <code>12345</code> into two equal halves</li>
+<li>We work with strings for the comparison since we care about digit patterns, not numeric properties</li>
+<li>We sum the actual numbers, not count them</li>
+</ul>
+<h2>Part Two: Finding Repeated Sequences</h2>
+<p>Part two ups the ante. Now we need to find numbers composed of <em>any</em> sequence repeated at least twice. So <code>123123</code> (period 3, repeated twice), <code>111111</code> (period 1, repeated six times), and <code>21212121</code> (period 2, repeated four times) all qualify.</p>
+<p>The key insight is that for a number with <code>n</code> digits, we only need to check periods that evenly divide <code>n</code>. A 12-digit number could have periods of 1, 2, 3, 4, or 6.</p>
+<pre><code class="language-typescript">const checkMultiple = (value: string): boolean =&gt; {
+    const len = value.length;
+    
+    for (let period = 1; period &lt;= len / 2; period++) {
+        if (len % period !== 0) {
+            continue; // Period must evenly divide the length
+        }
+        
+        const segment = value.substring(0, period);
+        const repetitions = len / period;
+        const target = segment.repeat(repetitions);
+        
+        if (target === value) {
+            return true;
+        }
+    }
+    
+    return false;
+};
+</code></pre>
+<p>JavaScript&#39;s <code>String.prototype.repeat()</code> does the heavy lifting here. We extract the first <code>period</code> characters, repeat them enough times to match the original length, and compare.</p>
+<p>Note that we don&#39;t need to worry about double-counting. If <code>111111</code> matches for period 1, we return immediately — we don&#39;t care that it would also match for period 2 or 3.</p>
+<h2>Performance</h2>
+<p>The brute force approach iterates through every number in every range. With ranges potentially spanning millions of numbers, this could be slow.</p>
+<p>But it isn&#39;t. The full input runs in about 228 milliseconds.</p>
+<p>Could we optimize? Absolutely. For part one, given a range like <code>1000000-9999999</code>, we could mathematically calculate how many doubles exist without checking each number. But why bother? The code is clear, correct, and fast enough.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>String operations for digit manipulation</strong>: When you care about the <em>structure</em> of digits rather than their numeric value, convert to string early. The substring and repeat operations are cleaner than modulo arithmetic.</p>
+</li>
+<li><p><strong>Brute force has its place</strong>: Both parts iterate through potentially millions of numbers. It runs in under 250ms. Sometimes the &quot;naive&quot; solution is the right solution.</p>
+</li>
+<li><p><strong>Separation of concerns</strong>: Extracting <code>checkDouble</code> and <code>checkMultiple</code> into separate functions made refactoring from part one to part two trivial. The main loop stayed identical.</p>
+</li>
+<li><p><strong>Readability over cleverness</strong>: This code doesn&#39;t use any tricks. Anyone reading it can understand what it does. That&#39;s often more valuable than shaving off a few milliseconds.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2025/day-02">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2025 — Day 2</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

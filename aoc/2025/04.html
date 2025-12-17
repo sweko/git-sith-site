@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 4/2025 - Paper Rolls and Forklifts — AoC 2025 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Iteratively removing accessible paper rolls from a warehouse grid. A lesson in not mutating your input.">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 4/2025 - Paper Rolls and Forklifts</h1>
+        <div class="article-meta"><time datetime="2025">2025</time> · 4 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day four of AoC 2025 (available at <a href="https://adventofcode.com/2025/day/4">https://adventofcode.com/2025/day/4</a>) puts us in a warehouse with a grid of paper rolls. We&#39;re playing a <a href="https://www.youtube.com/watch?v=BiP0FpY88E4" target="_blank">forklift operator</a>, figuring out which rolls we can access and remove.</p>
+<p>A roll is accessible if it has fewer than four neighboring rolls in the eight adjacent positions. Empty spaces are marked with <code>.</code>, rolls with <code>#</code>.</p>
+<h2>Parsing the Input</h2>
+<p>The input is a straightforward character grid:</p>
+<pre><code class="language-typescript">type Cell = &quot;.&quot; | &quot;#&quot;;
+type Matrix = Cell[][];
+
+const processInput = (day: number): Matrix =&gt; {
+    const lines = readInputLines(day);
+    const cells = lines.map(line =&gt; 
+        line.split(&quot;&quot;) as Cell[]
+    );
+    return cells;
+};
+</code></pre>
+<p>Always test your input parsing before diving into the algorithm. I can&#39;t count how many times I&#39;ve debugged a &quot;broken&quot; algorithm only to find the input was malformed.</p>
+<h2>Part One: Counting Accessible Rolls</h2>
+<p>For each roll, we count its neighbors in all eight directions. If fewer than four neighbors are rolls, that roll is accessible.</p>
+<pre><code class="language-typescript">const countNeighbors = (matrix: Matrix, row: number, col: number): number =&gt; {
+    const topRow = matrix[row - 1];
+    const bottomRow = matrix[row + 1];
+    const currentRow = matrix[row];
+    
+    const topLeft = topRow?.[col - 1] === &quot;#&quot; ? 1 : 0;
+    const top = topRow?.[col] === &quot;#&quot; ? 1 : 0;
+    const topRight = topRow?.[col + 1] === &quot;#&quot; ? 1 : 0;
+    const left = currentRow?.[col - 1] === &quot;#&quot; ? 1 : 0;
+    const right = currentRow?.[col + 1] === &quot;#&quot; ? 1 : 0;
+    const bottomLeft = bottomRow?.[col - 1] === &quot;#&quot; ? 1 : 0;
+    const bottom = bottomRow?.[col] === &quot;#&quot; ? 1 : 0;
+    const bottomRight = bottomRow?.[col + 1] === &quot;#&quot; ? 1 : 0;
+    
+    return topLeft + top + topRight + left + right + bottomLeft + bottom + bottomRight;
+};
+</code></pre>
+<p>JavaScript&#39;s optional chaining (<code>?.</code>) saves us here. Accessing <code>matrix[-1]</code> returns <code>undefined</code>, and <code>undefined?.[0]</code> is also <code>undefined</code>, which is not <code>&quot;#&quot;</code>, so we get 0. No boundary checks needed.</p>
+<h3>The Mutation Bug</h3>
+<p>My first attempt modified the input matrix directly, marking accessible rolls with <code>X</code>. This broke everything — once you mark a roll as <code>X</code>, its neighbors suddenly have fewer roll neighbors, cascading incorrectly through the grid.</p>
+<p>The fix: always work on a copy.</p>
+<pre><code class="language-typescript">const copy = matrix.map(row =&gt; [...row]);
+</code></pre>
+<p>This creates an independent copy where modifications don&#39;t affect the original. I went against my instincts of never mutating input and paid for it with debugging time.</p>
+<h2>Part Two: Iterative Removal</h2>
+<p>Part two asks: keep removing accessible rolls until no more can be removed. How many total rolls do we remove?</p>
+<p>This is where a graph-based solution would shine — model each roll as a node, edges to neighbors, and update connectivity as rolls are removed. Very efficient, very elegant.</p>
+<p>But brute force works too:</p>
+<pre><code class="language-typescript">type RemovalResult = {
+    matrix: Matrix;
+    removed: number;
+};
+
+const removeLayer = (matrix: Matrix): RemovalResult =&gt; {
+    const copy = matrix.map(row =&gt; [...row]);
+    let count = 0;
+    
+    for (let row = 0; row &lt; matrix.length; row++) {
+        for (let col = 0; col &lt; matrix[row].length; col++) {
+            if (matrix[row][col] !== &quot;#&quot;) continue;
+            
+            const neighbors = countNeighbors(matrix, row, col);
+            if (neighbors &lt; 4) {
+                copy[row][col] = &quot;.&quot;;
+                count++;
+            }
+        }
+    }
+    
+    return { matrix: copy, removed: count };
+};
+
+const partTwo = (input: Matrix, debug: boolean) =&gt; {
+    let matrix = input;
+    let total = 0;
+    let passCount = 0;
+    
+    while (true) {
+        const { matrix: newMatrix, removed } = removeLayer(matrix);
+        if (removed === 0) break;
+        
+        total += removed;
+        matrix = newMatrix;
+        passCount++;
+    }
+    
+    return total;
+};
+</code></pre>
+<p>We repeatedly call <code>removeLayer</code> until it returns 0 — a stable configuration where all remaining rolls have four or more neighbors and can&#39;t be accessed.</p>
+<h2>Performance</h2>
+<p>The brute force solution runs in 77 milliseconds over 45 passes on a 140×140 grid. Could a graph solution be faster? Absolutely. Is it worth implementing? For this input size, no.</p>
+<p>My rule of thumb: optimize when you need to, not when you can. The graph approach would add complexity for negligible real-world benefit here.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Don&#39;t mutate your input</strong>: Creating a copy before modification prevents cascading bugs. The few bytes of memory are worth the sanity.</p>
+</li>
+<li><p><strong>Optional chaining for boundary conditions</strong>: JavaScript&#39;s <code>?.</code> operator elegantly handles out-of-bounds array access, returning <code>undefined</code> instead of throwing.</p>
+</li>
+<li><p><strong>Brute force has limits, but they&#39;re often far away</strong>: 45 passes over 19,600 cells in 77ms. Sometimes the &quot;naive&quot; solution is plenty fast.</p>
+</li>
+<li><p><strong>Test your input parsing first</strong>: Before writing any algorithm, verify you&#39;re reading the data correctly. It saves hours of debugging the wrong thing.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2025/day-04">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2025 — Day 4</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
