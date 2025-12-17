@@ -4,12 +4,27 @@
 .article-container {
   max-width: 1100px; /* Wider article layout */
   margin: 2rem auto;
-  background: rgba(255,255,255,0.03);
+  background: var(--article-bg);
   padding: 2rem 2.5rem; /* slightly more horizontal padding for larger layouts */
   border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  box-shadow: 0 6px 18px var(--article-shadow);
+  color: var(--text-color);
 }
 
+.article-content pre {
+  background: var(--code-bg);
+}
+
+.article-meta { color: var(--muted-color); }
+
+.article-content { color: var(--text-color); }
+
+.article-footer { color: var(--muted-color); }
+.article-meta { color: var(--muted-color); }
+
+.article-content { color: var(--text-color); }
+
+.article-footer { color: var(--muted-color); }
 @media (min-width: 1400px) {
   .article-container { max-width: 1300px; padding: 3rem 3.5rem; }
 }
@@ -25,13 +40,13 @@
 }
 
 .article-meta {
-  color: rgba(255,255,255,0.75);
+  color: var(--muted-color);
   font-size: 0.95rem;
   margin-bottom: 0.75rem;
 }
 
 .article-description {
-  color: rgba(255,255,255,0.95);
+  color: var(--text-color);
   opacity: 0.95;
   margin-bottom: 1.25rem;
 }
@@ -40,7 +55,7 @@
   text-align: left;
   line-height: 1.8;
   font-size: 1.05rem;
-  color: #f6f6f6;
+  color: var(--text-color);
 }
 
 .article-content h2,
@@ -93,12 +108,12 @@
 
 .article-content table th,
 .article-content table td {
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border-muted);
   padding: 0.6rem;
 }
 
 .article-content blockquote {
-  border-left: 4px solid rgba(255,255,255,0.12);
+  border-left: 4px solid var(--border-muted);
   padding: 0.75rem 1rem;
   margin: 1rem 0;
   background: rgba(0,0,0,0.06);
@@ -131,7 +146,7 @@
 }
 
 .post-card {
-  background: rgba(255,255,255,0.03);
+  background: var(--article-bg);
   padding: 1rem;
   border-radius: 10px;
   min-height: 140px;

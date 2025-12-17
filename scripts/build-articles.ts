@@ -45,8 +45,16 @@ function build() {
     const full = path.join(CONTENT_DIR, file);
     const raw = fs.readFileSync(full, 'utf8');
     const { data, content } = matter(raw);
-    const html = marked(content);
+    let html = marked(content);
+    // Remove leading H1 from markdown content if it matches the article title (prevents duplicated H1)
     const title = (data && (data as any).title) ? String((data as any).title) : path.basename(file, '.md');
+    const leadH1 = /^\s*<h1[^>]*>([\s\S]*?)<\/h1>\s*/i.exec(html);
+    if (leadH1 && leadH1[1]) {
+      const leadText = leadH1[1].replace(/<[^>]*>/g, '').trim();
+      if (leadText && leadText.toLowerCase() === title.toLowerCase()) {
+        html = html.replace(leadH1[0], '');
+      }
+    }
     const slug = slugify(title);
     const date = (data && (data as any).date) ? new Date(String((data as any).date)).toISOString().split('T')[0] : '';
     const description = (data && (data as any).description) ? String((data as any).description) : '';
@@ -66,11 +74,13 @@ function build() {
   <meta property="og:description" content="${escapeHtml(description || excerpt)}">
   <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
+  <script src="/assets/js/theme-switcher.js" defer></script>
 </head>
 <body>
   <nav class="site-nav">
     <a href="/">Home</a>
     <a href="/articles/index.html">Articles</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
   </nav>
   <main>
     <div class="article-container container">
@@ -104,11 +114,13 @@ function build() {
   <meta name="description" content="Latest articles from GitSith">
   <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
+  <script src="/assets/js/theme-switcher.js" defer></script>
 </head>
 <body>
   <nav class="site-nav">
     <a href="/">Home</a>
     <a href="/articles/index.html">Articles</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
   </nav>
   <main>
     <div class="container">
