@@ -21,11 +21,12 @@
     <div class="article-container container">
       <header class="article-header">
         <h1>ByteBreach 2025.2 Writeup</h1>
-        <div class="article-meta"><time datetime="2025-12-17">2025-12-17</time> · 8 min read</div>
+        <div class="article-meta"><time datetime="2025-12-17">2025-12-17</time> · 16 min read</div>
         <p class="article-description">Writeup of the ByteBreach 2025.2 cybersecurity challenge</p>
       </header>
       <div class="article-content">
-        <p><strong>Challenge:</strong> ByteBreach 2025.2<br><strong>Organizer:</strong> BeyondMachines (Bozidar Spirovski)<br><strong>Duration:</strong> December 15, 2025 – January 2, 2026<br><strong>URL:</strong> <a href="https://challenge.beyondmachines.net/">https://challenge.beyondmachines.net/</a></p>
+        <p><em>A multi-stage CTF journey through cryptography, OSINT, infrastructure security, network forensics, and steganography — with a little help from AI and a lot of science fiction references.</em></p>
+<p><strong>Challenge:</strong> ByteBreach 2025.2<br><strong>Organizer:</strong> BeyondMachines (Bozidar Spirovski)<br><strong>Duration:</strong> December 15, 2025 – January 2, 2026<br><strong>URL:</strong> <a href="https://challenge.beyondmachines.net/">https://challenge.beyondmachines.net/</a></p>
 <h2>Overview</h2>
 <p>ByteBreach 2025.2 is a multi-stage cybersecurity challenge involving OSINT, cryptography, web security, and good old-fashioned detective work. The goal is to collect 8 tokens, each leading to the next challenge. The token names follow a distinctive pattern — more on that Easter egg at the end.</p>
 <h2>Tokens Collected</h2>
@@ -116,7 +117,7 @@ Next Token: http://walloftext.codeonion.net
 </blockquote>
 <p>Translation: <em>&quot;Did you think it would be this easy?&quot;</em></p>
 <p>Well played, Bozidar. Well played.</p>
-<h3>The Real Clue</h3>
+<h3>The Actual Clue</h3>
 <p>The actual clue wasn&#39;t hidden in the HTML structure — it was hiding in plain sight within the multilingual text itself. Reading through the different language blocks, I found Portuguese text that mentioned:</p>
 <ul>
 <li>An S3 bucket on <code>eu-central</code></li>
@@ -125,8 +126,9 @@ Next Token: http://walloftext.codeonion.net
 </ul>
 <p><strong>Notes:</strong></p>
 <ul>
-<li><strong>Cicadoidea</strong> is the superfamily of cicadas — a clear nod to the famous <a href="https://en.wikipedia.org/wiki/Cicada_3301">Cicada 3301</a> internet puzzle</li>
-<li>Using Macedonian Cyrillic for the filename filters out anyone just brute-forcing common filenames</li>
+<li><strong>Cicadoidea</strong> is the superfamily of cicadas — a nod to the famous <a href="https://en.wikipedia.org/wiki/Cicada_3301">Cicada 3301</a> internet puzzle</li>
+<li>Using Macedonian Cyrillic for the filename filters out anyone brute-forcing common filenames</li>
+<li>Being from North Macedonia, I had a slight home-field advantage here 🇲🇰</li>
 </ul>
 <hr>
 <h2>Stage 5: The S3 Bucket</h2>
@@ -194,15 +196,256 @@ Maybe you need the remote_url version?
 <p>&quot;This repo is going nowhere fast. We are abandoning it.&quot;
 &quot;The latest code is published on codeonion subdomain. Whoever wants to be bothered, go there.&quot;</p>
 </blockquote>
-<p>This hints at another <code>codeonion.net</code> subdomain. With GitHub repos, there are several places to investigate:</p>
+<p>The hint points to: <strong><a href="http://secondarysanity.codeonion.net/">http://secondarysanity.codeonion.net/</a></strong></p>
+<p>Visiting this page reveals another important message:</p>
+<blockquote>
+<p>&quot;I just hope i cleaned everything from production in my latest terraform delete, including the terraform variables.&quot;</p>
+</blockquote>
+<p><strong>Red flag:</strong> &quot;terraform variables&quot; is a direct hint. Terraform variable files (<code>.tfvars</code>) often contain secrets and are frequently left exposed accidentally.</p>
+<hr>
+<h2>Stage 8: Terraform Misconfiguration</h2>
+<p><strong>URL:</strong> <a href="http://secondarysanity.codeonion.net/terraform.tfvars">http://secondarysanity.codeonion.net/terraform.tfvars</a></p>
+<p>Accessing the Terraform variables file directly reveals a classic infrastructure security mistake — exposed secrets in configuration files:</p>
+<pre><code class="language-hcl">Token 4: Requiem_for_Velocity
+
+Next Token: https://drive.google.com/file/d/1AvhGVbvA-6KscvXMHhlgdek5CDcA9N9f/view?usp=drive_link
+</code></pre>
+<p><strong>🎯 Token 4: Requiem_for_Velocity</strong></p>
+<p><strong>Real-world lesson:</strong> Terraform files (<code>.tfvars</code>, <code>.tfstate</code>, <code>terraform.tfstate.backup</code>) are treasure troves for attackers. They often contain:</p>
 <ul>
-<li>Commit history</li>
-<li>Other branches</li>
-<li>Issues and Pull Requests</li>
-<li>Actions</li>
-<li>Forks</li>
+<li>Database passwords</li>
+<li>API keys</li>
+<li>Cloud provider credentials</li>
+<li>Infrastructure secrets</li>
 </ul>
-<p><em>[To be continued...]</em></p>
+<p>Always add <code>*.tfvars</code> and <code>*.tfstate*</code> to your <code>.gitignore</code> and never expose them on web servers.</p>
+<hr>
+<h2>Stage 9: Email Forensics &amp; OSINT</h2>
+<p><strong>File:</strong> <code>interview.eml</code> (downloaded from Google Drive)</p>
+<p>The EML file contained an email with two base64-encoded attachments:</p>
+<ol>
+<li>A CV (curriculum vitae) PDF</li>
+<li><code>details.zip</code> (password-protected)</li>
+</ol>
+<h3>The CV Analysis</h3>
+<p>The CV belonged to <strong>Ivie Clayton</strong>, an Engineering Manager from Manchester. Key details:</p>
+<ul>
+<li><strong>Current job:</strong> Engineering Manager at Accenture</li>
+<li><strong>Previous:</strong> Capgemini, IBM, Wipro</li>
+<li><strong>Education:</strong> University of Toronto, graduated August 2014</li>
+<li><strong>Marathon:</strong> Boston Marathon 2019, Bib #1421</li>
+<li><strong>Blog:</strong> <a href="https://itsivie.blogspot.com">https://itsivie.blogspot.com</a></li>
+</ul>
+<h3>The Blog OSINT</h3>
+<p>Ivie&#39;s blog contained several articles:</p>
+<ul>
+<li><strong>Password best practices</strong> — ironically confessing her own bad habits</li>
+<li>Articles about her <strong>cat named Pixelate</strong></li>
+<li>Her love of <strong>running</strong></li>
+<li>Her fascination with <strong>binary palindromes</strong></li>
+</ul>
+<p>The password article contained this confession:</p>
+<blockquote>
+<p>&quot;Years ago, I used &#39;Marley2014&#39; as a password. Marley was my childhood dog. 2014 was when I graduated university.&quot;</p>
+</blockquote>
+<h3>The Password Puzzle</h3>
+<p>This was the most challenging part — a classic OSINT misdirection:</p>
+<ul>
+<li><strong>Red herring:</strong> The Marley2014 confession seemed like the obvious answer</li>
+<li><strong>Real password components:</strong><ul>
+<li><strong>Pixelate</strong> — her current cat&#39;s name</li>
+<li><strong>1421</strong> — her marathon bib number (not a year!)</li>
+</ul>
+</li>
+</ul>
+<p>The connection: <strong>1421 in binary = 10110001101</strong>, which is a <strong>binary palindrome</strong> — linking to her stated interest!</p>
+<p><strong>Password:</strong> <code>Pixelate1421</code></p>
+<h3>The Zip File</h3>
+<p>Extracting <code>details.zip</code> with the password revealed:</p>
+<pre><code>Token 5: Relativistic_Records
+
+Next Token: https://sites.google.com/view/yellowstone-transit-log/
+</code></pre>
+<p><strong>🎯 Token 5: Relativistic_Records</strong></p>
+<p><strong>Note:</strong> &quot;Yellowstone&quot; is the planet where Chasm City is located in the Revelation Space universe — continuing the Alastair Reynolds theme.</p>
+<p><strong>Lesson learned:</strong> OSINT password puzzles often combine multiple sources in non-obvious ways:</p>
+<ul>
+<li>Current pet names (not former ones mentioned as examples)</li>
+<li>Numbers that have special meaning beyond the obvious (bib number, not graduation year)</li>
+<li>Look for connections between seemingly unrelated interests (binary palindromes + marathon bib)</li>
+</ul>
+<hr>
+<h2>Stage 10: Network Forensics</h2>
+<p><strong>URL:</strong> <a href="https://sites.google.com/view/yellowstone-transit-log/">https://sites.google.com/view/yellowstone-transit-log/</a></p>
+<p>The page &quot;Artifacts of Lost Protocol&quot; contained:</p>
+<blockquote>
+<p>&quot;The data archive remains intact, despite centuries of corruption and drift.&quot;
+&quot;Patterns that once meant something to someone, somewhere, in a time now lost to relativistic lag. We were careful to keep the logs secure and we always used hex encoding.&quot;</p>
+</blockquote>
+<p>The linked file was a <strong>pcapng</strong> (packet capture) file.</p>
+<h3>Initial Analysis Challenges</h3>
+<p>Opening the file in Wireshark showed various protocols:</p>
+<ul>
+<li>TDS (SQL Server) traffic</li>
+<li>GIOP (CORBA) protocol</li>
+<li>Syslog packets</li>
+<li>Various TCP connections</li>
+</ul>
+<p>Initial attempts to find patterns in:</p>
+<ul>
+<li>TCP payload data</li>
+<li>DNS queries</li>
+<li>HTTP objects</li>
+</ul>
+<p>...all came up empty.</p>
+<h3>The Breakthrough: Syslog Packets</h3>
+<p>The key was in the <strong>Syslog packets</strong>. The clue mentioned &quot;hex encoding,&quot; and examining the syslog messages revealed hex-encoded data.</p>
+<p>Using <code>tshark</code> to extract syslog data:</p>
+<pre><code class="language-bash">tshark -r data.pcapng -Y &quot;syslog&quot; -T fields -e syslog.msg
+</code></pre>
+<p>The extracted messages contained hex-encoded ASCII that, when decoded, revealed:</p>
+<pre><code>Token6:Testament_to_Darker_Hours;Next_Token:https://sites.google.com/view/hamadryad-onion/
+</code></pre>
+<p><strong>🎯 Token 6: Testament_to_Darker_Hours</strong></p>
+<p><strong>Lesson learned:</strong> Network forensics challenges often hide data in unexpected protocols. When the clue mentions a specific encoding (hex), look for that encoding in packet payloads, especially in text-based protocols like Syslog.</p>
+<hr>
+<h2>Stage 11: Timing Attack</h2>
+<p><strong>URL:</strong> <a href="https://sites.google.com/view/hamadryad-onion/">https://sites.google.com/view/hamadryad-onion/</a></p>
+<p>The page presents a scenario: an attacker trying to breach a legacy login endpoint, armed with:</p>
+<ul>
+<li>A list of usernames with login attempt response times</li>
+<li>A password list from an infostealer</li>
+</ul>
+<p>The challenge: identify which user the stolen passwords belong to without brute-forcing all combinations.</p>
+<h3>The Timing Side-Channel</h3>
+<p>Authentication systems can leak information through response times. When a username doesn&#39;t exist, the server can reject immediately. But for valid usernames, it must:</p>
+<ol>
+<li>Look up the user</li>
+<li>Hash the provided password  </li>
+<li>Compare to the stored hash</li>
+</ol>
+<p>This takes measurably longer.</p>
+<h3>Finding the Outlier</h3>
+<p>Examining the response times from the pastebin:</p>
+<ul>
+<li>Most responses: 5-50 ms</li>
+<li><strong>One outlier: 380 ms</strong> (7-10x longer!)</li>
+</ul>
+<p>The user with the 380ms response time is the valid account — the one whose credentials were stolen.</p>
+<h3>The Brute Force Script</h3>
+<p>With the target identified, I created a PowerShell script to test all ~100 stolen passwords against this single user:</p>
+<pre><code class="language-powershell">$url = &quot;https://yieldcat.com/api/legacy-login&quot;
+$username = &quot;mrobshaw@comcast.net&quot;
+
+foreach ($password in $passwords) {
+    $body = @{ username = $username; password = $password } | ConvertTo-Json
+    # POST with 10-second delay between attempts
+    # Handle 429 rate limits with 60-second backoff
+}
+</code></pre>
+<p><strong>Aside:</strong> Claude initially refused to generate this script, interpreting it as credential stuffing. After clarifying that yieldcat.com is a legitimate security training platform (which Claude verified via web search), it assisted. A good reminder that AI guardrails sometimes need context.</p>
+<h3>The Result</h3>
+<p>One of the passwords worked, revealing:</p>
+<pre><code>Token7:Paradox_Deferred;
+Next Token:https://drive.google.com/file/d/1pba2FYbH5oxujuYE-AnQogkxBGt4uDYi/view?usp=sharing
+</code></pre>
+<p><strong>🎯 Token 7: Paradox_Deferred</strong></p>
+<p><strong>Lesson learned:</strong> Timing side-channels are real vulnerabilities. Authentication systems should use constant-time comparison functions to prevent username enumeration.</p>
+<hr>
+<h2>Stage 12: Steganography</h2>
+<p><strong>File:</strong> <code>difference.zip</code> (from Google Drive)</p>
+<p>The zip contained two files:</p>
+<ul>
+<li><code>n1.png</code> - appears to be random noise</li>
+<li><code>n2.png</code> - also appears to be random noise</li>
+</ul>
+<p>Two nearly identical noisy images is a classic steganography setup. The hidden message is likely encoded in the <em>differences</em> between the images.</p>
+<p>Common techniques:</p>
+<ul>
+<li>XOR the two images together</li>
+<li>Subtract pixel values and look for patterns</li>
+<li>Compare LSB (Least Significant Bit) differences</li>
+<li>Look at specific color channels</li>
+</ul>
+<h3>The Steganography Technique</h3>
+<p>The solution involved XORing the two images together:</p>
+<pre><code class="language-python">from PIL import Image
+import numpy as np
+
+img1 = Image.open(&#39;n1.png&#39;)
+img2 = Image.open(&#39;n2.png&#39;)
+
+arr1 = np.array(img1)
+arr2 = np.array(img2)
+
+xor_result = arr1 ^ arr2
+</code></pre>
+<p>The XOR values clustered in two ranges: 0-15 and 240-255 (0xF0-0xFF). This indicated data hidden in the <strong>high nibble (upper 4 bits)</strong>.</p>
+<p>Further analysis revealed:</p>
+<ul>
+<li><strong>High nibble:</strong> Binary values only (0x0 or 0xF)</li>
+<li><strong>Low nibble:</strong> Random values 0-15 (noise/camouflage)</li>
+</ul>
+<p>Extracting pixels where the high nibble differs:</p>
+<pre><code class="language-python">high_nibble_binary = ((xor_result &gt;&gt; 4) &gt; 0).astype(np.uint8) * 255
+Image.fromarray(high_nibble_binary).save(&#39;hidden.png&#39;)
+</code></pre>
+<p>The resulting image revealed text:</p>
+<p><strong>🎯 Token 8: Doctrine_of_Receding_Light</strong></p>
+<h3>Visual Cryptography</h3>
+<p>This is classic <strong>visual cryptography</strong> - neither image alone reveals anything meaningful (both appear as random noise), but combining them mathematically exposes the hidden message. The low nibble randomness serves as camouflage to make the images appear completely random.</p>
+<hr>
+<h2>Challenge Complete! 🏆</h2>
+<p>All 8 tokens collected:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Token</th>
+<th>Challenge Type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Calibrated_Absence</td>
+<td>HTML metadata + OTP cryptography</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Threshold_of_Antiquity</td>
+<td>Multilingual OSINT + S3 bucket</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Trajectory_Uncertain</td>
+<td>JavaScript deobfuscation</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Requiem_for_Velocity</td>
+<td>Terraform misconfiguration</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Relativistic_Records</td>
+<td>Email forensics + OSINT password</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Testament_to_Darker_Hours</td>
+<td>Network forensics (pcapng/Syslog)</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Paradox_Deferred</td>
+<td>Timing attack + credential testing</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Doctrine_of_Receding_Light</td>
+<td>Visual cryptography/steganography</td>
+</tr>
+</tbody></table>
 <hr>
 <h2>Easter Egg: The Token Names</h2>
 <p>The eight token names follow a very distinctive naming pattern:</p>
@@ -256,13 +499,35 @@ Maybe you need the remote_url version?
 <p>Lighthuggers are massive interstellar spacecraft that travel at relativistic speeds (hence &quot;light-huggers&quot; — they hug close to the speed of light). The poetic, melancholic names reflect the existential weight of centuries-long journeys and the time dilation that separates crews from everyone they ever knew.</p>
 <p>Bozidar Spirovski is clearly a fan. The token names aren&#39;t just identifiers — they&#39;re a love letter to hard science fiction.</p>
 <hr>
+<h2>Working with Claude</h2>
+<p>I tackled this CTF with Claude as my AI partner throughout. Some observations:</p>
+<p><strong>Where Claude excelled:</strong></p>
+<ul>
+<li>OTP decryption and cryptographic calculations</li>
+<li>Explaining steganography techniques and writing Python extraction scripts</li>
+<li>Network forensics analysis with tshark</li>
+<li>Research on real-world security incidents (the Shai-Hulud supply chain attack)</li>
+</ul>
+<p><strong>Where Claude struggled:</strong></p>
+<ul>
+<li>Static JavaScript deobfuscation when runtime shuffling was involved (the browser debugger was the right tool)</li>
+<li>Initial refusal on the brute-force script (needed context that this was a legitimate CTF)</li>
+<li>Getting confused when decrypted output &quot;didn&#39;t look right&quot; (passwords aren&#39;t sentences!)</li>
+</ul>
+<p>The takeaway: AI is a powerful CTF partner for analysis, scripting, and research — but knowing when to reach for browser DevTools or other specialized tools remains essential.</p>
+<hr>
 <h2>Tools Used</h2>
 <ul>
 <li>Browser developer tools (View Source, Inspect Element, Console, Debugger)</li>
-<li>Claude (for OTP decryption, research, and attempted JS deobfuscation)</li>
+<li>Claude (for OTP decryption, research, JS deobfuscation attempts, pcapng analysis)</li>
+<li>Python with PIL/NumPy (for steganography extraction)</li>
 <li>Basic knowledge of AWS S3 URL structure</li>
 <li>Google Translate (for the Arabic red herring)</li>
 <li>A reading knowledge of Macedonian Cyrillic</li>
+<li>PowerShell scripts (for base64 decoding, credential testing)</li>
+<li>Wireshark / tshark (for pcapng network forensics)</li>
+<li>7-Zip or similar (for password-protected zip extraction)</li>
+<li>Patience (for the OSINT password puzzle)</li>
 </ul>
 <hr>
 <h2>Key Takeaways</h2>
@@ -281,9 +546,23 @@ Maybe you need the remote_url version?
 </li>
 <li><p><strong>Check multiple angles on GitHub</strong> — Repos can hide secrets in commit history, branches, issues, actions, and more.</p>
 </li>
+<li><p><strong>Terraform files are security goldmines</strong> — Always check for exposed <code>.tfvars</code> and <code>.tfstate</code> files. They frequently contain credentials.</p>
+</li>
+<li><p><strong>OSINT requires connecting disparate sources</strong> — The password combined current cat name + marathon bib (not graduation year). Look for non-obvious connections.</p>
+</li>
+<li><p><strong>Network forensics: follow the encoding hint</strong> — When a clue mentions &quot;hex encoding,&quot; look for hex in packet payloads. Syslog and other text protocols are good hiding spots.</p>
+</li>
+<li><p><strong>Don&#39;t overthink red herrings</strong> — The Marley2014 confession was a decoy. Sometimes the most &quot;obvious&quot; answer is intentional misdirection.</p>
+</li>
+<li><p><strong>Timing attacks reveal valid accounts</strong> — Response time differences can leak whether a username exists. Look for statistical outliers.</p>
+</li>
+<li><p><strong>AI assistants need context</strong> — Claude refused to help with credential testing until it understood the legitimate CTF context. Be prepared to explain your use case.</p>
+</li>
 </ol>
 <hr>
-<p><em>Writeup in progress. More stages to be documented as the challenge continues.</em></p>
+<h2>Acknowledgments</h2>
+<p>Thanks to Bozidar Spirovski and <a href="https://beyondmachines.net">BeyondMachines</a> for creating an excellent challenge that covered real-world security concepts while keeping things fun. The Alastair Reynolds theming was a delightful touch — I&#39;ll never look at lighthugger names the same way again.</p>
+<p>If you enjoyed this writeup, check out the <a href="https://beyondmachines.net">BeyondMachines training platform</a> for more security challenges.</p>
 
       </div>
       <footer class="article-footer">
