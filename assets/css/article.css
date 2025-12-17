@@ -174,3 +174,15 @@
   .article-header h1 { font-size: 1.6rem; }
   .article-container { padding: 1rem; margin: 0.5rem; }
 }
+
+/* AoC day nav */
+.aoc-nav{
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  margin-top:1rem;
+}
+.aoc-nav a{ color: var(--accent); text-decoration:none; padding:0.2rem 0.5rem; border-radius:4px; }
+.aoc-nav a:focus{ outline: 2px solid var(--accent); outline-offset:3px }
+.aoc-nav a.prev{ text-align:left }
+.aoc-nav a.next{ text-align:right }

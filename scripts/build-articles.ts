@@ -72,6 +72,7 @@ function build() {
   <meta name="description" content="${escapeHtml(description || excerpt)}">
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description || excerpt)}">
+  <link rel="canonical" href="/articles/${slug}/">
   <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
   <script src="/assets/js/theme-switcher.js" defer></script>
@@ -113,6 +114,7 @@ function build() {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Articles — ${SITE_TITLE}</title>
   <meta name="description" content="Latest articles from GitSith">
+  <link rel="canonical" href="/articles/">
   <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
   <script src="/assets/js/theme-switcher.js" defer></script>

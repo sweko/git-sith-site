@@ -83,8 +83,7 @@ const indexHtml = `<!doctype html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Advent Of Code — ${SITE_TITLE}</title>
-  <link rel="stylesheet" href="${CSS_PATH}">
+  <title>Advent Of Code — ${SITE_TITLE}</title>  <link rel="canonical" href="/aoc/">  <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
   <script src="/assets/js/theme-switcher.js" defer></script>
 </head>
@@ -121,6 +120,7 @@ for (const y of Object.keys(years)) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AoC ${y} — ${SITE_TITLE}</title>
+  <link rel="canonical" href="/aoc/${y}/">
   <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
   <script src="/assets/js/theme-switcher.js" defer></script>
@@ -145,8 +145,12 @@ for (const y of Object.keys(years)) {
 
   fs.writeFileSync(path.join(ydir, 'index.html'), yearIndex, 'utf8');
 
-  // Write day pages
-  for (const d of daysForYear) {
+  // Write day pages (with previous/next links when available)
+  for (let i = 0; i < daysForYear.length; i++) {
+    const d = daysForYear[i];
+    const prev = i > 0 ? daysForYear[i - 1] : null;
+    const next = i < daysForYear.length - 1 ? daysForYear[i + 1] : null;
+
     const srcFile = d.srcFile ? d.srcFile : `day-${d.day}-${y}.md`;
     const src = path.join(CONTENT_DIR, srcFile);
     let raw = '';
@@ -166,6 +170,11 @@ for (const y of Object.keys(years)) {
     const excerpt = d.description || getExcerpt(content || '');
     const readingMinutes = getReadingTime(content || '');
 
+    const navLinks = [] as string[];
+    if (prev) navLinks.push(`<a class="prev" href="${prev.filename}" rel="prev" aria-label="Previous: Day ${parseInt(prev.day,10)} — ${escapeHtml(prev.title)}">← Day ${parseInt(prev.day,10)} — ${escapeHtml(prev.title)}</a>`);
+    if (next) navLinks.push(`<a class="next" href="${next.filename}" rel="next" aria-label="Next: Day ${parseInt(next.day,10)} — ${escapeHtml(next.title)}">Day ${parseInt(next.day,10)} — ${escapeHtml(next.title)} →</a>`);
+    const navHtml = navLinks.length ? `<nav class="aoc-nav" aria-label="Advent Of Code navigation">${navLinks.join('\n')}</nav>` : '';
+
     const page = `<!doctype html>
 <html lang="en">
 <head>
@@ -173,9 +182,11 @@ for (const y of Object.keys(years)) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Day ${parseInt(d.day,10)}/${y} - ${escapeHtml(d.title)} — AoC ${y} — ${SITE_TITLE}</title>
   <meta name="description" content="${escapeHtml(d.description || excerpt)}">
+  <link rel="canonical" href="/aoc/${y}/${d.day}/">
   <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
   <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
 </head>
 <body>
   <nav class="site-nav">
@@ -195,6 +206,7 @@ for (const y of Object.keys(years)) {
       </div>
       <footer class="article-footer">
         <p>Advent Of Code ${y} — Day ${parseInt(d.day,10)}</p>
+        ${navHtml}
       </footer>
     </div>
   </main>
