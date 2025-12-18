@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 1/2024 - Historian Hysteria — AoC 2024 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Sorting lists, calculating distances, and building histograms. The 2024 adventure begins with a missing historian.">
+  <link rel="canonical" href="/aoc/2024/01/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 1/2024 - Historian Hysteria</h1>
+        <div class="article-meta"><time datetime="2024">2024</time> · 4 min read</div>
+      </header>
+      <div class="article-content">
+        <p>The first puzzle of 2024&#39;s AoC (available at <a href="https://adventofcode.com/2024/day/1">https://adventofcode.com/2024/day/1</a>) kicks off with a mystery: the chief historian has gone missing. <a href="https://www.youtube.com/watch?v=X5jlTlUTWfQ" target="_blank">Where did he go?</a> Two groups of historians have compiled lists of location IDs to check, but the lists don&#39;t match up.</p>
+<p>The input gives us two columns of numbers — left list and right list — separated by spaces.</p>
+<h2>Parsing the Input</h2>
+<p>The format looks simple, but there&#39;s a catch: the spacing isn&#39;t consistent. Some inputs have two spaces between columns, others have three. I hardcoded the split on the spaces I saw:</p>
+<pre><code class="language-typescript">type Pair = [number[], number[]];
+
+const processInput = (day: number): Pair =&gt; {
+    const lines = readInputLines(day);
+    const first: number[] = [];
+    const second: number[] = [];
+    
+    for (const line of lines) {
+        const [left, right] = line.split(&quot;   &quot;); // Three spaces
+        first.push(Number(left));
+        second.push(Number(right));
+    }
+    
+    return [first, second];
+};
+</code></pre>
+<p>A regex split on <code>\s+</code> would be more robust, but this worked for the actual input.</p>
+<h2>Part One: Total Distance</h2>
+<p>We need to pair up the smallest number in the left list with the smallest in the right list, then the second-smallest with second-smallest, and so on. For each pair, calculate the distance (absolute difference) and sum them all.</p>
+<p>The approach: sort both lists, then iterate through them in parallel.</p>
+<pre><code class="language-typescript">const partOne = (input: Pair, debug: boolean) =&gt; {
+    const [first, second] = input;
+    
+    const fSorted = first.toSorted((a, b) =&gt; a - b);
+    const sSorted = second.toSorted((a, b) =&gt; a - b);
+    
+    let totalDistance = 0;
+    for (let index = 0; index &lt; fSorted.length; index++) {
+        const distance = Math.abs(fSorted[index] - sSorted[index]);
+        totalDistance += distance;
+    }
+    
+    return totalDistance;
+};
+</code></pre>
+<h3>JavaScript Sorting Gotcha</h3>
+<p>If you just call <code>array.sort()</code> on numbers in JavaScript, you get lexicographic sorting:</p>
+<pre><code class="language-javascript">[1, 2, 5, 4, 10].sort()  // Returns [1, 10, 2, 4, 5] — wrong!
+</code></pre>
+<p>The string &quot;10&quot; comes before &quot;2&quot; alphabetically. Always provide a comparison function for numeric sorting: <code>(a, b) =&gt; a - b</code>.</p>
+<h3>The Absolute Value Trap</h3>
+<p>The puzzle talks about &quot;distance,&quot; which is always positive. But if you compute <code>first - second</code> without <code>Math.abs()</code>, you&#39;ll get negative values when the right number is larger. Those negative values will cancel out positive ones in your sum, giving the wrong answer.</p>
+<p>This wasn&#39;t explicitly stated in the puzzle, but &quot;distance&quot; implies absolute value. A trap waiting to catch the unwary.</p>
+<h2>Part Two: Similarity Score</h2>
+<p>Part two changes the metric entirely. Now we calculate a &quot;similarity score&quot; by multiplying each number in the left list by how many times it appears in the right list.</p>
+<p>This screams &quot;histogram&quot; — build a frequency map of the right list, then iterate through the left list:</p>
+<pre><code class="language-typescript">const histogram = (input: number[]): Map&lt;number, number&gt; =&gt; {
+    const result = new Map&lt;number, number&gt;();
+    for (const num of input) {
+        const count = result.get(num) ?? 0;
+        result.set(num, count + 1);
+    }
+    return result;
+};
+
+const partTwo = (input: Pair, debug: boolean) =&gt; {
+    const [first, second] = input;
+    
+    const fHist = histogram(first);
+    const sHist = histogram(second);
+    
+    let similarity = 0;
+    for (const [key, times] of fHist) {
+        const occurrences = sHist.get(key) ?? 0;
+        const score = key * times * occurrences;
+        similarity += score;
+    }
+    
+    return similarity;
+};
+</code></pre>
+<p>Note: we iterate over the <em>histogram</em> of the first list, not the list itself. If <code>3</code> appears three times in the left list and three times in the right list, we compute <code>3 * 3 * 3 = 27</code> once, rather than computing <code>3 * 3 = 9</code> three separate times. Same result, cleaner logic.</p>
+<h2>Performance</h2>
+<p>Both parts run instantly. Part one is O(n log n) for the sorting. Part two is O(n) for building histograms and iterating.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>JavaScript sorting is lexicographic by default</strong>: Always provide a numeric comparison function when sorting numbers. This trips up even experienced developers.</p>
+</li>
+<li><p><strong>Distance means absolute value</strong>: When a puzzle says &quot;distance,&quot; think <code>Math.abs()</code>. The difference between two numbers can be negative; the distance cannot.</p>
+</li>
+<li><p><strong>Histograms for frequency counting</strong>: When you need to count occurrences, build a frequency map first. It&#39;s cleaner than nested loops and often more efficient.</p>
+</li>
+<li><p><strong><code>toSorted()</code> vs <code>sort()</code></strong>: The newer <code>toSorted()</code> returns a new array, leaving the original unchanged. Use it when you don&#39;t want to mutate your input.</p>
+</li>
+<li><p><strong>Test your input parsing</strong>: The inconsistent spacing between columns was a minor gotcha. Always verify you&#39;re reading the data correctly before diving into the algorithm.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2024/ts/day-01">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2024 — Day 1</p>
+        
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
