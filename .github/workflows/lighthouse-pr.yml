@@ -57,8 +57,20 @@ jobs:
             --output html --output-path ./dev/lighthouse-reports/homepage-mobile.html \
             --preset=mobile --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--no-sandbox"
 
+      - name: Capture mobile screenshots
+        run: |
+          # ensure node deps are available
+          npm ci
+          node scripts/capture-screenshots.js
+
       - name: Upload Lighthouse reports
         uses: actions/upload-artifact@v4
         with:
           name: lighthouse-reports
           path: ./dev/lighthouse-reports
+
+      - name: Upload mobile screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-screenshots
+          path: ./dev/screenshots
