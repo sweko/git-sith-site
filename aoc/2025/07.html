@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 7/2025 - Laser Splitters — AoC 2025 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Beam splitting, path counting, and the magic of memoization. When recursion needs a cache to survive.">
+  <link rel="canonical" href="/aoc/2025/07/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 7/2025 - Laser Splitters</h1>
+        <div class="article-meta"><time datetime="2025">2025</time> · 5 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day seven of AoC 2025 (available at <a href="https://adventofcode.com/2025/day/7">https://adventofcode.com/2025/day/7</a>) brings us more than halfway through this year&#39;s 12-day event. We&#39;re working with lasers and splitters in some kind of teleporter mechanism.</p>
+<p>A laser enters from a starting position marked <code>S</code>, travels downward through the grid, and encounters splitters along the way. When a beam hits a splitter, it creates a <a href="https://www.youtube.com/watch?v=MM62wjLrgmA" target="_blank">schism</a> — splitting into two paths, left and right.</p>
+<h2>Parsing the Input</h2>
+<p>The input is a simple character grid:</p>
+<pre><code class="language-typescript">type Cell = &quot;S&quot; | &quot;.&quot; | &quot;\\&quot;;
+type Matrix = Cell[][];
+
+const processInput = (day: number): Matrix =&gt; {
+    const lines = readInputLines(day);
+    return lines.map(line =&gt; line.split(&quot;&quot;) as Cell[]);
+};
+</code></pre>
+<p>The grid has empty spaces (<code>.</code>), the start position (<code>S</code>), and splitters. Conveniently, every even row is empty, so we never have adjacent splitters — and we never go out of bounds.</p>
+<h2>Part One: Counting Activated Splitters</h2>
+<p>For part one, track where beams go and count how many splitters get activated. The twist: when two beams arrive at the same splitter, it only counts once.</p>
+<pre><code class="language-typescript">const partOne = (input: Matrix, debug: boolean) =&gt; {
+    const firstRow = input[0];
+    const startCol = firstRow.indexOf(&quot;S&quot;);
+    
+    let beamLocations = [startCol];
+    let activatedSplitters = 0;
+    
+    for (let row = 1; row &lt; input.length; row++) {
+        const currentRow = input[row];
+        const temps: number[] = [];
+        
+        for (const col of beamLocations) {
+            if (currentRow[col] === &quot;\\&quot;) {
+                activatedSplitters++;
+                temps.push(col - 1); // Split left
+                temps.push(col + 1); // Split right
+            } else {
+                temps.push(col); // Continue straight
+            }
+        }
+        
+        // Remove duplicates — two beams at same position merge
+        beamLocations = [...new Set(temps)];
+    }
+    
+    return activatedSplitters;
+};
+</code></pre>
+<p>The <code>Set</code> trick handles the merging elegantly. If two beams land on the same column, they become one beam going forward.</p>
+<h2>Part Two: Quantum Paths</h2>
+<p>Part two changes everything. Now we need to count <em>all possible paths</em> a particle could take if it randomly chose left or right at each splitter. This is no longer about tracking positions — it&#39;s about counting combinations.</p>
+<p>The recursive approach is natural:</p>
+<pre><code class="language-typescript">type Point = { row: number; col: number };
+
+const countMoves = (input: Matrix, beamLocation: Point): number =&gt; {
+    const { row, col } = beamLocation;
+    
+    // Reached the bottom — one valid path
+    if (row === input.length - 1) {
+        return 1;
+    }
+    
+    const nextRow = input[row + 1];
+    const isSplitter = nextRow[col] === &quot;\\&quot;;
+    
+    if (isSplitter) {
+        const leftMoves = countMoves(input, { row: row + 1, col: col - 1 });
+        const rightMoves = countMoves(input, { row: row + 1, col: col + 1 });
+        return leftMoves + rightMoves;
+    } else {
+        return countMoves(input, { row: row + 1, col: col });
+    }
+};
+</code></pre>
+<p>Clean, elegant, obviously correct. And completely unusable.</p>
+<h3>The Performance Problem</h3>
+<p>Running this on the real input, I added some logging to see progress. After letting it run for a while, it had made over 3 <em>billion</em> recursive calls and wasn&#39;t close to finishing. The recursion tree explodes exponentially.</p>
+<p>But here&#39;s the key insight: it doesn&#39;t matter <em>how</em> a beam got to position (row, col). The number of paths from that point forward is always the same. We&#39;re recalculating the same subproblems billions of times.</p>
+<h3>Memoization to the Rescue</h3>
+<pre><code class="language-typescript">const countMoves = (input: Matrix, beamLocation: Point, cache: Record&lt;string, number&gt;): number =&gt; {
+    const { row, col } = beamLocation;
+    const key = `${row},${col}`;
+    
+    if (cache[key] !== undefined) {
+        return cache[key];
+    }
+    
+    if (row === input.length - 1) {
+        cache[key] = 1;
+        return 1;
+    }
+    
+    const nextRow = input[row + 1];
+    const isSplitter = nextRow[col] === &quot;\\&quot;;
+    
+    let result: number;
+    if (isSplitter) {
+        const leftMoves = countMoves(input, { row: row + 1, col: col - 1 }, cache);
+        const rightMoves = countMoves(input, { row: row + 1, col: col + 1 }, cache);
+        result = leftMoves + rightMoves;
+    } else {
+        result = countMoves(input, { row: row + 1, col: col }, cache);
+    }
+    
+    cache[key] = result;
+    return result;
+};
+</code></pre>
+<p>The cache stores results for each (row, col) position. Once we&#39;ve calculated how many paths lead from a position to the bottom, we never recalculate it.</p>
+<p>The result? A 14-digit number (trillions of paths) computed in milliseconds instead of millennia.</p>
+<h2>Why Memoization Works Here</h2>
+<p>This is a classic dynamic programming scenario. The problem has <em>optimal substructure</em> (the answer depends on answers to smaller subproblems) and <em>overlapping subproblems</em> (we solve the same subproblems repeatedly).</p>
+<p>Without caching, we traverse the same positions over and over through different paths. With caching, each position is computed exactly once, and subsequent visits just look up the cached value.</p>
+<p>The difference: O(2^n) becomes O(n×m) where n and m are the grid dimensions.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Recursion is elegant but dangerous</strong>: The recursive solution is beautiful and obviously correct. It&#39;s also completely impractical without optimization.</p>
+</li>
+<li><p><strong>Memoization transforms exponential to polynomial</strong>: Adding a cache turned an impossible computation into a trivial one. Same algorithm, vastly different performance.</p>
+</li>
+<li><p><strong>Position is all that matters</strong>: The key insight is that the path history doesn&#39;t affect the future. Only the current position determines the number of remaining paths.</p>
+</li>
+<li><p><strong>Use strings for cache keys</strong>: JavaScript doesn&#39;t have structural equality for objects. Converting <code>{row, col}</code> to <code>&quot;row,col&quot;</code> gives us a usable hash key.</p>
+</li>
+<li><p><strong>Monitor your recursion</strong>: Adding logging to track progress revealed that the naive solution was making billions of calls. When recursion seems slow, instrument it to understand why.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2025/day-07">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2025 — Day 7</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="06.html" rel="prev" aria-label="Previous: Day 6 — Trash Compactor">← Day 6 — Trash Compactor</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
