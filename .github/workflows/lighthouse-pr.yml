@@ -1,0 +1,64 @@
+name: Lighthouse PR report
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  lighthouse:
+    name: Run Lighthouse (mobile) and upload reports
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
+      - name: Serve site
+        run: npx http-server ./ -p 8080 &
+
+      - name: Wait for server
+        run: |
+          for i in {1..10}; do
+            if curl -sSf http://127.0.0.1:8080 >/dev/null; then
+              echo Server is up
+              break
+            fi
+            sleep 1
+          done
+
+      - name: Create reports dir
+        run: mkdir -p ./dev/lighthouse-reports
+
+      - name: Lighthouse — AoC Day 7 (mobile)
+        run: |
+          npx -y lighthouse http://127.0.0.1:8080/aoc/2025/07.html \
+            --output html --output-path ./dev/lighthouse-reports/aoc-day07-mobile.html \
+            --preset=mobile --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--no-sandbox"
+
+      - name: Lighthouse — Article: Introducing GitSith (mobile)
+        run: |
+          npx -y lighthouse http://127.0.0.1:8080/articles/introducing-gitsith.html \
+            --output html --output-path ./dev/lighthouse-reports/introducing-gitsith-mobile.html \
+            --preset=mobile --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--no-sandbox"
+
+      - name: Lighthouse — Homepage (mobile)
+        run: |
+          npx -y lighthouse http://127.0.0.1:8080/ \
+            --output html --output-path ./dev/lighthouse-reports/homepage-mobile.html \
+            --preset=mobile --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--no-sandbox"
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: ./dev/lighthouse-reports
