@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 1/2022 - Calorie Counting — AoC 2022 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Parsing grouped input and finding the hungriest elves. Array helpers to the rescue.">
+  <link rel="canonical" href="/aoc/2022/01/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 1/2022 - Calorie Counting</h1>
+        <div class="article-meta"><time datetime="2022">2022</time> · 3 min read</div>
+      </header>
+      <div class="article-content">
+        <p>The first puzzle of 2022&#39;s AoC (available at <a href="https://adventofcode.com/2022/day/1">https://adventofcode.com/2022/day/1</a>) sends us into the jungle with a group of elves. <a href="https://www.youtube.com/watch?v=o1tj2zJ2Wvg" target="_blank">Welcome to the jungle</a> — we&#39;re here to find magical star fruit, but first we need to figure out who&#39;s carrying the most snacks.</p>
+<p>Each elf has written down the calorie values of their snacks, separated by blank lines between elves:</p>
+<pre><code>1000
+2000
+3000
+
+4000
+
+5000
+6000
+</code></pre>
+<p>The first elf has three items (1000 + 2000 + 3000 = 6000 calories), the second has one (4000), and so on.</p>
+<h2>Parsing the Input</h2>
+<p>The input format is the tricky part here. We have numbers separated by blank lines, where blank lines mark the boundary between elves. This requires a different approach than the typical &quot;one item per line&quot; parsing:</p>
+<pre><code class="language-typescript">const processInput = (lines: string[]): number[][] =&gt; {
+    const elves: number[][] = [[]];
+    
+    for (const line of lines) {
+        if (line === &quot;&quot;) {
+            elves.push([]); // Start a new elf
+        } else {
+            elves[elves.length - 1].push(Number(line));
+        }
+    }
+    
+    return elves;
+};
+</code></pre>
+<p>We start with one empty array (the first elf), then either add to the current elf or start a new one when we hit a blank line. The result is an array of arrays — each inner array contains one elf&#39;s snack calories.</p>
+<h2>Part One: Hungriest Elf</h2>
+<p>Find the elf carrying the most total calories. Map each elf to their sum, then find the maximum:</p>
+<pre><code class="language-typescript">const partOne = (elves: number[][], debug: boolean) =&gt; {
+    const totals = elves.map(elf =&gt; elf.reduce((a, b) =&gt; a + b, 0));
+    return Math.max(...totals);
+};
+</code></pre>
+<p>I actually have a bunch of array helper methods I&#39;ve built up over time — <code>sum</code>, <code>max</code>, <code>maxBy</code>, and others. Slightly shameful prototype pollution, but incredibly useful for AoC:</p>
+<pre><code class="language-typescript">const partOne = (elves: number[][], debug: boolean) =&gt; {
+    return elves.map(elf =&gt; elf.sum()).max();
+};
+</code></pre>
+<p>Same logic, cleaner syntax.</p>
+<h2>Part Two: Top Three</h2>
+<p>Find the sum of calories carried by the top three elves. Sort the totals in descending order, take the first three, sum them:</p>
+<pre><code class="language-typescript">const partTwo = (elves: number[][], debug: boolean) =&gt; {
+    const totals = elves.map(elf =&gt; elf.reduce((a, b) =&gt; a + b, 0));
+    const sorted = totals.sort((a, b) =&gt; b - a);
+    return sorted[0] + sorted[1] + sorted[2];
+};
+</code></pre>
+<p>Note: this code assumes we have at least three elves. In production, you&#39;d add a check. For AoC, I know the input has plenty of elves, so I&#39;m comfortable with this &quot;bad code that makes documented assumptions.&quot;</p>
+<h2>Performance</h2>
+<p>Both parts run instantly. We&#39;re just summing arrays and finding maximums — O(n) operations on small data.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Blank lines as separators</strong>: When input uses blank lines to group data, accumulate into the current group and start a new group on empty lines.</p>
+</li>
+<li><p><strong>Array helpers pay off</strong>: Having <code>sum()</code> and <code>max()</code> methods on arrays makes the code read like the problem description. Worth the prototype pollution for AoC.</p>
+</li>
+<li><p><strong>Assumptions are fine when documented</strong>: Hardcoding <code>sorted[0] + sorted[1] + sorted[2]</code> is fragile but clear. Just know your input.</p>
+</li>
+<li><p><strong>Keep parts independent</strong>: I copy-paste code between part one and part two rather than sharing. It makes timing easier and lets me mutate freely.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2022/ts/day-01">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2022 — Day 1</p>
+        
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

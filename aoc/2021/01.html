@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 1/2021 - Sonar Sweep — AoC 2021 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Counting depth increases and sliding windows. Sometimes Excel is the right tool for the job.">
+  <link rel="canonical" href="/aoc/2021/01/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 1/2021 - Sonar Sweep</h1>
+        <div class="article-meta"><time datetime="2021">2021</time> · 4 min read</div>
+      </header>
+      <div class="article-content">
+        <p>The first puzzle of 2021&#39;s AoC (available at <a href="https://adventofcode.com/2021/day/1">https://adventofcode.com/2021/day/1</a>) kicks off with a crisis: an elf has accidentally knocked Santa&#39;s sleigh keys into the ocean. Fortunately, we have a <a href="https://www.youtube.com/watch?v=m2uTFF_3MaA" target="_blank">submarine</a> for just such emergencies — covered in Christmas lights, naturally.</p>
+<p>The submarine&#39;s sonar gives us depth measurements. We need to analyze how quickly the sea floor depth increases.</p>
+<h2>Parsing the Input</h2>
+<p>The input is simply one number per line:</p>
+<pre><code class="language-typescript">const processInput = (day: number): number[] =&gt; {
+    const lines = readInputLines(day);
+    return lines.map(line =&gt; parseInt(line, 10));
+};
+</code></pre>
+<p>Always specify the radix (10) with <code>parseInt</code>. JavaScript can get weird with leading zeros otherwise.</p>
+<h2>Part One: Counting Increases</h2>
+<p>Count how many times the depth measurement increases from one reading to the next.</p>
+<pre><code class="language-typescript">const partOne = (input: number[], debug: boolean) =&gt; {
+    let count = 0;
+    
+    for (let i = 1; i &lt; input.length; i++) {
+        if (input[i] &gt; input[i - 1]) {
+            count++;
+        }
+    }
+    
+    return count;
+};
+</code></pre>
+<p>Starting the loop from index 1 (not 0) because we&#39;re comparing each element to its predecessor. GitHub Copilot actually guessed this pattern when I started typing — it recognized the &quot;start from 1&quot; idiom as a comparison pattern.</p>
+<h2>Part Two: Sliding Windows</h2>
+<p>Part two introduces a sliding window: instead of comparing individual measurements, compare the sum of three consecutive measurements.</p>
+<p>First, create the windows:</p>
+<pre><code class="language-typescript">const partTwo = (input: number[], debug: boolean) =&gt; {
+    // Create sliding window sums
+    const windows: number[] = [];
+    for (let i = 2; i &lt; input.length; i++) {
+        windows.push(input[i] + input[i - 1] + input[i - 2]);
+    }
+    
+    // Count increases (same logic as part one)
+    let count = 0;
+    for (let i = 1; i &lt; windows.length; i++) {
+        if (windows[i] &gt; windows[i - 1]) {
+            count++;
+        }
+    }
+    
+    return count;
+};
+</code></pre>
+<p>We start from index 2 because we need two previous elements to form a complete window. From 2000 input values, we get 1998 windows.</p>
+<p>I keep part one and part two independent — I could refactor the counting logic into a shared function, but I prefer each part to be self-contained. Makes debugging easier and lets me run them independently.</p>
+<h2>The Excel Solution</h2>
+<p>For a linear list of numbers, sometimes Excel is the right tool:</p>
+<p><strong>Part One:</strong></p>
+<ul>
+<li>Column A: input values</li>
+<li>Column B: <code>=A2-A1</code> (difference from previous)</li>
+<li>Result: <code>=COUNTIF(B:B,&quot;&gt;0&quot;)</code></li>
+</ul>
+<p><strong>Part Two:</strong></p>
+<ul>
+<li>Column C: <code>=A1+A2+A3</code> (sliding window sum)</li>
+<li>Column D: <code>=C2-C1</code> (difference)</li>
+<li>Result: <code>=COUNTIF(D:D,&quot;&gt;0&quot;)</code></li>
+</ul>
+<p>Both solutions gave the same answers: 1602 and 1633. Sometimes you don&#39;t need code at all — but the TypeScript solution is more reusable and scriptable.</p>
+<h2>Off-By-One Awareness</h2>
+<p>These problems are ripe for off-by-one errors:</p>
+<ul>
+<li>2000 input values → 1999 comparisons (part one)</li>
+<li>2000 input values → 1998 windows → 1997 comparisons (part two)</li>
+</ul>
+<p>Excel actually helps here because you can see exactly which cells have data and which don&#39;t. In code, you need to think carefully about your loop bounds.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Start loops from 1 when comparing to previous</strong>: The idiom <code>for (let i = 1; ...)</code> signals &quot;I need the previous element.&quot;</p>
+</li>
+<li><p><strong>Sliding windows start later</strong>: If your window needs N previous elements, start from index N-1.</p>
+</li>
+<li><p><strong>Keep parts independent</strong>: Copy-paste between parts rather than sharing code. It&#39;s redundant but simpler to debug.</p>
+</li>
+<li><p><strong>Excel is underrated</strong>: For one-off linear computations, a spreadsheet can be faster than writing code. No shame in using the right tool.</p>
+</li>
+<li><p><strong>Always verify input parsing</strong>: Before solving anything, log your parsed input and compare to the source. Wrong parsing = wrong answer, always.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2021/ts/day-01">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2021 — Day 1</p>
+        
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
