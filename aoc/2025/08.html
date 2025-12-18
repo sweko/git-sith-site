@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 8/2025 - Junction Boxes — AoC 2025 — GitSith - Advent Of Code</title>
+  <meta name="description" content="3D Euclidean distances, circuit merging, and union-find without knowing it. Graph problems in disguise.">
+  <link rel="canonical" href="/aoc/2025/08/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 8/2025 - Junction Boxes</h1>
+        <div class="article-meta"><time datetime="2025">2025</time> · 5 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day eight of AoC 2025 (available at <a href="https://adventofcode.com/2025/day/8">https://adventofcode.com/2025/day/8</a>) brings geometry — but don&#39;t panic, it&#39;s manageable. We have junction boxes in 3D space, and we need to connect them based on which ones are <a href="https://www.youtube.com/watch?v=PTFwQP86BRs" target="_blank">closer</a> together.</p>
+<p>The input is straightforward: three comma-separated coordinates per line, one junction box per line.</p>
+<h2>Parsing the Input</h2>
+<pre><code class="language-typescript">type Point = { x: number; y: number; z: number };
+
+const processInput = (day: number): Point[] =&gt; {
+    const lines = readInputLines(day);
+    return lines.map(line =&gt; {
+        const [x, y, z] = line.split(&quot;,&quot;).map(Number);
+        return { x, y, z };
+    });
+};
+</code></pre>
+<p>All coordinates are positive, so we&#39;re working in a single octant. No sign shenanigans to worry about.</p>
+<h2>Calculating Distances</h2>
+<p>We need Euclidean distance in 3D — the square root of the sum of squared differences:</p>
+<pre><code class="language-typescript">type Distance = {
+    first: string;
+    second: string;
+    distance: number;
+};
+
+const toKey = (p: Point): string =&gt; `${p.x} ${p.y} ${p.z}`;
+
+const getDistances = (points: Point[]): Distance[] =&gt; {
+    const distances: Distance[] = [];
+    
+    for (let i = 0; i &lt; points.length; i++) {
+        for (let j = i + 1; j &lt; points.length; j++) {
+            const p1 = points[i];
+            const p2 = points[j];
+            const distance = Math.sqrt(
+                (p1.x - p2.x) ** 2 + 
+                (p1.y - p2.y) ** 2 + 
+                (p1.z - p2.z) ** 2
+            );
+            distances.push({
+                first: toKey(p1),
+                second: toKey(p2),
+                distance
+            });
+        }
+    }
+    
+    return distances.sort((a, b) =&gt; a.distance - b.distance);
+};
+</code></pre>
+<p>For 1,000 junction boxes, that&#39;s about 500,000 distance calculations. Sorted by distance, we can process connections from shortest to longest.</p>
+<h2>Part One: Finding Circuits</h2>
+<p>We connect the 10 (or 1,000 for the real input) closest pairs and count how many separate circuits form. A circuit is any group of connected junction boxes.</p>
+<p>This is essentially the union-find problem. When we connect two junction boxes:</p>
+<ol>
+<li><strong>Both already in the same circuit</strong>: Do nothing</li>
+<li><strong>Both in different circuits</strong>: Merge the circuits</li>
+<li><strong>One in a circuit, one not</strong>: Add the loner to the existing circuit</li>
+<li><strong>Neither in a circuit</strong>: Create a new circuit with both</li>
+</ol>
+<pre><code class="language-typescript">const partOne = (input: Point[], debug: boolean) =&gt; {
+    const distances = getDistances(input);
+    const junctions = distances.slice(0, 1000); // Top N closest
+    
+    const circuits: Set&lt;string&gt;[] = [];
+    
+    for (const { first, second } of junctions) {
+        const firstCircuit = circuits.find(c =&gt; c.has(first));
+        const secondCircuit = circuits.find(c =&gt; c.has(second));
+        
+        if (firstCircuit &amp;&amp; secondCircuit) {
+            if (firstCircuit !== secondCircuit) {
+                // Merge circuits
+                const merged = new Set([...firstCircuit, ...secondCircuit]);
+                const secondIndex = circuits.indexOf(secondCircuit);
+                circuits.splice(secondIndex, 1);
+                const firstIndex = circuits.indexOf(firstCircuit);
+                circuits[firstIndex] = merged;
+            }
+            // Same circuit: do nothing
+        } else if (firstCircuit) {
+            firstCircuit.add(second);
+        } else if (secondCircuit) {
+            secondCircuit.add(first);
+        } else {
+            circuits.push(new Set([first, second]));
+        }
+    }
+    
+    // Sort by size, multiply top 3
+    circuits.sort((a, b) =&gt; b.size - a.size);
+    const [top1, top2, top3] = circuits;
+    return (top1?.size ?? 1) * (top2?.size ?? 1) * (top3?.size ?? 1);
+};
+</code></pre>
+<h3>The Merge Bug</h3>
+<p>My first implementation had a subtle bug in the merge case:</p>
+<pre><code class="language-typescript">// Wrong!
+firstCircuit = new Set([...firstCircuit, ...secondCircuit]);
+circuits.splice(circuits.indexOf(secondCircuit), 1);
+// Now indexOf(firstCircuit) returns -1 because we replaced the reference!
+</code></pre>
+<p>By reassigning <code>firstCircuit</code> to a new Set, the original reference in the <code>circuits</code> array was unchanged. When I tried to find it again to update it, it wasn&#39;t there anymore.</p>
+<p>The fix: create the merged set separately, then update the array:</p>
+<pre><code class="language-typescript">const merged = new Set([...firstCircuit, ...secondCircuit]);
+// Remove second first (before indices shift)
+circuits.splice(circuits.indexOf(secondCircuit), 1);
+// Now update first
+circuits[circuits.indexOf(firstCircuit)] = merged;
+</code></pre>
+<p>JavaScript reference semantics strike again.</p>
+<h2>Part Two: One Big Circuit</h2>
+<p>Part two asks: keep connecting until all junction boxes form a single circuit. Which connection makes that happen?</p>
+<p>Now we need to process <em>all</em> distances (sorted), not just the top N. We start with each junction box in its own circuit:</p>
+<pre><code class="language-typescript">const partTwo = (input: Point[], debug: boolean) =&gt; {
+    const distances = getDistances(input);
+    
+    // Start with each point in its own circuit
+    const circuits: Set&lt;string&gt;[] = input.map(p =&gt; new Set([toKey(p)]));
+    
+    for (const { first, second } of distances) {
+        const firstCircuit = circuits.find(c =&gt; c.has(first))!;
+        const secondCircuit = circuits.find(c =&gt; c.has(second))!;
+        
+        if (firstCircuit !== secondCircuit) {
+            // Merge circuits
+            const merged = new Set([...firstCircuit, ...secondCircuit]);
+            circuits.splice(circuits.indexOf(secondCircuit), 1);
+            circuits[circuits.indexOf(firstCircuit)] = merged;
+            
+            if (circuits.length === 1) {
+                // Found it! Return product of x-coordinates
+                const [fx] = first.split(&quot; &quot;).map(Number);
+                const [sx] = second.split(&quot; &quot;).map(Number);
+                return fx * sx;
+            }
+        }
+    }
+    
+    throw new Error(&quot;Couldn&#39;t connect all circuits&quot;);
+};
+</code></pre>
+<p>Starting with 1,000 circuits, each merge reduces the count by one. We watch the count drop: 999, 998, 997... until we hit 1.</p>
+<h2>Performance</h2>
+<p>Part one runs quickly — we only process 1,000 connections. Part two takes almost a full second because we might need to process many more connections before achieving a single circuit.</p>
+<p>A proper union-find data structure with path compression would be faster, but for this input size, the naive approach works fine.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Union-find in disguise</strong>: This is the classic disjoint set problem. Recognizing it helps you know what operations you need: find which set an element belongs to, merge two sets.</p>
+</li>
+<li><p><strong>Reference vs value</strong>: The merge bug was a classic JavaScript gotcha. When you reassign a variable, you&#39;re not modifying the original object — you&#39;re pointing to a new one.</p>
+</li>
+<li><p><strong>Start with all singletons</strong>: For part two, initializing each point in its own circuit simplified the logic. No more &quot;neither in a circuit&quot; case.</p>
+</li>
+<li><p><strong>Debug with small inputs</strong>: Working through the example by hand in a spreadsheet revealed the merge bug. The small input is your friend.</p>
+</li>
+<li><p><strong>String keys for object identity</strong>: JavaScript can&#39;t use objects as Set elements meaningfully (no structural equality). Converting points to strings gives us usable keys.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2025/day-08">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2025 — Day 8</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="07.html" rel="prev" aria-label="Previous: Day 7 — Laser Splitters">← Day 7 — Laser Splitters</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
