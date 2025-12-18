@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 1/2023 - Trebuchet?! — AoC 2023 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Finding digits in strings and falling into the same trap as everyone else. Including Uncle Bob.">
+  <link rel="canonical" href="/aoc/2023/01/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 1/2023 - Trebuchet?!</h1>
+        <div class="article-meta"><time datetime="2023">2023</time> · 5 min read</div>
+      </header>
+      <div class="article-content">
+        <p>The first puzzle of 2023&#39;s AoC (available at <a href="https://adventofcode.com/2023/day/1">https://adventofcode.com/2023/day/1</a>) starts with us being loaded into a trebuchet. The calibration document has been &quot;amended&quot; by an elf, and we need to extract calibration values from each line by combining the first digit and the last digit into a two-digit number.</p>
+<p>For a line like <code>a1b2c3d</code>, the first digit is <code>1</code>, the last is <code>3</code>, giving us <code>13</code>.</p>
+<h2>Parsing and Part One</h2>
+<p>Each line needs to yield its first and last digit. JavaScript&#39;s <code>find</code> and <code>findLast</code> on character arrays work nicely:</p>
+<pre><code class="language-typescript">const mapFirstLast = (input: string[]): { first: number; last: number }[] =&gt; {
+    return input.map(line =&gt; {
+        const chars = line.split(&quot;&quot;);
+        const digitRegex = /\d/;
+        
+        const first = chars.find(c =&gt; digitRegex.test(c))!;
+        const last = chars.findLast(c =&gt; digitRegex.test(c))!;
+        
+        return { first: +first, last: +last };
+    });
+};
+
+const partOne = (input: string[], debug: boolean) =&gt; {
+    const fls = mapFirstLast(input);
+    return fls.reduce((sum, { first, last }) =&gt; sum + first * 10 + last, 0);
+};
+</code></pre>
+<p>Part <a href="https://www.youtube.com/watch?v=WM8bTdBs-cw" target="_blank">one</a> returns <code>55621</code> for my input. Straightforward enough.</p>
+<h2>Part Two: The Trap</h2>
+<p>Part two reveals that spelled-out numbers (<code>one</code>, <code>two</code>, etc.) also count as digits. Simple, right? Just do a find-and-replace: <code>one</code> → <code>1</code>, <code>two</code> → <code>2</code>, and so on.</p>
+<p><strong>Wrong.</strong></p>
+<p>Consider the string <code>oneight</code>. If you replace <code>one</code> with <code>1</code>, you get <code>1ight</code>. The <code>eight</code> is destroyed. But according to the puzzle, looking from the start, the first digit is <code>one</code> (1). Looking from the end, the last digit is <code>eight</code> (8). The answer should be <code>18</code>, not <code>11</code>.</p>
+<p>This trap caught <em>everyone</em>. I saw discussions everywhere about it. Even Uncle Bob tweeted about falling into this hole. Part one tricks you into a pattern of thinking, and part two punishes you for it.</p>
+<h2>The Fix: Search From Both Ends</h2>
+<p>Instead of modifying the string, search from the start for the first digit and from the end for the last digit:</p>
+<pre><code class="language-typescript">const getFirstDigit = (input: string, map: Record&lt;string, number&gt;): number =&gt; {
+    // Terribly inefficient, but works
+    for (let index = 0; index &lt; input.length; index++) {
+        const part = input.substring(index);
+        for (const key in map) {
+            if (part.startsWith(key)) {
+                return map[key];
+            }
+        }
+    }
+    return -Infinity; // Should never happen
+};
+
+const getLastDigit = (input: string, map: Record&lt;string, number&gt;): number =&gt; {
+    for (let index = input.length; index &gt;= 0; index--) {
+        const part = input.substring(0, index);
+        for (const key in map) {
+            if (part.endsWith(key)) {
+                return map[key];
+            }
+        }
+    }
+    return -Infinity;
+};
+</code></pre>
+<p>For part one, the map is simple: <code>{ &quot;1&quot;: 1, &quot;2&quot;: 2, ... &quot;9&quot;: 9 }</code>.</p>
+<p>For part two, we extend it: <code>{ &quot;1&quot;: 1, &quot;one&quot;: 1, &quot;2&quot;: 2, &quot;two&quot;: 2, ... }</code>.</p>
+<pre><code class="language-typescript">const partTwoMap: Record&lt;string, number&gt; = {
+    &quot;1&quot;: 1, &quot;one&quot;: 1,
+    &quot;2&quot;: 2, &quot;two&quot;: 2,
+    &quot;3&quot;: 3, &quot;three&quot;: 3,
+    &quot;4&quot;: 4, &quot;four&quot;: 4,
+    &quot;5&quot;: 5, &quot;five&quot;: 5,
+    &quot;6&quot;: 6, &quot;six&quot;: 6,
+    &quot;7&quot;: 7, &quot;seven&quot;: 7,
+    &quot;8&quot;: 8, &quot;eight&quot;: 8,
+    &quot;9&quot;: 9, &quot;nine&quot;: 9,
+};
+
+const partTwo = (input: string[], debug: boolean) =&gt; {
+    let total = 0;
+    for (const line of input) {
+        const first = getFirstDigit(line, partTwoMap);
+        const last = getLastDigit(line, partTwoMap);
+        total += first * 10 + last;
+    }
+    return total;
+};
+</code></pre>
+<p>Now <code>oneight</code> correctly returns <code>18</code>.</p>
+<h2>Performance</h2>
+<p>The nested loops are O(n × m × k) where n is string length, m is number of keys, and k is key length. That&#39;s terrible algorithmically, but with ~1,000 lines and small strings, it runs in under 60 milliseconds. Good enough.</p>
+<p>A regex-based solution could be more elegant, but this brute-force approach is easy to understand and debug.</p>
+<h2>The Lesson</h2>
+<p>Part one&#39;s test input and real input only contained numeric digits. Part two&#39;s test input was <em>different</em> from part one&#39;s — a hint that something fundamental changed, not just an extension.</p>
+<p>The overlapping number problem (<code>twone</code>, <code>oneight</code>, <code>sevenine</code>) doesn&#39;t appear in obvious test cases. You only discover it when your answer is wrong and you start debugging.</p>
+<p>When the puzzle says &quot;the first digit&quot; and &quot;the last digit,&quot; it means exactly that — search from each end independently. Don&#39;t try to transform the string into something part one can handle.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Read the puzzle carefully</strong>: &quot;First digit&quot; and &quot;last digit&quot; implies searching from both directions, not finding-and-replacing.</p>
+</li>
+<li><p><strong>Test inputs can mislead</strong>: Part two&#39;s test input was intentionally different. The real traps only appear in the actual input.</p>
+</li>
+<li><p><strong>Simple brute force works</strong>: Nested loops are ugly but clear. With small inputs, clarity beats cleverness.</p>
+</li>
+<li><p><strong>Everyone makes mistakes</strong>: When Uncle Bob falls into the same trap, you&#39;re in good company.</p>
+</li>
+<li><p><strong><code>startsWith</code> and <code>endsWith</code> are your friends</strong>: These string methods make the directional search clean and readable.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2023/ts/day-01">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2023 — Day 1</p>
+        
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
