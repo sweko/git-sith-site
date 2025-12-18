@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 4/2021 - Giant Squid — AoC 2021 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Playing Bingo with a cephalopod, debugging for-loop mutations, and learning when to let the squid win.">
+  <link rel="canonical" href="/aoc/2021/04/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 4/2021 - Giant Squid</h1>
+        <div class="article-meta"><time datetime="2021">2021</time> · 5 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day four of AoC 2021 (available at <a href="https://adventofcode.com/2021/day/4">https://adventofcode.com/2021/day/4</a>) takes a surreal turn: a giant squid has attached itself to the submarine and wants to play Bingo. You&#39;ve got to know when to hold &#39;em, <a href="https://www.youtube.com/watch?v=7hx4gdlfamo" target="_blank">know when to fold &#39;em</a> — especially when part two asks us to deliberately lose.</p>
+<p>The input has drawn numbers on the first line, followed by 5×5 Bingo boards separated by blank lines.</p>
+<h2>Parsing the Input</h2>
+<p>This is the first puzzle this year where parsing is genuinely tedious. We need to extract the draw sequence and multiple boards:</p>
+<pre><code class="language-typescript">interface BingoGame {
+    numbers: number[];
+    tickets: BingoTicket[];
+}
+
+class BingoTicket {
+    numbers: number[][];
+    hits: number[] = [];
+    won: boolean = false;
+    
+    constructor(numbers: number[][]) {
+        this.numbers = numbers;
+    }
+    
+    hasNumber(n: number): boolean {
+        return this.numbers.some(row =&gt; row.includes(n));
+    }
+    
+    mark(n: number): void {
+        if (this.hasNumber(n)) {
+            this.hits.push(n);
+        }
+    }
+    
+    isWinner(): boolean {
+        // Check rows
+        for (const row of this.numbers) {
+            if (row.every(n =&gt; this.hits.includes(n))) {
+                return true;
+            }
+        }
+        // Check columns
+        for (let col = 0; col &lt; 5; col++) {
+            const column = this.numbers.map(row =&gt; row[col]);
+            if (column.every(n =&gt; this.hits.includes(n))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    getRemaining(): number[] {
+        return this.numbers.flat().filter(n =&gt; !this.hits.includes(n));
+    }
+    
+    reset(): void {
+        this.hits = [];
+        this.won = false;
+    }
+}
+</code></pre>
+<p>For parsing the boards, I used regex to handle the inconsistent spacing (single-digit numbers are padded):</p>
+<pre><code class="language-typescript">const regex = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)$/;
+</code></pre>
+<p>Regex101 is invaluable here. The boards have variable spacing, and regex handles it cleanly.</p>
+<h2>Part One: First Winner</h2>
+<p>Draw numbers until a board wins. Calculate the score: sum of unmarked numbers × winning number.</p>
+<pre><code class="language-typescript">const partOne = (input: BingoGame, debug: boolean) =&gt; {
+    const draws = input.numbers.slice();
+    const tickets = input.tickets;
+    tickets.forEach(t =&gt; t.reset());
+    
+    let winner: BingoTicket | null = null;
+    
+    while (!winner) {
+        const draw = draws.shift()!;
+        
+        for (const ticket of tickets) {
+            ticket.mark(draw);
+            if (ticket.isWinner()) {
+                winner = ticket;
+                break;
+            }
+        }
+    }
+    
+    const remaining = winner.getRemaining();
+    const sum = remaining.reduce((a, b) =&gt; a + b, 0);
+    const lastDraw = winner.hits[winner.hits.length - 1];
+    
+    return sum * lastDraw;
+};
+</code></pre>
+<h2>Part Two: Let the Squid Win</h2>
+<p>Now we need to find the <em>last</em> board to win. The strategy: keep playing until all boards have won, tracking which one wins last.</p>
+<h3>The Mutation Bug</h3>
+<p>My first attempt used <code>for...of</code> with array splicing to remove winning boards:</p>
+<pre><code class="language-typescript">for (const ticket of tickets) {
+    ticket.mark(draw);
+    if (ticket.isWinner()) {
+        winner = ticket;
+        tickets.splice(tickets.indexOf(ticket), 1); // BUG!
+        break;
+    }
+}
+</code></pre>
+<p>The <code>break</code> was a copy-paste error from part one. It stopped after marking the first ticket that had the drawn number, not after finding a winner. Boards weren&#39;t getting marked properly.</p>
+<p>But there&#39;s a deeper issue: <strong>mutating an array while iterating with <code>for...of</code> skips elements</strong>.</p>
+<p>If you have <code>[1, 2, 3, 4, 5]</code> and remove element at index 2 (the <code>3</code>), everything shifts left. The loop&#39;s internal index advances to 3, which now points to <code>5</code> — you&#39;ve skipped <code>4</code> entirely.</p>
+<p>The fix: use an index-based loop and adjust the index when removing:</p>
+<pre><code class="language-typescript">for (let i = 0; i &lt; tickets.length; i++) {
+    const ticket = tickets[i];
+    ticket.mark(draw);
+    if (ticket.isWinner()) {
+        winner = ticket;
+        tickets.splice(i, 1);
+        i--; // Compensate for the removal
+    }
+}
+</code></pre>
+<p>Or better: track wins with a flag instead of removing:</p>
+<pre><code class="language-typescript">const partTwo = (input: BingoGame, debug: boolean) =&gt; {
+    const draws = input.numbers.slice();
+    const tickets = input.tickets;
+    tickets.forEach(t =&gt; t.reset());
+    
+    let winner: BingoTicket | null = null;
+    let winCount = 0;
+    
+    while (winCount !== tickets.length) {
+        const draw = draws.shift()!;
+        
+        for (const ticket of tickets) {
+            if (ticket.won) continue;
+            
+            ticket.mark(draw);
+            if (ticket.isWinner()) {
+                ticket.won = true;
+                winner = ticket;
+                winCount++;
+            }
+        }
+    }
+    
+    const remaining = winner!.getRemaining();
+    const sum = remaining.reduce((a, b) =&gt; a + b, 0);
+    const lastDraw = winner!.hits[winner!.hits.length - 1];
+    
+    return sum * lastDraw;
+};
+</code></pre>
+<p>Now we don&#39;t modify the array at all — we just skip boards that have already won.</p>
+<h2>The Reset Problem</h2>
+<p>Another gotcha: objects are passed by reference. If part one modifies the tickets (adding hits), part two gets the modified versions. The <code>reset()</code> method clears state between runs:</p>
+<pre><code class="language-typescript">reset(): void {
+    this.hits = [];
+    this.won = false;
+}
+</code></pre>
+<p>Always call it before processing to ensure clean state.</p>
+<h2>Performance</h2>
+<p>The solution runs in about 30ms. It&#39;s not optimal — we recalculate <code>isWinner()</code> and check <code>hits.includes()</code> repeatedly. A production version would use Sets for O(1) lookups and cache winner status. But for a one-shot puzzle, it&#39;s fast enough.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Don&#39;t mutate arrays while iterating</strong>: If you must remove elements during iteration, use index-based loops and adjust the index, or use a flag-based approach.</p>
+</li>
+<li><p><strong><code>for...of</code> hides the index</strong>: This abstraction is great until you need to modify the collection. Then it bites you.</p>
+</li>
+<li><p><strong>Copy-paste bugs are real</strong>: The <code>break</code> statement from part one didn&#39;t belong in part two. Always review pasted code.</p>
+</li>
+<li><p><strong>Reset state between runs</strong>: When objects are reused, ensure they start in a clean state. Reference semantics mean part one&#39;s modifications persist into part two.</p>
+</li>
+<li><p><strong>Classes can help organize complex state</strong>: The <code>BingoTicket</code> class encapsulates the board, hits, and win logic. It&#39;s not the prettiest class (public properties everywhere), but it&#39;s better than juggling raw arrays.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2021/ts/day-04">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2021 — Day 4</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="03.html" rel="prev" aria-label="Previous: Day 3 — Binary Diagnostic">← Day 3 — Binary Diagnostic</a>
+<a class="next" href="05.html" rel="next" aria-label="Next: Day 5 — Hydrothermal Venture">Day 5 — Hydrothermal Venture →</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

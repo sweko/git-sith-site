@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 5/2021 - Hydrothermal Venture — AoC 2021 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Mapping vent lines on a grid, handling diagonals, and accepting that a million cells is fine.">
+  <link rel="canonical" href="/aoc/2021/05/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 5/2021 - Hydrothermal Venture</h1>
+        <div class="article-meta"><time datetime="2021">2021</time> · 5 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day five of AoC 2021 (available at <a href="https://adventofcode.com/2021/day/5">https://adventofcode.com/2021/day/5</a>) has us mapping hydrothermal vents on the ocean floor. These vents produce large opaque clouds — <a href="https://www.youtube.com/watch?v=Q2FzZSBD5LE" target="_blank">smoke on the water</a>, if you will. We need to find where the vent lines overlap.</p>
+<p>The input describes line segments: <code>0,9 -&gt; 5,9</code> means a line from point (0,9) to point (5,9).</p>
+<h2>Parsing the Input</h2>
+<p>Regex makes this clean:</p>
+<pre><code class="language-typescript">interface Point {
+    x: number;
+    y: number;
+}
+
+interface Vent {
+    from: Point;
+    to: Point;
+}
+
+const processInput = (day: number): Vent[] =&gt; {
+    const lines = readInputLines(day);
+    const regex = /^(\d+),(\d+) -&gt; (\d+),(\d+)$/;
+    
+    return lines.map(line =&gt; {
+        const match = line.match(regex);
+        if (!match) throw new Error(`Invalid line: ${line}`);
+        
+        return {
+            from: { x: parseInt(match[1], 10), y: parseInt(match[2], 10) },
+            to: { x: parseInt(match[3], 10), y: parseInt(match[4], 10) }
+        };
+    });
+};
+</code></pre>
+<h2>Part One: Horizontal and Vertical Lines Only</h2>
+<p>First, filter to only horizontal (same Y) or vertical (same X) lines:</p>
+<pre><code class="language-typescript">const gridLines = input.filter(vent =&gt; 
+    vent.from.x === vent.to.x || vent.from.y === vent.to.y
+);
+</code></pre>
+<p>Then build a grid and mark each point on each line:</p>
+<pre><code class="language-typescript">const xMax = Math.max(...input.flatMap(v =&gt; [v.from.x, v.to.x]));
+const yMax = Math.max(...input.flatMap(v =&gt; [v.from.y, v.to.y]));
+
+const grid: number[][] = new Array(xMax + 1)
+    .fill(0)
+    .map(() =&gt; new Array(yMax + 1).fill(0));
+
+for (const line of gridLines) {
+    const fromX = Math.min(line.from.x, line.to.x);
+    const toX = Math.max(line.from.x, line.to.x);
+    const fromY = Math.min(line.from.y, line.to.y);
+    const toY = Math.max(line.from.y, line.to.y);
+    
+    for (let row = fromX; row &lt;= toX; row++) {
+        for (let col = fromY; col &lt;= toY; col++) {
+            grid[row][col]++;
+        }
+    }
+}
+</code></pre>
+<p>Note the nested loops: for horizontal/vertical lines, one of these loops is &quot;degenerate&quot; — it runs exactly once because <code>fromX === toX</code> or <code>fromY === toY</code>. So we&#39;re not actually doing O(n²) work per line.</p>
+<p>Finally, count cells where two or more lines overlap:</p>
+<pre><code class="language-typescript">const result = grid
+    .map(row =&gt; row.filter(cell =&gt; cell &gt;= 2).length)
+    .reduce((a, b) =&gt; a + b, 0);
+</code></pre>
+<h2>Part Two: Adding Diagonals</h2>
+<p>The puzzle guarantees all diagonal lines are exactly 45 degrees — the X and Y distances are always equal. This simplifies things enormously.</p>
+<p>First, I checked whether my input had any non-grid, non-diagonal lines:</p>
+<pre><code class="language-typescript">for (const line of diagonals) {
+    const xDiff = Math.abs(line.from.x - line.to.x);
+    const yDiff = Math.abs(line.from.y - line.to.y);
+    if (xDiff !== yDiff) {
+        console.log(&quot;Non-diagonal found!&quot;);
+    }
+}
+</code></pre>
+<p>Result: everything is either horizontal, vertical, or 45-degree diagonal. We don&#39;t have to solve the general case — just our specific input.</p>
+<p>For diagonals, we need direction vectors:</p>
+<pre><code class="language-typescript">const diagonals = input.filter(vent =&gt; 
+    vent.from.x !== vent.to.x &amp;&amp; vent.from.y !== vent.to.y
+);
+
+for (const line of diagonals) {
+    const count = Math.abs(line.from.x - line.to.x);
+    const xDir = line.from.x &lt; line.to.x ? 1 : -1;
+    const yDir = line.from.y &lt; line.to.y ? 1 : -1;
+    
+    for (let i = 0; i &lt;= count; i++) {
+        const x = line.from.x + i * xDir;
+        const y = line.from.y + i * yDir;
+        grid[x][y]++;
+    }
+}
+</code></pre>
+<p>The <code>xDir</code> and <code>yDir</code> are either +1 or -1, indicating which way we step. A line from (8,0) to (0,8) has <code>xDir = -1</code> and <code>yDir = +1</code>.</p>
+<h2>Why Not Use the Nested Loop for Diagonals?</h2>
+<p>The nested loop approach for horizontal/vertical lines would fill a <em>square</em> for diagonals. A line from (0,0) to (8,8) would incorrectly mark all 81 cells in that 9×9 region, when we only want the 9 diagonal cells.</p>
+<h2>Performance</h2>
+<p>The grid is about 1000×1000 = 1 million cells. That&#39;s ~4MB of memory and takes about 100-120ms to process. Not blazing fast, but acceptable.</p>
+<p>An analytical solution exists: calculate line intersections mathematically without building a grid. But for a one-shot puzzle with a million cells, the naive approach works fine.</p>
+<p>My overall goal for AoC is total runtime under a minute for all 25 days. Individual puzzles taking 100ms are well within budget.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Don&#39;t solve the general case</strong>: The puzzle guarantees 45-degree diagonals. I verified my input had no other angles, then wrote code specifically for that constraint.</p>
+</li>
+<li><p><strong>Degenerate loops are fine</strong>: A loop from 5 to 5 runs once. Using the same nested-loop structure for horizontal and vertical lines is cleaner than special-casing.</p>
+</li>
+<li><p><strong>Direction vectors simplify diagonal logic</strong>: Instead of sorting coordinates, compute <code>xDir</code> and <code>yDir</code> as +1 or -1, then step from the start point.</p>
+</li>
+<li><p><strong>A million cells is manageable</strong>: Modern computers handle megabyte-scale data trivially. Don&#39;t prematurely optimize away from the obvious grid approach.</p>
+</li>
+<li><p><strong>Verify assumptions with code</strong>: Instead of manually checking 500 lines for non-diagonal cases, write a quick check and run it.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2021/ts/day-05">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2021 — Day 5</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="04.html" rel="prev" aria-label="Previous: Day 4 — Giant Squid">← Day 4 — Giant Squid</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

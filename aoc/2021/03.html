@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 3/2021 - Binary Diagnostic — AoC 2021 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Counting bits, filtering reports, and resisting the urge to do actual bit twiddling. Sometimes strings are fine.">
+  <link rel="canonical" href="/aoc/2021/03/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 3/2021 - Binary Diagnostic</h1>
+        <div class="article-meta"><time datetime="2021">2021</time> · 5 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day three of AoC 2021 (available at <a href="https://adventofcode.com/2021/day/3">https://adventofcode.com/2021/day/3</a>) has us running diagnostics on the submarine. The input is a list of binary numbers, and we need to analyze bit patterns across all of them.</p>
+<p>Time to count some <a href="https://www.youtube.com/watch?v=3wk7C64kaP4" target="_blank">zeros</a> and ones.</p>
+<h2>Parsing the Input</h2>
+<p>Each line is a binary string. I&#39;m representing bits as literal string types:</p>
+<pre><code class="language-typescript">type Bit = &quot;0&quot; | &quot;1&quot;;
+
+const processInput = (day: number): Bit[][] =&gt; {
+    const lines = readInputLines(day);
+    return lines.map(line =&gt; line.split(&quot;&quot;) as Bit[]);
+};
+</code></pre>
+<p>Yes, using strings to represent bits is &quot;wasteful.&quot; But it works, it&#39;s clear, and the input is small. Save the bit-twiddling heroics for when you need them.</p>
+<h2>Part One: Most and Least Common Bits</h2>
+<p>For each bit position, find the most common bit across all numbers. That forms the gamma rate. The epsilon rate is the complement (least common bits).</p>
+<p>First, count zeros and ones at each position:</p>
+<pre><code class="language-typescript">type Count = { &quot;0&quot;: number; &quot;1&quot;: number };
+
+const getCounts = (input: Bit[][]): Count[] =&gt; {
+    const width = input[0].length;
+    const counts: Count[] = Array.from({ length: width }, () =&gt; ({ &quot;0&quot;: 0, &quot;1&quot;: 0 }));
+    
+    for (const row of input) {
+        for (let i = 0; i &lt; row.length; i++) {
+            counts[i][row[i]]++;
+        }
+    }
+    
+    return counts;
+};
+</code></pre>
+<p>Then extract gamma and epsilon:</p>
+<pre><code class="language-typescript">const partOne = (input: Bit[][], debug: boolean) =&gt; {
+    const counts = getCounts(input);
+    
+    const gamma = counts.map(c =&gt; c[&quot;0&quot;] &gt; c[&quot;1&quot;] ? &quot;0&quot; : &quot;1&quot;).join(&quot;&quot;);
+    const epsilon = counts.map(c =&gt; c[&quot;0&quot;] &gt; c[&quot;1&quot;] ? &quot;1&quot; : &quot;0&quot;).join(&quot;&quot;);
+    
+    const gValue = parseInt(gamma, 2);
+    const eValue = parseInt(epsilon, 2);
+    
+    return gValue * eValue;
+};
+</code></pre>
+<p>JavaScript&#39;s <code>parseInt(str, 2)</code> handles binary-to-decimal conversion. No need to manually calculate powers of two.</p>
+<h2>Part Two: Filtering Reports</h2>
+<p>Part two is more complex. We filter the list based on bit criteria, position by position, until one number remains.</p>
+<p>For the <strong>oxygen generator rating</strong>: at each position, keep numbers with the most common bit (ties favor <code>1</code>).</p>
+<p>For the <strong>CO2 scrubber rating</strong>: keep numbers with the least common bit (ties favor <code>0</code>).</p>
+<pre><code class="language-typescript">type Histogram = { most: Bit; least: Bit };
+
+const getHistogram = (reports: Bit[][], index: number): Histogram =&gt; {
+    let zeros = 0;
+    let ones = 0;
+    
+    for (const row of reports) {
+        if (row[index] === &quot;0&quot;) zeros++;
+        else ones++;
+    }
+    
+    return {
+        most: zeros &gt; ones ? &quot;0&quot; : &quot;1&quot;,   // Ties favor 1
+        least: ones &lt; zeros ? &quot;1&quot; : &quot;0&quot;   // Ties favor 0
+    };
+};
+
+const partTwo = (input: Bit[][], debug: boolean) =&gt; {
+    // Oxygen generator rating
+    let o2Reports = [...input];
+    let o2Index = 0;
+    while (o2Reports.length &gt; 1) {
+        const hist = getHistogram(o2Reports, o2Index);
+        o2Reports = o2Reports.filter(row =&gt; row[o2Index] === hist.most);
+        o2Index++;
+    }
+    const o2Value = parseInt(o2Reports[0].join(&quot;&quot;), 2);
+    
+    // CO2 scrubber rating
+    let co2Reports = [...input];
+    let co2Index = 0;
+    while (co2Reports.length &gt; 1) {
+        const hist = getHistogram(co2Reports, co2Index);
+        co2Reports = co2Reports.filter(row =&gt; row[co2Index] === hist.least);
+        co2Index++;
+    }
+    const co2Value = parseInt(co2Reports[0].join(&quot;&quot;), 2);
+    
+    return o2Value * co2Value;
+};
+</code></pre>
+<p>The code is duplicated between O2 and CO2 calculations. I could extract a helper, but we&#39;re only calling it twice. For AoC, clarity beats DRY.</p>
+<h3>The Tie-Breaker Trap</h3>
+<p>The puzzle specifies that ties favor <code>1</code> for most-common and <code>0</code> for least-common. This asymmetry is easy to miss. My histogram logic handles it:</p>
+<pre><code class="language-typescript">most: zeros &gt; ones ? &quot;0&quot; : &quot;1&quot;   // Equal means 1 wins
+least: ones &lt; zeros ? &quot;1&quot; : &quot;0&quot;  // Equal means 0 wins
+</code></pre>
+<p>If zeros and ones are equal, <code>zeros &gt; ones</code> is false, so we return <code>&quot;1&quot;</code>. The least-common check is inverted similarly.</p>
+<h2>Performance</h2>
+<p>Both parts run in under 10 milliseconds combined. The algorithm is essentially linear — we&#39;re iterating through the input a handful of times.</p>
+<p>I&#39;m sure there&#39;s a clever bit-manipulation solution hiding here. You could probably XOR and AND your way to the answer faster. But the naive approach is fast enough and obviously correct. Optimization can wait for puzzles where it matters.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Strings are fine for small inputs</strong>: Representing bits as <code>&quot;0&quot;</code> and <code>&quot;1&quot;</code> strings is wasteful but clear. Premature optimization is the root of all evil.</p>
+</li>
+<li><p><strong><code>parseInt(str, 2)</code> is your friend</strong>: JavaScript handles binary parsing natively. No need for manual conversion.</p>
+</li>
+<li><p><strong>Literal types catch errors</strong>: <code>type Bit = &quot;0&quot; | &quot;1&quot;</code> means TypeScript will complain if you accidentally use <code>&quot;2&quot;</code> or forget to handle a case.</p>
+</li>
+<li><p><strong>Copy before filtering</strong>: The <code>[...input]</code> spread creates a copy so the original array isn&#39;t mutated. Important when you need to process the same data twice with different criteria.</p>
+</li>
+<li><p><strong>Watch for tie-breaker rules</strong>: The asymmetric handling of ties (favor 1 vs favor 0) is the kind of detail that&#39;s easy to miss on first read.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2021/ts/day-03">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2021 — Day 3</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="02.html" rel="prev" aria-label="Previous: Day 2 — Dive!">← Day 2 — Dive!</a>
+<a class="next" href="04.html" rel="next" aria-label="Next: Day 4 — Giant Squid">Day 4 — Giant Squid →</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

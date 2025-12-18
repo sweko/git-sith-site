@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 2/2021 - Dive! — AoC 2021 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Piloting a submarine with regex-parsed commands. Tuples and TypeScript inference doing the heavy lifting.">
+  <link rel="canonical" href="/aoc/2021/02/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 2/2021 - Dive!</h1>
+        <div class="article-meta"><time datetime="2021">2021</time> · 4 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day two of AoC 2021 (available at <a href="https://adventofcode.com/2021/day/2">https://adventofcode.com/2021/day/2</a>) has us piloting the submarine. Time to <a href="https://www.youtube.com/watch?v=paxCkni3ahU" target="_blank">dive</a> deeper into the ocean to find those sleigh keys.</p>
+<p>The input is a series of commands: <code>forward 5</code>, <code>down 3</code>, <code>up 2</code>. We need to track position and depth.</p>
+<h2>Parsing the Input</h2>
+<p>My first instinct when I see structured text: regex. But my rule is <strong>never write regexes in code</strong> — always develop them in a tool like regex101, then paste them in.</p>
+<pre><code class="language-typescript">type Direction = &quot;forward&quot; | &quot;down&quot; | &quot;up&quot;;
+type Instruction = [Direction, number];
+
+const processInput = (day: number): Instruction[] =&gt; {
+    const lines = readInputLines(day);
+    const regex = /^(forward|down|up) (\d+)$/;
+    
+    return lines.map(line =&gt; {
+        const match = line.match(regex);
+        return [match![1] as Direction, Number(match![2])];
+    });
+};
+</code></pre>
+<p>The <code>Direction</code> type is a literal union — TypeScript knows a direction can only be one of three specific strings. The <code>Instruction</code> tuple pairs a direction with a number. This modeling pays off later.</p>
+<h2>Part One: Simple Navigation</h2>
+<ul>
+<li><code>forward X</code> increases horizontal position by X</li>
+<li><code>down X</code> increases depth by X (we&#39;re underwater, positive is down)</li>
+<li><code>up X</code> decreases depth by X</li>
+</ul>
+<pre><code class="language-typescript">const partOne = (input: Instruction[], debug: boolean) =&gt; {
+    let position = 0;
+    let depth = 0;
+    
+    for (const [direction, value] of input) {
+        if (direction === &quot;forward&quot;) {
+            position += value;
+        } else if (direction === &quot;down&quot;) {
+            depth += value;
+        } else if (direction === &quot;up&quot;) {
+            depth -= value;
+        }
+    }
+    
+    if (depth &lt; 0) {
+        throw new Error(&quot;The submarine is flying!&quot;);
+    }
+    
+    return position * depth;
+};
+</code></pre>
+<p>The flying submarine check is a sanity assertion. Submarines aren&#39;t equipped for aviation — if we go above water, something&#39;s wrong with our logic.</p>
+<p>GitHub Copilot was helpful here. Once I typed <code>if (direction === &quot;forward&quot;)</code>, it inferred the pattern and suggested the depth increases/decreases. Good type modeling feeds good autocomplete.</p>
+<h2>Part Two: Aim Mechanics</h2>
+<p>Part two changes the interpretation. Now we track &quot;aim&quot; as a third value:</p>
+<ul>
+<li><code>down X</code> increases aim by X</li>
+<li><code>up X</code> decreases aim by X  </li>
+<li><code>forward X</code> increases position by X AND increases depth by (aim × X)</li>
+</ul>
+<pre><code class="language-typescript">const partTwo = (input: Instruction[], debug: boolean) =&gt; {
+    let position = 0;
+    let depth = 0;
+    let aim = 0;
+    
+    for (const [direction, value] of input) {
+        if (direction === &quot;forward&quot;) {
+            position += value;
+            depth += aim * value;
+        } else if (direction === &quot;down&quot;) {
+            aim += value;
+        } else if (direction === &quot;up&quot;) {
+            aim -= value;
+        }
+    }
+    
+    if (depth &lt; 0) {
+        throw new Error(&quot;The submarine is flying!&quot;);
+    }
+    
+    return position * depth;
+};
+</code></pre>
+<p>Same structure, different semantics. Down/up now affect aim instead of depth directly, and forward has a side effect on depth.</p>
+<h2>Why Tuples Matter</h2>
+<p>The <code>Instruction</code> type as <code>[Direction, number]</code> lets us destructure cleanly:</p>
+<pre><code class="language-typescript">for (const [direction, value] of input) {
+</code></pre>
+<p>TypeScript knows <code>direction</code> is a <code>Direction</code> and <code>value</code> is a <code>number</code>. The inference flows through, Copilot makes better suggestions, and typos get caught at compile time.</p>
+<p>Compare to using <code>any[]</code> or <code>{command: string, value: number}</code> — you lose the precision and the tooling benefits.</p>
+<h2>Performance</h2>
+<p>Both parts run in about a millisecond. The input parsing takes longer (~22ms) than the actual computation. </p>
+<p>Could I optimize? Sure. Should I? No. It runs once, it&#39;s fast enough. Optimizing from 1ms to 0.5ms when you run it once per month saves you... nothing meaningful.</p>
+<p>Save optimization energy for the later puzzles where naive solutions run until the heat death of the universe.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Develop regexes outside your code</strong>: Tools like regex101 let you test and debug interactively. Paste the working regex into your code.</p>
+</li>
+<li><p><strong>Literal types are powerful</strong>: <code>&quot;forward&quot; | &quot;down&quot; | &quot;up&quot;</code> is more useful than <code>string</code>. TypeScript can verify exhaustiveness and enable better autocomplete.</p>
+</li>
+<li><p><strong>Tuples for fixed structures</strong>: When you have &quot;exactly two things, first is X, second is Y,&quot; use a tuple type, not an array.</p>
+</li>
+<li><p><strong>Sanity assertions catch logic bugs</strong>: The &quot;flying submarine&quot; check would immediately reveal if my up/down logic was inverted.</p>
+</li>
+<li><p><strong>Don&#39;t optimize prematurely</strong>: A millisecond is fast enough for a one-shot computation.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2021/ts/day-02">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2021 — Day 2</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="01.html" rel="prev" aria-label="Previous: Day 1 — Sonar Sweep">← Day 1 — Sonar Sweep</a>
+<a class="next" href="03.html" rel="next" aria-label="Next: Day 3 — Binary Diagnostic">Day 3 — Binary Diagnostic →</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
