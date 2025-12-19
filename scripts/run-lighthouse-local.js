@@ -73,9 +73,27 @@ async function waitForServer(url, attempts = 60, delay = 500) {
     console.log('\nRunning collapsible code checks...');
     runSync('node', [path.join('scripts','check-collapsible.js')]);
 
-    // Determine Puppeteer's Chromium path for reproducible Lighthouse runs
-    const CHROME_PATH = spawnSync('node', ['-e', "console.log(require('puppeteer').executablePath())"], { encoding: 'utf8', shell: true }).stdout.trim();
-    console.log('Using Chrome at:', CHROME_PATH);
+    // Determine Puppeteer's Chromium path for reproducible Lighthouse runs (prefer Puppeteer)
+    let CHROME_PATH = process.env.CHROME_PATH;
+    let usingSystemChrome = false;
+    try {
+      if (!CHROME_PATH) {
+        const puppeteer = require('puppeteer');
+        CHROME_PATH = puppeteer.executablePath();
+        console.log('Using Puppeteer Chromium at:', CHROME_PATH);
+      } else {
+        usingSystemChrome = true;
+        console.warn('Using CHROME_PATH from environment:', CHROME_PATH, '(system Chrome). This may affect running user Chrome instances. Set CHROME_PATH to Puppeteer Chromium or install puppeteer for an isolated Chrome.');
+      }
+    } catch (e) {
+      if (process.env.CHROME_PATH) {
+        CHROME_PATH = process.env.CHROME_PATH;
+        usingSystemChrome = true;
+        console.warn('Puppeteer not available; falling back to CHROME_PATH env:', CHROME_PATH);
+      } else {
+        throw new Error('Puppeteer not installed and CHROME_PATH not set. Install puppeteer (npm i -D puppeteer) or set CHROME_PATH to your Chrome binary to run Lighthouse locally.');
+      }
+    }
 
     // Ensure output directories exist
     const reportsDir = path.join('dev','lighthouse','reports');
@@ -95,17 +113,29 @@ async function waitForServer(url, attempts = 60, delay = 500) {
       `--chrome-path="${CHROME_PATH}"`
     ];
 
+    function runLighthouse(outPath, url, emulation) {
+      try {
+        runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags(outPath, url, emulation)]);
+      } catch (err) {
+        if (fs.existsSync(outPath)) {
+          console.warn(`Lighthouse failed but produced a report at ${outPath}; proceeding and ignoring cleanup errors.`);
+        } else {
+          throw err;
+        }
+      }
+    }
+
     console.log('\nRunning Lighthouse (mobile) for AoC Day 7...');
-    runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags('./dev/lighthouse/reports/aoc-day07-mobile.html', 'http://127.0.0.1:8080/aoc/2025/07.html', 'mobile')]);
+    runLighthouse('./dev/lighthouse/reports/aoc-day07-mobile.html', 'http://127.0.0.1:8080/aoc/2025/07.html', 'mobile');
 
     console.log('Running Lighthouse (mobile) for Introducing GitSith...');
-    runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags('./dev/lighthouse/reports/introducing-gitsith-mobile.html', 'http://127.0.0.1:8080/articles/introducing-gitsith.html', 'mobile')]);
+    runLighthouse('./dev/lighthouse/reports/introducing-gitsith-mobile.html', 'http://127.0.0.1:8080/articles/introducing-gitsith.html', 'mobile');
 
     console.log('Running Lighthouse (desktop) for AoC Day 7...');
-    runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags('./dev/lighthouse/reports/aoc-day07-desktop.html', 'http://127.0.0.1:8080/aoc/2025/07.html', 'desktop')]);
+    runLighthouse('./dev/lighthouse/reports/aoc-day07-desktop.html', 'http://127.0.0.1:8080/aoc/2025/07.html', 'desktop');
 
     console.log('Running Lighthouse (desktop) for Introducing GitSith...');
-    runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags('./dev/lighthouse/reports/introducing-gitsith-desktop.html', 'http://127.0.0.1:8080/articles/introducing-gitsith.html', 'desktop')]);
+    runLighthouse('./dev/lighthouse/reports/introducing-gitsith-desktop.html', 'http://127.0.0.1:8080/articles/introducing-gitsith.html', 'desktop');
 
     // Capture screenshots
     console.log('\nCapturing screenshots (mobile + desktop)...');
