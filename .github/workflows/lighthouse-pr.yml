@@ -43,19 +43,19 @@ jobs:
         run: |
           npx -y lighthouse http://127.0.0.1:8080/aoc/2025/07.html \
             --output html --output-path ./dev/lighthouse-reports/aoc-day07-mobile.html \
-            --preset=mobile --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--no-sandbox"
+            --preset=perf --emulated-form-factor=mobile --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--no-sandbox"
 
       - name: Lighthouse — Article - Introducing GitSith (mobile)
         run: |
           npx -y lighthouse http://127.0.0.1:8080/articles/introducing-gitsith.html \
             --output html --output-path ./dev/lighthouse-reports/introducing-gitsith-mobile.html \
-            --preset=mobile --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--no-sandbox"
+            --preset=perf --emulated-form-factor=mobile --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--no-sandbox"
 
       - name: Lighthouse — Homepage (mobile)
         run: |
           npx -y lighthouse http://127.0.0.1:8080/ \
             --output html --output-path ./dev/lighthouse-reports/homepage-mobile.html \
-            --preset=mobile --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--no-sandbox"
+            --preset=perf --emulated-form-factor=mobile --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--no-sandbox"
 
       - name: Capture mobile screenshots
         run: |
