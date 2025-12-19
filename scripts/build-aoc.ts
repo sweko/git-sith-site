@@ -83,9 +83,17 @@ const indexHtml = `<!doctype html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Advent Of Code — ${SITE_TITLE}</title>  <link rel="canonical" href="/aoc/">  <link rel="stylesheet" href="${CSS_PATH}">
+  <title>Advent Of Code — ${SITE_TITLE}</title>  <link rel="canonical" href="/aoc/">
+  <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
   <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
 </head>
 <body>
   <nav class="site-nav">
@@ -186,6 +194,13 @@ for (const y of Object.keys(years)) {
   <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
   <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
   <script src="/assets/js/aoc-nav.js" defer></script>
 </head>
 <body>
