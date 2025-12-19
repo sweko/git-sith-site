@@ -45,7 +45,7 @@ jobs:
             --output html --output-path ./dev/lighthouse-reports/aoc-day07-mobile.html \
             --preset=mobile --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--no-sandbox"
 
-      - name: Lighthouse — Article: Introducing GitSith (mobile)
+      - name: Lighthouse — Article - Introducing GitSith (mobile)
         run: |
           npx -y lighthouse http://127.0.0.1:8080/articles/introducing-gitsith.html \
             --output html --output-path ./dev/lighthouse-reports/introducing-gitsith-mobile.html \
