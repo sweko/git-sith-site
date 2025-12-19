@@ -200,6 +200,7 @@ for (const y of Object.keys(years)) {
       <header class="article-header">
         <h1>Day ${parseInt(d.day,10)}/${y} - ${escapeHtml(d.title)}</h1>
         <div class="article-meta"><time datetime="${y}">${y}</time> · ${readingMinutes} min read</div>
+        ${navHtml}
       </header>
       <div class="article-content">
         ${html}
