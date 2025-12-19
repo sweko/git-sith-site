@@ -1,0 +1,116 @@
+name: Lighthouse PR report
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  lighthouse:
+    name: Run Lighthouse (mobile) and upload reports
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
+      - name: Serve site
+        run: npx http-server ./ -p 8080 &
+
+      - name: Wait for server
+        run: |
+          for i in {1..10}; do
+            if curl -sSf http://127.0.0.1:8080 >/dev/null; then
+              echo Server is up
+              break
+            fi
+            sleep 1
+          done
+
+      - name: Create reports dir
+        run: mkdir -p ./dev/lighthouse-reports
+
+      - name: Verify collapsible code blocks
+        run: node scripts/check-collapsible.js
+
+      - name: Lighthouse — AoC Day 7 (mobile)
+        run: |
+          # Use Puppeteer's bundled Chromium to avoid X server display issues in the runner
+          CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+          npx -y lighthouse http://127.0.0.1:8080/aoc/2025/07.html \
+            --output html --output-path ./dev/lighthouse-reports/aoc-day07-mobile.html \
+            --preset=perf --emulated-form-factor=mobile --only-categories=performance,accessibility,best-practices,seo \
+            --chrome-flags="--no-sandbox --headless=new --disable-gpu --disable-dev-shm-usage" \
+            --chrome-path="$CHROME_PATH"
+
+      - name: Lighthouse — Article - Introducing GitSith (mobile)
+        run: |
+          CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+          npx -y lighthouse http://127.0.0.1:8080/articles/introducing-gitsith.html \
+            --output html --output-path ./dev/lighthouse-reports/introducing-gitsith-mobile.html \
+            --preset=perf --emulated-form-factor=mobile --only-categories=performance,accessibility,best-practices,seo \
+            --chrome-flags="--no-sandbox --headless=new --disable-gpu --disable-dev-shm-usage" \
+            --chrome-path="$CHROME_PATH"
+
+      - name: Lighthouse — Homepage (mobile)
+        run: |
+          CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+          npx -y lighthouse http://127.0.0.1:8080/ \
+            --output html --output-path ./dev/lighthouse-reports/homepage-mobile.html \
+            --preset=perf --emulated-form-factor=mobile --only-categories=performance,accessibility,best-practices,seo \
+            --chrome-flags="--no-sandbox --headless=new --disable-gpu --disable-dev-shm-usage" \
+            --chrome-path="$CHROME_PATH"
+
+      - name: Lighthouse — AoC Day 7 (desktop)
+        run: |
+          CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+          npx -y lighthouse http://127.0.0.1:8080/aoc/2025/07.html \
+            --output html --output-path ./dev/lighthouse-reports/aoc-day07-desktop.html \
+            --preset=perf --emulated-form-factor=desktop --only-categories=performance,accessibility,best-practices,seo \
+            --chrome-flags="--no-sandbox --headless=new --disable-gpu --disable-dev-shm-usage" \
+            --chrome-path="$CHROME_PATH"
+
+      - name: Lighthouse — Article - Introducing GitSith (desktop)
+        run: |
+          CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+          npx -y lighthouse http://127.0.0.1:8080/articles/introducing-gitsith.html \
+            --output html --output-path ./dev/lighthouse-reports/introducing-gitsith-desktop.html \
+            --preset=perf --emulated-form-factor=desktop --only-categories=performance,accessibility,best-practices,seo \
+            --chrome-flags="--no-sandbox --headless=new --disable-gpu --disable-dev-shm-usage" \
+            --chrome-path="$CHROME_PATH"
+
+      - name: Lighthouse — Homepage (desktop)
+        run: |
+          CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+          npx -y lighthouse http://127.0.0.1:8080/ \
+            --output html --output-path ./dev/lighthouse-reports/homepage-desktop.html \
+            --preset=perf --emulated-form-factor=desktop --only-categories=performance,accessibility,best-practices,seo \
+            --chrome-flags="--no-sandbox --headless=new --disable-gpu --disable-dev-shm-usage" \
+            --chrome-path="$CHROME_PATH"
+
+      - name: Capture mobile screenshots
+        run: |
+          # ensure node deps are available
+          npm ci
+          node scripts/capture-screenshots.js
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: ./dev/lighthouse/reports
+
+      - name: Upload mobile screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-screenshots
+          path: ./dev/lighthouse/screenshots

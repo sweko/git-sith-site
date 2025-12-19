@@ -2,16 +2,18 @@
 
 /* Article layout */
 .article-container {
-  max-width: 1100px; /* Wider article layout */
-  margin: 2rem auto;
+  max-width: min(1100px, 65ch); /* limit line length and cap width */
+  width: calc(100% - 2rem);
+  margin: 1.25rem auto;
   background: var(--article-bg);
-  padding: 2rem 2.5rem; /* slightly more horizontal padding for larger layouts */
+  padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 6px 18px var(--article-shadow);
   color: var(--text-color);
+  box-sizing: border-box;
   /* match nav's backdrop for a unified translucent surface */
   backdrop-filter: var(--surface-blur, blur(6px));
-}
+} 
 
 .article-content pre {
   background: var(--code-bg);
@@ -91,12 +93,18 @@
   background: var(--code-bg);
   padding: 1.1rem 1.2rem;
   border-radius: 10px;
-  overflow: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   margin: 1rem 0;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
   font-size: 0.95rem;
   line-height: 1.6;
-} .article-content pre code { background: transparent; padding: 0; display: block; }
+  white-space: pre;
+}
+@media (max-width: 420px) {
+  .article-content pre { white-space: pre-wrap; word-break: break-word; }
+}
+.article-content pre code { background: transparent; padding: 0; display: block; }
 .article-content pre code { background: transparent; padding: 0; display: block; }
 
 .article-content code {
@@ -134,6 +142,27 @@
   margin: 0.75rem auto;
   border-radius: 6px;
 }
+
+/* Make tables horizontally scrollable on small screens without changing markup */
+.article-content table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Improve touch targets for nav and buttons */
+.site-nav a, .theme-toggle, .aoc-nav a { padding: 0.45rem 0.6rem; min-height: 44px; display: inline-flex; align-items: center; }
+
+/* Responsive heading sizing */
+.article-header h1 { font-size: clamp(1.6rem, 4.5vw, 2.25rem); }
+
+/* Slightly tighter spacing on very small screens */
+@media (max-width: 640px) {
+  .article-container { padding: 0.9rem; margin: 0.5rem; }
+  .article-content { font-size: 1rem; line-height: 1.5; }
+}
+
 
 .article-footer {
   margin-top: 2rem;
@@ -174,6 +203,26 @@
   .article-header h1 { font-size: 1.6rem; }
   .article-container { padding: 1rem; margin: 0.5rem; }
 }
+
+/* Collapsible code blocks for mobile */
+.collapsible-code { margin: 0.65rem 0; border-radius: 8px; overflow: hidden; }
+.collapsible-code summary {
+  list-style: none;
+  cursor: pointer;
+  background: rgba(0,0,0,0.04);
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-muted);
+}
+.collapsible-code summary::-webkit-details-marker { display: none; }
+.collapsible-code pre { margin: 0; padding: 1rem; border-radius: 0; }
+
+/* Make sure summary looks like a small button on light/dark */
+.collapsible-code summary { color: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  .collapsible-code, .collapsible-code summary { transition: none; }
+} 
 
 /* AoC day nav */
 .aoc-nav{

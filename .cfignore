@@ -33,3 +33,7 @@ Thumbs.db
 
 # Keep the site output and static assets
 # (do NOT add `index.html`, `assets/`, or `articles/` here)
+
+# CI-generated Artifacts 
+artifacts
+lighthouse
