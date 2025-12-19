@@ -40,7 +40,7 @@ jobs:
         run: mkdir -p ./dev/lighthouse-reports
 
       - name: Verify collapsible code blocks
-        run: node scripts/check-collapsible.js
+        run: npx -y tsx scripts/check-collapsible.ts
 
       - name: Lighthouse — AoC Day 7 (mobile)
         run: |
@@ -101,7 +101,7 @@ jobs:
         run: |
           # ensure node deps are available
           npm ci
-          node scripts/capture-screenshots.js
+          npx -y tsx scripts/capture-screenshots.ts
 
       - name: Upload Lighthouse reports
         uses: actions/upload-artifact@v4
