@@ -6,10 +6,12 @@ import puppeteer from 'puppeteer';
   const outDir = path.resolve(__dirname, '..', 'dev', 'lighthouse', 'screenshots');
   fs.mkdirSync(outDir, { recursive: true });
 
+  const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8080';
+
   const urls: Array<{ name: string; url: string }> = [
-    { name: 'homepage', url: 'http://127.0.0.1:8080/' },
-    { name: 'aoc-day07', url: 'http://127.0.0.1:8080/aoc/2025/07.html' },
-    { name: 'introducing-gitsith', url: 'http://127.0.0.1:8080/articles/introducing-gitsith.html' }
+    { name: 'homepage', url: `${BASE_URL}/` },
+    { name: 'aoc-day07', url: `${BASE_URL}/aoc/2025/07.html` },
+    { name: 'introducing-gitsith', url: `${BASE_URL}/articles/introducing-gitsith.html` }
   ];
 
   const viewports = [

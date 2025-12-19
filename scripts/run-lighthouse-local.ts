@@ -188,8 +188,13 @@ async function waitForServer(url: string, attempts = 60, delay = 500) {
     console.log('\nCapturing screenshots (mobile + desktop)...');
     runSync('npx', ['-y', 'tsx', path.join('scripts', 'capture-screenshots.ts')]);
 
+    console.log('\nPerforming final Chrome temp directory cleanup...');
+    cleanupChromeTempDirs();
+
     console.log('\nAll checks complete. Shutting down local server.');
     try { server.close(); } catch (e) {}
+
+
     process.exit(0);
   } catch (err: any) {
     console.error('Local lighthouse run failed:', err.message || err);

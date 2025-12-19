@@ -1,7 +1,8 @@
 import puppeteer from 'puppeteer';
 
 (async () => {
-  const url = 'http://127.0.0.1:8080/aoc/2025/07.html';
+  const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8080';
+  const url = `${BASE_URL}/aoc/2025/07.html`;
   const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
   const page = await browser.newPage();
   await page.setViewport({ width: 375, height: 667, isMobile: true });

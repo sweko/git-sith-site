@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "npm run build:articles && npm run build:aoc",
+    "build": "npm run build:articles && npm run build:aoc && npm run build:sitemap",
     "build:articles": "tsx scripts/build-articles.ts",
     "build:aoc": "tsx scripts/build-aoc.ts",
+    "build:sitemap": "tsx scripts/build-sitemap.ts",
     "screenshots": "tsx scripts/capture-screenshots.ts",
-    "lighthouse": "tsx scripts/run-lighthouse-local.ts"
+    "lighthouse": "tsx scripts/run-lighthouse-local.ts",
+    "lighthouse:prod": "tsx scripts/run-lighthouse-prod.ts"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

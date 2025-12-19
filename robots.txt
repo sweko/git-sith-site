@@ -1,0 +1,8 @@
+# robots.txt for gitsith.com
+# Allow all crawlers by default. Update as needed.
+
+User-agent: *
+Allow: /
+
+# If you publish a sitemap, uncomment and set the correct URL:
+Sitemap: https://gitsith.com/sitemap.xml
