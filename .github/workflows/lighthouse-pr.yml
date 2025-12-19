@@ -76,7 +76,7 @@ jobs:
             --chrome-flags="--no-sandbox --headless=new --disable-gpu --disable-dev-shm-usage" \
             --chrome-path="$CHROME_PATH"
 
-      - name: Lighthouse — Article: Introducing GitSith (desktop)
+      - name: Lighthouse — Article - Introducing GitSith (desktop)
         run: |
           CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
           npx -y lighthouse http://127.0.0.1:8080/articles/introducing-gitsith.html \
