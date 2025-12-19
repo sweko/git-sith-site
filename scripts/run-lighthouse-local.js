@@ -10,7 +10,8 @@ function runSync(cmd, args, opts = {}) {
   }
 }
 
-async function waitForServer(url, attempts = 10, delay = 500) {
+async function waitForServer(url, attempts = 60, delay = 500) {
+  // Wait longer to accommodate npx installs on first run
   for (let i = 0; i < attempts; i++) {
     try {
       await new Promise((resolve, reject) => {
@@ -34,13 +35,24 @@ async function waitForServer(url, attempts = 10, delay = 500) {
     runSync('npm', ['run', 'build']);
 
     // Start a local static server via npx http-server
-    console.log('Starting local http-server on port 8080...');
-    const server = spawn('npx', ['http-server', './', '-p', '8080'], { stdio: 'inherit', shell: true });
+    console.log('Starting local http-server on port 8080... (using npx --yes to avoid install prompt)');
+    const server = spawn('npx', ['--yes','http-server', './', '-p', '8080'], { stdio: 'inherit' });
 
-    // Wait for server
+    // If the server process exits early, fail fast
+    let serverExited = false;
+    server.on('exit', (code, sig) => {
+      serverExited = true;
+      console.error(`Local server process exited early (code=${code}, signal=${sig})`);
+    });
+    server.on('error', (err) => {
+      serverExited = true;
+      console.error('Failed to start local server:', err);
+    });
+
+    // Wait for server (allow longer for initial npx install)
     const up = await waitForServer('http://127.0.0.1:8080/');
-    if (!up) {
-      server.kill();
+    if (!up || serverExited) {
+      try { server.kill(); } catch (e) {}
       throw new Error('Local server did not start in time');
     }
 
