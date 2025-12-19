@@ -67,6 +67,33 @@ jobs:
             --chrome-flags="--no-sandbox --headless=new --disable-gpu --disable-dev-shm-usage" \
             --chrome-path="$CHROME_PATH"
 
+      - name: Lighthouse — AoC Day 7 (desktop)
+        run: |
+          CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+          npx -y lighthouse http://127.0.0.1:8080/aoc/2025/07.html \
+            --output html --output-path ./dev/lighthouse-reports/aoc-day07-desktop.html \
+            --preset=perf --emulated-form-factor=desktop --only-categories=performance,accessibility,best-practices,seo \
+            --chrome-flags="--no-sandbox --headless=new --disable-gpu --disable-dev-shm-usage" \
+            --chrome-path="$CHROME_PATH"
+
+      - name: Lighthouse — Article: Introducing GitSith (desktop)
+        run: |
+          CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+          npx -y lighthouse http://127.0.0.1:8080/articles/introducing-gitsith.html \
+            --output html --output-path ./dev/lighthouse-reports/introducing-gitsith-desktop.html \
+            --preset=perf --emulated-form-factor=desktop --only-categories=performance,accessibility,best-practices,seo \
+            --chrome-flags="--no-sandbox --headless=new --disable-gpu --disable-dev-shm-usage" \
+            --chrome-path="$CHROME_PATH"
+
+      - name: Lighthouse — Homepage (desktop)
+        run: |
+          CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+          npx -y lighthouse http://127.0.0.1:8080/ \
+            --output html --output-path ./dev/lighthouse-reports/homepage-desktop.html \
+            --preset=perf --emulated-form-factor=desktop --only-categories=performance,accessibility,best-practices,seo \
+            --chrome-flags="--no-sandbox --headless=new --disable-gpu --disable-dev-shm-usage" \
+            --chrome-path="$CHROME_PATH"
+
       - name: Capture mobile screenshots
         run: |
           # ensure node deps are available

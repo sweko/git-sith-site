@@ -204,6 +204,26 @@
   .article-container { padding: 1rem; margin: 0.5rem; }
 }
 
+/* Collapsible code blocks for mobile */
+.collapsible-code { margin: 0.65rem 0; border-radius: 8px; overflow: hidden; }
+.collapsible-code summary {
+  list-style: none;
+  cursor: pointer;
+  background: rgba(0,0,0,0.04);
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-muted);
+}
+.collapsible-code summary::-webkit-details-marker { display: none; }
+.collapsible-code pre { margin: 0; padding: 1rem; border-radius: 0; }
+
+/* Make sure summary looks like a small button on light/dark */
+.collapsible-code summary { color: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  .collapsible-code, .collapsible-code summary { transition: none; }
+} 
+
 /* AoC day nav */
 .aoc-nav{
   display:flex;
