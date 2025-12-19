@@ -4,5 +4,5 @@
 User-agent: *
 Allow: /
 
-# If you publish a sitemap, uncomment and set the correct URL:
+# Sitemap for search engines
 Sitemap: https://gitsith.com/sitemap.xml
