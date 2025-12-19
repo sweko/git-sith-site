@@ -77,6 +77,12 @@ async function waitForServer(url, attempts = 60, delay = 500) {
     const CHROME_PATH = spawnSync('node', ['-e', "console.log(require('puppeteer').executablePath())"], { encoding: 'utf8', shell: true }).stdout.trim();
     console.log('Using Chrome at:', CHROME_PATH);
 
+    // Ensure output directories exist
+    const reportsDir = path.join('dev','lighthouse','reports');
+    const screenshotsDir = path.join('dev','lighthouse','screenshots');
+    try { fs.mkdirSync(reportsDir, { recursive: true }); } catch (e) { /* ignore */ }
+    try { fs.mkdirSync(screenshotsDir, { recursive: true }); } catch (e) { /* ignore */ }
+
     // Run Lighthouse audits (mobile + desktop) for representative pages
     const lighthouseFlags = (outPath, url, emulation) => [
       url,
