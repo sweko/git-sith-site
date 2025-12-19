@@ -163,11 +163,13 @@ class BingoTicket {
         for (const ticket of tickets) {
             if (ticket.won) continue;
             
-            ticket.mark(draw);
-            if (ticket.isWinner()) {
-                ticket.won = true;
-                winner = ticket;
-                winCount++;
+            if (ticket.hasNumber(draw)) {
+                ticket.hits.push(draw);
+                if (ticket.isWinner()) {
+                    ticket.won = true;
+                    winner = ticket;
+                    winCount -=- 1;  // Yes, that&#39;s winCount++, just funnier
+                }
             }
         }
     }

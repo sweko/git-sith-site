@@ -96,38 +96,34 @@ const partOne = (input: Input, debug: boolean) =&gt; {
 <li>If so, adjust our start to avoid double-counting</li>
 <li>Sum up the lengths</li>
 </ol>
-<pre><code class="language-typescript">const partTwo = (input: Input, debug: boolean) =&gt; {
-    const { ranges } = input;
-    
+<pre><code class="language-typescript">const partTwo = ({ranges}: Input, debug: boolean) =&gt; {
     const sortedRanges = ranges
-        .map(range =&gt; range.slice() as Range)
+        .map(range =&gt; range.slice())
         .toSorted((a, b) =&gt; a[0] - b[0]);
     
     let totalCount = 0;
-    
+
     for (let index = 0; index &lt; sortedRanges.length; index++) {
         const currentRange = sortedRanges[index];
+        // Find max end value of all previous ranges using helper
+        const prevMax = sortedRanges.slice(0, index).max(([_, max]) =&gt; max);
         
-        // Find the maximum end value of all previous ranges
-        const previousMaximums = sortedRanges
-            .slice(0, index)
-            .map(([_, max]) =&gt; max);
-        const previousMax = Math.max(-Infinity, ...previousMaximums);
-        
-        // If previous ranges overlap, adjust our start
-        if (previousMax &gt;= currentRange[0]) {
-            currentRange[0] = previousMax + 1;
+        if (prevMax &gt;= currentRange[0]) {
+            currentRange[0] = prevMax + 1;
         }
-        
-        // Only count if we have a valid range left
-        if (currentRange[0] &lt;= currentRange[1]) {
-            totalCount += currentRange[1] - currentRange[0] + 1;
+
+        if (currentRange[0] &gt; currentRange[1]) {
+            continue; // Fully overlapped
         }
+
+        const rangeLength = currentRange[1] - currentRange[0] + 1;
+        totalCount += rangeLength;
     }
-    
+
     return totalCount;
 };
 </code></pre>
+<p>The <code>.max()</code> helper takes a selector function and returns the maximum value. It&#39;s another prototype extension.</p>
 <p>The key insight: by sorting first, we guarantee all previous ranges started before (or at) our start. We only need to check if any of them <em>end</em> after our start — that&#39;s the overlap.</p>
 <p>When we find an overlap, we adjust our start to <code>previousMax + 1</code>. If that pushes our start past our end, the range is fully subsumed and contributes zero.</p>
 <h3>Why This Works</h3>

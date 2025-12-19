@@ -55,30 +55,30 @@ const processInput = (day: number): Point[] =&gt; {
     distance: number;
 };
 
-const toKey = (p: Point): string =&gt; `${p.x} ${p.y} ${p.z}`;
+const toKey = (point: Point): string =&gt; `${point.x},${point.y},${point.z}`;
 
-const getDistances = (points: Point[]): Distance[] =&gt; {
+function getDistances(input: Point[]) {
     const distances: Distance[] = [];
-    
-    for (let i = 0; i &lt; points.length; i++) {
-        for (let j = i + 1; j &lt; points.length; j++) {
-            const p1 = points[i];
-            const p2 = points[j];
-            const distance = Math.sqrt(
-                (p1.x - p2.x) ** 2 + 
-                (p1.y - p2.y) ** 2 + 
-                (p1.z - p2.z) ** 2
-            );
+
+    for (let findex = 0; findex &lt; input.length; findex++) {
+        const first = input[findex];
+        for (let sindex = findex + 1; sindex &lt; input.length; sindex++) {
+            const second = input[sindex];
+            const dx = first.x - second.x;
+            const dy = first.y - second.y;
+            const dz = first.z - second.z;
+            const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
             distances.push({
-                first: toKey(p1),
-                second: toKey(p2),
-                distance
+                first: toKey(first),
+                second: toKey(second),
+                distance: distance
             });
         }
     }
-    
-    return distances.sort((a, b) =&gt; a.distance - b.distance);
-};
+
+    distances.sort((a, b) =&gt; a.distance - b.distance);
+    return distances;
+}
 </code></pre>
 <p>For 1,000 junction boxes, that&#39;s about 500,000 distance calculations. Sorted by distance, we can process connections from shortest to longest.</p>
 <h2>Part One: Finding Circuits</h2>
@@ -91,38 +91,38 @@ const getDistances = (points: Point[]): Distance[] =&gt; {
 <li><strong>Neither in a circuit</strong>: Create a new circuit with both</li>
 </ol>
 <pre><code class="language-typescript">const partOne = (input: Point[], debug: boolean) =&gt; {
+    const topJunctionCount = 1000;
     const distances = getDistances(input);
-    const junctions = distances.slice(0, 1000); // Top N closest
-    
+    const junctions = distances.slice(0, topJunctionCount);
+
     const circuits: Set&lt;string&gt;[] = [];
-    
-    for (const { first, second } of junctions) {
-        const firstCircuit = circuits.find(c =&gt; c.has(first));
-        const secondCircuit = circuits.find(c =&gt; c.has(second));
-        
+
+    for (const {first, second} of junctions) {
+        let firstCircuit = circuits.find(c =&gt; c.has(first));
+        let secondCircuit = circuits.find(c =&gt; c.has(second));
+
         if (firstCircuit &amp;&amp; secondCircuit) {
             if (firstCircuit !== secondCircuit) {
                 // Merge circuits
-                const merged = new Set([...firstCircuit, ...secondCircuit]);
-                const secondIndex = circuits.indexOf(secondCircuit);
-                circuits.splice(secondIndex, 1);
-                const firstIndex = circuits.indexOf(firstCircuit);
-                circuits[firstIndex] = merged;
+                const joinedCircuit = new Set([...firstCircuit, ...secondCircuit]);
+                circuits.splice(circuits.indexOf(secondCircuit), 1);
+                circuits[circuits.indexOf(firstCircuit)] = joinedCircuit;
             }
-            // Same circuit: do nothing
         } else if (firstCircuit) {
             firstCircuit.add(second);
         } else if (secondCircuit) {
             secondCircuit.add(first);
         } else {
+            // Create new circuit
             circuits.push(new Set([first, second]));
         }
     }
     
     // Sort by size, multiply top 3
     circuits.sort((a, b) =&gt; b.size - a.size);
-    const [top1, top2, top3] = circuits;
-    return (top1?.size ?? 1) * (top2?.size ?? 1) * (top3?.size ?? 1);
+    const [topOne, topTwo, topThree] = circuits;
+    const result = topOne.size * (topTwo ? topTwo.size : 1) * (topThree ? topThree.size : 1);
+    return result;
 };
 </code></pre>
 <h3>The Merge Bug</h3>
@@ -146,30 +146,28 @@ circuits[circuits.indexOf(firstCircuit)] = merged;
 <p>Now we need to process <em>all</em> distances (sorted), not just the top N. We start with each junction box in its own circuit:</p>
 <pre><code class="language-typescript">const partTwo = (input: Point[], debug: boolean) =&gt; {
     const distances = getDistances(input);
-    
-    // Start with each point in its own circuit
+
     const circuits: Set&lt;string&gt;[] = input.map(p =&gt; new Set([toKey(p)]));
-    
-    for (const { first, second } of distances) {
-        const firstCircuit = circuits.find(c =&gt; c.has(first))!;
-        const secondCircuit = circuits.find(c =&gt; c.has(second))!;
-        
+
+    for (const {first, second} of distances) {
+        let firstCircuit = circuits.find(c =&gt; c.has(first))!;
+        let secondCircuit = circuits.find(c =&gt; c.has(second))!;
+
         if (firstCircuit !== secondCircuit) {
             // Merge circuits
-            const merged = new Set([...firstCircuit, ...secondCircuit]);
+            const joinedCircuit = new Set([...firstCircuit, ...secondCircuit]);
             circuits.splice(circuits.indexOf(secondCircuit), 1);
-            circuits[circuits.indexOf(firstCircuit)] = merged;
-            
-            if (circuits.length === 1) {
-                // Found it! Return product of x-coordinates
-                const [fx] = first.split(&quot; &quot;).map(Number);
-                const [sx] = second.split(&quot; &quot;).map(Number);
-                return fx * sx;
-            }
+            circuits[circuits.indexOf(firstCircuit)] = joinedCircuit;
+        }
+
+        if (circuits.length == 1) {
+            // Found it! Return product of x-coordinates
+            const fx = first.split(&quot;,&quot;).map(Number)[0];
+            const sx = second.split(&quot;,&quot;).map(Number)[0];
+            return fx * sx;
         }
     }
-    
-    throw new Error(&quot;Couldn&#39;t connect all circuits&quot;);
+    throw new Error(&quot;Could not connect all circuits&quot;);
 };
 </code></pre>
 <p>Starting with 1,000 circuits, each merge reduces the count by one. We watch the count drop: 999, 998, 997... until we hit 1.</p>

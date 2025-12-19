@@ -38,8 +38,8 @@
 <p>The input is a list of horizontal positions for each crab submarine.</p>
 <h2>Parsing the Input</h2>
 <p>Simple comma-separated integers:</p>
-<pre><code class="language-typescript">const processInput = (day: number): number[] =&gt; {
-    const input = readInput(day);
+<pre><code class="language-typescript">const processInput = async (day: number) =&gt; {
+    const input = await readInput(day);
     return input.split(&quot;,&quot;).map(n =&gt; parseInt(n, 10));
 };
 </code></pre>
@@ -49,20 +49,18 @@
 <pre><code class="language-typescript">const partOne = (input: number[], debug: boolean) =&gt; {
     const min = Math.min(...input);
     const max = Math.max(...input);
-    
-    let minFuel = Infinity;
-    
+
+    let minValue = Number.MAX_SAFE_INTEGER;
+
     for (let position = min; position &lt;= max; position++) {
-        let fuel = 0;
-        for (const crab of input) {
-            fuel += Math.abs(crab - position);
-        }
-        if (fuel &lt; minFuel) {
-            minFuel = fuel;
+        const pvalue = input
+            .map(value =&gt; Math.abs(value - position))
+            .reduce((acc, value) =&gt; acc + value, 0);
+        if (pvalue &lt; minValue) {
+            minValue = pvalue;
         }
     }
-    
-    return minFuel;
+    return minValue;
 };
 </code></pre>
 <p>This is O(n × range) — for ~1000 crabs across ~2000 positions, that&#39;s ~2 million operations. Fast enough.</p>
@@ -72,28 +70,23 @@
 <p>The cost to move <code>n</code> steps is the sum of integers from 1 to n. This is where Gauss comes in.</p>
 <p>Legend has it that young Gauss was asked to sum the numbers 1 to 100. Instead of adding laboriously, he noticed: 1+100=101, 2+99=101, 3+98=101... There are 50 such pairs, so the answer is 50×101=5050.</p>
 <p>The general formula: <strong>sum(1 to n) = n × (n+1) / 2</strong></p>
-<pre><code class="language-typescript">const triangularCost = (distance: number): number =&gt; {
-    return (distance * (distance + 1)) / 2;
-};
-
-const partTwo = (input: number[], debug: boolean) =&gt; {
+<pre><code class="language-typescript">const partTwo = (input: number[], debug: boolean) =&gt; {
     const min = Math.min(...input);
     const max = Math.max(...input);
-    
-    let minFuel = Infinity;
-    
+
+    let minValue = Number.MAX_SAFE_INTEGER;
+
     for (let position = min; position &lt;= max; position++) {
-        let fuel = 0;
-        for (const crab of input) {
-            const distance = Math.abs(crab - position);
-            fuel += triangularCost(distance);
-        }
-        if (fuel &lt; minFuel) {
-            minFuel = fuel;
+        const pvalue = input
+            .map(value =&gt; Math.abs(value - position))
+            .map(value =&gt; value * (value + 1) / 2)  // Gauss&#39;s formula inline
+            .reduce((acc, value) =&gt; acc + value, 0);
+
+        if (pvalue &lt; minValue) {
+            minValue = pvalue;
         }
     }
-    
-    return minFuel;
+    return minValue;
 };
 </code></pre>
 <p>Same brute force structure, different cost function.</p>

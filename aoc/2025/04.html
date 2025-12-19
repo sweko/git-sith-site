@@ -35,90 +35,83 @@
       </header>
       <div class="article-content">
         <p>Day four of AoC 2025 (available at <a href="https://adventofcode.com/2025/day/4">https://adventofcode.com/2025/day/4</a>) puts us in a warehouse with a grid of paper rolls. We&#39;re playing a <a href="https://www.youtube.com/watch?v=BiP0FpY88E4" target="_blank">forklift operator</a>, figuring out which rolls we can access and remove.</p>
-<p>A roll is accessible if it has fewer than four neighboring rolls in the eight adjacent positions. Empty spaces are marked with <code>.</code>, rolls with <code>#</code>.</p>
+<p>A roll is accessible if it has fewer than four neighboring rolls in the eight adjacent positions. Empty spaces are marked with <code>.</code>, rolls with <code>@</code>.</p>
 <h2>Parsing the Input</h2>
 <p>The input is a straightforward character grid:</p>
-<pre><code class="language-typescript">type Cell = &quot;.&quot; | &quot;#&quot;;
-type Matrix = Cell[][];
+<pre><code class="language-typescript">type Cell = &quot;.&quot; | &quot;@&quot;;
 
-const processInput = (day: number): Matrix =&gt; {
+const processInput = (day: number) =&gt; {
     const lines = readInputLines(day);
-    const cells = lines.map(line =&gt; 
-        line.split(&quot;&quot;) as Cell[]
-    );
+    const cells = lines.map(line =&gt; line.split(&quot;&quot;) as Cell[]);
     return cells;
 };
 </code></pre>
 <p>Always test your input parsing before diving into the algorithm. I can&#39;t count how many times I&#39;ve debugged a &quot;broken&quot; algorithm only to find the input was malformed.</p>
 <h2>Part One: Counting Accessible Rolls</h2>
 <p>For each roll, we count its neighbors in all eight directions. If fewer than four neighbors are rolls, that roll is accessible.</p>
-<pre><code class="language-typescript">const countNeighbors = (matrix: Matrix, row: number, col: number): number =&gt; {
-    const topRow = matrix[row - 1];
-    const bottomRow = matrix[row + 1];
-    const currentRow = matrix[row];
+<p>The neighbor counting is inline in the <code>removeLayer</code> function, which handles both the counting and the removal:</p>
+<pre><code class="language-typescript">type Cell = &quot;.&quot; | &quot;@&quot;;
+
+type RemoveResponse = {
+    matrix: Cell[][];
+    removed: number;
+};
+
+const removeLayer = (matrix: Cell[][]): RemoveResponse =&gt; {
+    let count = 0;
+    const copy = matrix.map(row =&gt; [...row]);
     
-    const topLeft = topRow?.[col - 1] === &quot;#&quot; ? 1 : 0;
-    const top = topRow?.[col] === &quot;#&quot; ? 1 : 0;
-    const topRight = topRow?.[col + 1] === &quot;#&quot; ? 1 : 0;
-    const left = currentRow?.[col - 1] === &quot;#&quot; ? 1 : 0;
-    const right = currentRow?.[col + 1] === &quot;#&quot; ? 1 : 0;
-    const bottomLeft = bottomRow?.[col - 1] === &quot;#&quot; ? 1 : 0;
-    const bottom = bottomRow?.[col] === &quot;#&quot; ? 1 : 0;
-    const bottomRight = bottomRow?.[col + 1] === &quot;#&quot; ? 1 : 0;
-    
-    return topLeft + top + topRight + left + right + bottomLeft + bottom + bottomRight;
+    for (let row = 0; row &lt; matrix.length; row++) {
+        for (let col = 0; col &lt; matrix[row].length; col++) {
+            if (matrix[row][col] !== &quot;@&quot;) continue;
+
+            const topRow = matrix[row - 1];
+            const topLeft = topRow?.[col - 1] === &quot;@&quot; ? 1 : 0;
+            const topTop = topRow?.[col] === &quot;@&quot; ? 1 : 0;
+            const topRight = topRow?.[col + 1] === &quot;@&quot; ? 1 : 0;
+            const left = matrix[row][col - 1] === &quot;@&quot; ? 1 : 0;
+            const right = matrix[row][col + 1] === &quot;@&quot; ? 1 : 0;
+            const bottomRow = matrix[row + 1];
+            const bottomLeft = bottomRow?.[col - 1] === &quot;@&quot; ? 1 : 0;
+            const bottomBottom = bottomRow?.[col] === &quot;@&quot; ? 1 : 0;
+            const bottomRight = bottomRow?.[col + 1] === &quot;@&quot; ? 1 : 0;
+
+            const neighbors = topLeft + topTop + topRight + left + right + bottomLeft + bottomBottom + bottomRight;
+
+            if (neighbors &lt; 4) {
+                copy[row][col] = &quot;.&quot;;
+                count += 1;
+            }
+        }
+    }
+    return { matrix: copy, removed: count };
 };
 </code></pre>
-<p>JavaScript&#39;s optional chaining (<code>?.</code>) saves us here. Accessing <code>matrix[-1]</code> returns <code>undefined</code>, and <code>undefined?.[0]</code> is also <code>undefined</code>, which is not <code>&quot;#&quot;</code>, so we get 0. No boundary checks needed.</p>
-<h3>The Mutation Bug</h3>
-<p>My first attempt modified the input matrix directly, marking accessible rolls with <code>X</code>. This broke everything — once you mark a roll as <code>X</code>, its neighbors suddenly have fewer roll neighbors, cascading incorrectly through the grid.</p>
-<p>The fix: always work on a copy.</p>
-<pre><code class="language-typescript">const copy = matrix.map(row =&gt; [...row]);
-</code></pre>
-<p>This creates an independent copy where modifications don&#39;t affect the original. I went against my instincts of never mutating input and paid for it with debugging time.</p>
+<p>JavaScript&#39;s optional chaining (<code>?.</code>) saves us here. Accessing <code>matrix[-1]</code> returns <code>undefined</code>, and <code>undefined?.[0]</code> is also <code>undefined</code>, which is not <code>&quot;@&quot;</code>, so we get 0. No boundary checks needed.</p>
+<p>The key insight: we read from the <em>original</em> matrix but write to the <em>copy</em>. This prevents the cascading bug where removing one roll affects its neighbors&#39; counts.</p>
 <h2>Part Two: Iterative Removal</h2>
 <p>Part two asks: keep removing accessible rolls until no more can be removed. How many total rolls do we remove?</p>
 <p>This is where a graph-based solution would shine — model each roll as a node, edges to neighbors, and update connectivity as rolls are removed. Very efficient, very elegant.</p>
 <p>But brute force works too:</p>
-<pre><code class="language-typescript">type RemovalResult = {
-    matrix: Matrix;
-    removed: number;
+<pre><code class="language-typescript">const partOne = (input: Cell[][], debug: boolean) =&gt; {
+    const {removed: result} = removeLayer(input);
+    return result;
 };
 
-const removeLayer = (matrix: Matrix): RemovalResult =&gt; {
-    const copy = matrix.map(row =&gt; [...row]);
-    let count = 0;
-    
-    for (let row = 0; row &lt; matrix.length; row++) {
-        for (let col = 0; col &lt; matrix[row].length; col++) {
-            if (matrix[row][col] !== &quot;#&quot;) continue;
-            
-            const neighbors = countNeighbors(matrix, row, col);
-            if (neighbors &lt; 4) {
-                copy[row][col] = &quot;.&quot;;
-                count++;
-            }
-        }
-    }
-    
-    return { matrix: copy, removed: count };
-};
+const partTwo = (input: Cell[][], debug: boolean) =&gt; {
+    let {removed, matrix} = removeLayer(input);
+    let totalRemoved = removed;
 
-const partTwo = (input: Matrix, debug: boolean) =&gt; {
-    let matrix = input;
-    let total = 0;
-    let passCount = 0;
-    
-    while (true) {
-        const { matrix: newMatrix, removed } = removeLayer(matrix);
-        if (removed === 0) break;
-        
-        total += removed;
-        matrix = newMatrix;
-        passCount++;
+    let passCount = 1;
+    while (removed &gt; 0) {
+        passCount += 1;
+        const response = removeLayer(matrix);
+        matrix = response.matrix;
+        removed = response.removed;
+        totalRemoved += removed;
     }
-    
-    return total;
+
+    return totalRemoved;
 };
 </code></pre>
 <p>We repeatedly call <code>removeLayer</code> until it returns 0 — a stable configuration where all remaining rolls have four or more neighbors and can&#39;t be accessed.</p>

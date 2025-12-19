@@ -37,9 +37,9 @@
 <p>The submarine&#39;s sonar gives us depth measurements. We need to analyze how quickly the sea floor depth increases.</p>
 <h2>Parsing the Input</h2>
 <p>The input is simply one number per line:</p>
-<pre><code class="language-typescript">const processInput = (day: number): number[] =&gt; {
-    const lines = readInputLines(day);
-    return lines.map(line =&gt; parseInt(line, 10));
+<pre><code class="language-typescript">const processInput = async (day: number) =&gt; {
+    const input = await readInputLines(day);
+    return input.map(line =&gt; parseInt(line, 10));
 };
 </code></pre>
 <p>Always specify the radix (10) with <code>parseInt</code>. JavaScript can get weird with leading zeros otherwise.</p>
@@ -47,13 +47,16 @@
 <p>Count how many times the depth measurement increases from one reading to the next.</p>
 <pre><code class="language-typescript">const partOne = (input: number[], debug: boolean) =&gt; {
     let count = 0;
-    
+
     for (let i = 1; i &lt; input.length; i++) {
-        if (input[i] &gt; input[i - 1]) {
-            count++;
+        const current = input[i];
+        const previous = input[i - 1];
+
+        if (current &gt; previous) {
+            count += 1;
         }
     }
-    
+
     return count;
 };
 </code></pre>
@@ -62,20 +65,23 @@
 <p>Part two introduces a sliding window: instead of comparing individual measurements, compare the sum of three consecutive measurements.</p>
 <p>First, create the windows:</p>
 <pre><code class="language-typescript">const partTwo = (input: number[], debug: boolean) =&gt; {
-    // Create sliding window sums
-    const windows: number[] = [];
+    // Calculate the windows
+    const windows = [];
     for (let i = 2; i &lt; input.length; i++) {
-        windows.push(input[i] + input[i - 1] + input[i - 2]);
+        const window = input[i] + input[i - 1] + input[i - 2];
+        windows.push(window);
     }
-    
-    // Count increases (same logic as part one)
+
     let count = 0;
     for (let i = 1; i &lt; windows.length; i++) {
-        if (windows[i] &gt; windows[i - 1]) {
-            count++;
+        const current = windows[i];
+        const previous = windows[i - 1];
+
+        if (current &gt; previous) {
+            count += 1;
         }
     }
-    
+
     return count;
 };
 </code></pre>

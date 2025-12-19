@@ -41,17 +41,18 @@
 <pre><code class="language-typescript">type Direction = &quot;forward&quot; | &quot;down&quot; | &quot;up&quot;;
 type Instruction = [Direction, number];
 
-const processInput = (day: number): Instruction[] =&gt; {
-    const lines = readInputLines(day);
-    const regex = /^(forward|down|up) (\d+)$/;
+const processInput = async (day: number) =&gt; {
+    const input = await readInputLines(day);
+    const regex = /^(forward|down|up) (\d)$/;
     
-    return lines.map(line =&gt; {
-        const match = line.match(regex);
-        return [match![1] as Direction, Number(match![2])];
+    return input.map(line =&gt; {
+        const match = regex.exec(line);
+        return [match![1], parseInt(match![2])] as Instruction;
     });
 };
 </code></pre>
-<p>The <code>Direction</code> type is a literal union — TypeScript knows a direction can only be one of three specific strings. The <code>Instruction</code> tuple pairs a direction with a number. This modeling pays off later.</p>
+<p>The <code>Direction</code> type is a literal union — TypeScript knows a direction can only be one of three specific strings. The <code>Instruction</code> tuple pairs a direction with a number.</p>
+<p>Note the regex only matches single digits (<code>\d</code> not <code>\d+</code>). This works because AoC inputs for this puzzle never exceed 9 — a safe assumption verified by eyeballing the input. In production code you&#39;d use <code>\d+</code>, but here we can be lazy.</p>
 <h2>Part One: Simple Navigation</h2>
 <ul>
 <li><code>forward X</code> increases horizontal position by X</li>

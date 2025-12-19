@@ -83,9 +83,9 @@ for (const line of gridLines) {
     const fromY = Math.min(line.from.y, line.to.y);
     const toY = Math.max(line.from.y, line.to.y);
     
-    for (let row = fromX; row &lt;= toX; row++) {
-        for (let col = fromY; col &lt;= toY; col++) {
-            grid[row][col]++;
+    for (let rindex = fromX; rindex &lt;= toX; rindex++) {
+        for (let cindex = fromY; cindex &lt;= toY; cindex++) {
+            grid[cindex][rindex]++;  // Note: grid[y][x] ordering
         }
     }
 }
@@ -121,7 +121,7 @@ for (const line of diagonals) {
     for (let i = 0; i &lt;= count; i++) {
         const x = line.from.x + i * xDir;
         const y = line.from.y + i * yDir;
-        grid[x][y]++;
+        grid[y][x]++;  // Note: grid[y][x] ordering
     }
 }
 </code></pre>

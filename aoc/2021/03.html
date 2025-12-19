@@ -40,43 +40,41 @@
 <p>Each line is a binary string. I&#39;m representing bits as literal string types:</p>
 <pre><code class="language-typescript">type Bit = &quot;0&quot; | &quot;1&quot;;
 
-const processInput = (day: number): Bit[][] =&gt; {
-    const lines = readInputLines(day);
+const processInput = async (day: number) =&gt; {
+    const lines = await readInputLines(day);
     return lines.map(line =&gt; line.split(&quot;&quot;) as Bit[]);
 };
 </code></pre>
 <p>Yes, using strings to represent bits is &quot;wasteful.&quot; But it works, it&#39;s clear, and the input is small. Save the bit-twiddling heroics for when you need them.</p>
 <h2>Part One: Most and Least Common Bits</h2>
 <p>For each bit position, find the most common bit across all numbers. That forms the gamma rate. The epsilon rate is the complement (least common bits).</p>
-<p>First, count zeros and ones at each position:</p>
+<p>First, count zeros and ones at each position using <code>reduce</code>:</p>
 <pre><code class="language-typescript">type Count = { &quot;0&quot;: number; &quot;1&quot;: number };
 
-const getCounts = (input: Bit[][]): Count[] =&gt; {
-    const width = input[0].length;
-    const counts: Count[] = Array.from({ length: width }, () =&gt; ({ &quot;0&quot;: 0, &quot;1&quot;: 0 }));
-    
-    for (const row of input) {
+const partOne = (input: Bit[][], debug: boolean) =&gt; {
+    const initCounts: Count[] = input[0].map(_ =&gt; ({
+        &#39;0&#39;: 0,
+        &#39;1&#39;: 0
+    }));
+
+    const counts = input.reduce((count, row) =&gt; {
         for (let i = 0; i &lt; row.length; i++) {
-            counts[i][row[i]]++;
+            const bit = row[i];
+            count[i][bit] += 1;
         }
-    }
-    
-    return counts;
+        return count;
+    }, initCounts);
+
+    const gamma = counts.map(count =&gt; (count[0] &gt; count[1] ? &#39;0&#39; : &#39;1&#39;)).join(&quot;&quot;);
+    const epsilon = counts.map(count =&gt; (count[0] &gt; count[1] ? &#39;1&#39; : &#39;0&#39;)).join(&quot;&quot;);
+
+    const gvalue = parseInt(gamma, 2);
+    const evalue = parseInt(epsilon, 2);
+
+    return gvalue * evalue;
 };
 </code></pre>
-<p>Then extract gamma and epsilon:</p>
-<pre><code class="language-typescript">const partOne = (input: Bit[][], debug: boolean) =&gt; {
-    const counts = getCounts(input);
-    
-    const gamma = counts.map(c =&gt; c[&quot;0&quot;] &gt; c[&quot;1&quot;] ? &quot;0&quot; : &quot;1&quot;).join(&quot;&quot;);
-    const epsilon = counts.map(c =&gt; c[&quot;0&quot;] &gt; c[&quot;1&quot;] ? &quot;1&quot; : &quot;0&quot;).join(&quot;&quot;);
-    
-    const gValue = parseInt(gamma, 2);
-    const eValue = parseInt(epsilon, 2);
-    
-    return gValue * eValue;
-};
-</code></pre>
+<p>The <code>reduce</code> accumulates counts across all rows, incrementing the appropriate counter for each bit position.</p>
 <p>JavaScript&#39;s <code>parseInt(str, 2)</code> handles binary-to-decimal conversion. No need to manually calculate powers of two.</p>
 <h2>Part Two: Filtering Reports</h2>
 <p>Part two is more complex. We filter the list based on bit criteria, position by position, until one number remains.</p>
@@ -84,42 +82,41 @@ const getCounts = (input: Bit[][]): Count[] =&gt; {
 <p>For the <strong>CO2 scrubber rating</strong>: keep numbers with the least common bit (ties favor <code>0</code>).</p>
 <pre><code class="language-typescript">type Histogram = { most: Bit; least: Bit };
 
-const getHistogram = (reports: Bit[][], index: number): Histogram =&gt; {
-    let zeros = 0;
-    let ones = 0;
-    
-    for (const row of reports) {
-        if (row[index] === &quot;0&quot;) zeros++;
-        else ones++;
+const getCount = (input: Bit[][], index: number): Histogram =&gt; {
+    const count: Count = { &#39;0&#39;: 0, &#39;1&#39;: 0 };
+
+    for (let i = 0; i &lt; input.length; i++) {
+        const bit = input[i][index];
+        count[bit] += 1;
     }
-    
+
     return {
-        most: zeros &gt; ones ? &quot;0&quot; : &quot;1&quot;,   // Ties favor 1
-        least: ones &lt; zeros ? &quot;1&quot; : &quot;0&quot;   // Ties favor 0
+        &#39;most&#39;: count[0] &gt; count[1] ? &#39;0&#39; : &#39;1&#39;,
+        &#39;least&#39;: count[0] &gt; count[1] ? &#39;1&#39; : &#39;0&#39;
     };
 };
 
 const partTwo = (input: Bit[][], debug: boolean) =&gt; {
     // Oxygen generator rating
-    let o2Reports = [...input];
-    let o2Index = 0;
-    while (o2Reports.length &gt; 1) {
-        const hist = getHistogram(o2Reports, o2Index);
-        o2Reports = o2Reports.filter(row =&gt; row[o2Index] === hist.most);
-        o2Index++;
+    let o2reports = input.slice();
+    let o2index = 0;
+    while (o2reports.length &gt; 1) {
+        const count = getCount(o2reports, o2index);
+        o2reports = o2reports.filter(row =&gt; row[o2index] === count.most);
+        o2index += 1;
     }
-    const o2Value = parseInt(o2Reports[0].join(&quot;&quot;), 2);
-    
+    const o2Value = parseInt(o2reports[0].join(&quot;&quot;), 2);
+
     // CO2 scrubber rating
-    let co2Reports = [...input];
-    let co2Index = 0;
-    while (co2Reports.length &gt; 1) {
-        const hist = getHistogram(co2Reports, co2Index);
-        co2Reports = co2Reports.filter(row =&gt; row[co2Index] === hist.least);
-        co2Index++;
+    let co2reports = input.slice();
+    let co2index = 0;
+    while (co2reports.length &gt; 1) {
+        const count = getCount(co2reports, co2index);
+        co2reports = co2reports.filter(row =&gt; row[co2index] === count.least);
+        co2index += 1;
     }
-    const co2Value = parseInt(co2Reports[0].join(&quot;&quot;), 2);
-    
+    const co2Value = parseInt(co2reports[0].join(&quot;&quot;), 2);
+
     return o2Value * co2Value;
 };
 </code></pre>

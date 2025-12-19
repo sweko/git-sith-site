@@ -46,9 +46,8 @@
     direction: &quot;R&quot; | &quot;L&quot;;
     steps: number;
 };
-</code></pre>
-<p>The parsing is straightforward - extract the first character as the direction and parse the rest as a number:</p>
-<pre><code class="language-typescript">const processInput = (day: number): Instruction[] =&gt; {
+
+const processInput = (day: number): Instruction[] =&gt; {
     const lines = readInputLines(day);
     const instructions = lines.map(line =&gt; {
         const direction = line.charAt(0) as &quot;R&quot; | &quot;L&quot;;
@@ -58,27 +57,11 @@
     return instructions;
 };
 </code></pre>
-<h2>Part One: Counting Zero Landings</h2>
-<p>For part one, we need to count how many times the dial lands exactly on zero after applying each instruction. The naive approach would be:</p>
-<pre><code class="language-typescript">let position = 50;
-let result = 0;
-for (const instruction of input) {
-    if (instruction.direction === &quot;R&quot;) {
-        position += instruction.steps;
-    } else {
-        position -= instruction.steps;
-    }
-    position = position % 100;
-    if (position === 0) {
-        result += 1;
-    }
-}
-</code></pre>
-<p>But this doesn&#39;t work. Why? Because JavaScript&#39;s modulo operator behaves differently than in some other languages when dealing with negative numbers:</p>
+<h2>The <code>toLock</code> Function</h2>
+<p>Before we dive into the solutions, we need to handle JavaScript&#39;s quirky modulo behavior. When dealing with negative numbers:</p>
 <pre><code class="language-javascript">-1 % 100   // returns -1, not 99
 -300 % 100 // returns -0 (yes, negative zero is a thing in JavaScript!)
 </code></pre>
-<h3>The <code>toLock</code> Function</h3>
 <p>We need a proper modulo function that always returns a value between 0 and 99:</p>
 <pre><code class="language-typescript">const toLock = (n: number) =&gt; (n % 100 + 100) % 100;
 </code></pre>
@@ -88,36 +71,58 @@ for (const instruction of input) {
 <li>Adding 100 to guarantee a positive number (between 1 and 199)</li>
 <li>Applying <code>% 100</code> again to get back to the 0-99 range</li>
 </ol>
-<p>With this fix, part one returns <strong>141</strong> for my input.</p>
+<h2>Part One: Counting Zero Landings</h2>
+<p>For part one, we need to count how many times the dial lands exactly on zero after applying each instruction:</p>
+<pre><code class="language-typescript">const partOne = (input: Instruction[], debug: boolean) =&gt; {
+    let position = 50;
+    let result = 0;
+    for (const instruction of input) {
+        if (instruction.direction === &quot;R&quot;) {
+            position += instruction.steps;
+        } else {
+            position -= instruction.steps;
+        }
+        position = toLock(position);
+        if (position === 0) {
+            result += 1;
+        }
+    }
+    return result;
+};
+</code></pre>
+<p>With the <code>toLock</code> function handling the wraparound correctly, part one returns <strong>141</strong> for my input.</p>
 <h2>Part Two: Counting Zero Crossings</h2>
 <p>Part two changes the requirement - now we need to count every time the dial <em>passes through</em> zero during rotation, not just when it lands on zero at the end.</p>
 <p>For example, starting at position 50 and rotating left 68 steps means we pass through zero once on our way to position 82.</p>
 <p>The mathematically elegant solution would be to calculate how many times we cross zero based on the start position, end position, and direction. But I chose the simpler (and admittedly less efficient) approach: simulate every single click.</p>
-<pre><code class="language-typescript">let position = 50;
-let result = 0;
-for (const instruction of input) {
-    if (instruction.direction === &quot;R&quot;) {
-        let clicks = instruction.steps;
-        while (clicks &gt; 0) {
-            position += 1;
-            position = toLock(position);
-            if (position === 0) {
-                result += 1;
+<pre><code class="language-typescript">const partTwo = (input: Instruction[], debug: boolean) =&gt; {
+    let position = 50;
+    let result = 0;
+    for (const instruction of input) {
+        if (instruction.direction === &quot;R&quot;) {
+            let clicks = instruction.steps;
+            while (clicks &gt; 0) {
+                position += 1;
+                position = toLock(position);
+                if (position === 0) {
+                    result += 1;
+                }
+                clicks -= 1;
             }
-            clicks -= 1;
-        }
-    } else {
-        let clicks = instruction.steps;
-        while (clicks &gt; 0) {
-            position -= 1;
-            position = toLock(position);
-            if (position === 0) {
-                result += 1;
+        } else {
+            let clicks = instruction.steps;
+            while (clicks &gt; 0) {
+                position -= 1;
+                position = toLock(position);
+                if (position === 0) {
+                    result += 1;
+                }
+                clicks -= 1;
             }
-            clicks -= 1;
         }
     }
-}
+    return result;
+};
 </code></pre>
 <h3>Performance Considerations</h3>
 <p>This simulation approach is wasteful. If we rotate 200 times, we&#39;re doing 200 loop iterations when we could just calculate that we pass zero twice (200 / 100 = 2).</p>

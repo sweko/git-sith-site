@@ -37,23 +37,25 @@
 <p>For a line like <code>a1b2c3d</code>, the first digit is <code>1</code>, the last is <code>3</code>, giving us <code>13</code>.</p>
 <h2>Parsing and Part One</h2>
 <p>Each line needs to yield its first and last digit. JavaScript&#39;s <code>find</code> and <code>findLast</code> on character arrays work nicely:</p>
-<pre><code class="language-typescript">const mapFirstLast = (input: string[]): { first: number; last: number }[] =&gt; {
+<pre><code class="language-typescript">const mapFirstLast = (input: string[], map: Record&lt;string, number&gt;) =&gt; {
     return input.map(line =&gt; {
-        const chars = line.split(&quot;&quot;);
-        const digitRegex = /\d/;
-        
-        const first = chars.find(c =&gt; digitRegex.test(c))!;
-        const last = chars.findLast(c =&gt; digitRegex.test(c))!;
-        
-        return { first: +first, last: +last };
+        const first = getFirstDigit(line, map);
+        const last = getLastDigit(line, map);
+        return { first, last };
     });
 };
 
 const partOne = (input: string[], debug: boolean) =&gt; {
-    const fls = mapFirstLast(input);
-    return fls.reduce((sum, { first, last }) =&gt; sum + first * 10 + last, 0);
+    const map: Record&lt;string, number&gt; = {
+        &quot;1&quot;: 1, &quot;2&quot;: 2, &quot;3&quot;: 3, &quot;4&quot;: 4, &quot;5&quot;: 5,
+        &quot;6&quot;: 6, &quot;7&quot;: 7, &quot;8&quot;: 8, &quot;9&quot;: 9,
+    };
+    const fls = mapFirstLast(input, map);
+    const result = fls.sum(fl =&gt; fl.first * 10 + fl.last);
+    return result;
 };
 </code></pre>
+<p>The <code>.sum()</code> is another of my array helper methods — it takes a selector function and sums the results.</p>
 <p>Part <a href="https://www.youtube.com/watch?v=WM8bTdBs-cw" target="_blank">one</a> returns <code>55621</code> for my input. Straightforward enough.</p>
 <h2>Part Two: The Trap</h2>
 <p>Part two reveals that spelled-out numbers (<code>one</code>, <code>two</code>, etc.) also count as digits. Simple, right? Just do a find-and-replace: <code>one</code> → <code>1</code>, <code>two</code> → <code>2</code>, and so on.</p>
@@ -62,21 +64,21 @@ const partOne = (input: string[], debug: boolean) =&gt; {
 <p>This trap caught <em>everyone</em>. I saw discussions everywhere about it. Even Uncle Bob tweeted about falling into this hole. Part one tricks you into a pattern of thinking, and part two punishes you for it.</p>
 <h2>The Fix: Search From Both Ends</h2>
 <p>Instead of modifying the string, search from the start for the first digit and from the end for the last digit:</p>
-<pre><code class="language-typescript">const getFirstDigit = (input: string, map: Record&lt;string, number&gt;): number =&gt; {
-    // Terribly inefficient, but works
+<pre><code class="language-typescript">// This is terribly inefficient, but it works
+const getFirstDigit = (input: string, map: Record&lt;string, number&gt;) =&gt; {
     for (let index = 0; index &lt; input.length; index++) {
-        const part = input.substring(index);
+        const part = input.substring(index, input.length);
         for (const key in map) {
             if (part.startsWith(key)) {
                 return map[key];
             }
         }
     }
-    return -Infinity; // Should never happen
+    return Number.NEGATIVE_INFINITY;
 };
 
-const getLastDigit = (input: string, map: Record&lt;string, number&gt;): number =&gt; {
-    for (let index = input.length; index &gt;= 0; index--) {
+const getLastDigit = (input: string, map: Record&lt;string, number&gt;) =&gt; {
+    for (let index = input.length; index &gt; 0; index--) {
         const part = input.substring(0, index);
         for (const key in map) {
             if (part.endsWith(key)) {
@@ -84,31 +86,21 @@ const getLastDigit = (input: string, map: Record&lt;string, number&gt;): number 
             }
         }
     }
-    return -Infinity;
+    return Number.NEGATIVE_INFINITY;
 };
 </code></pre>
 <p>For part one, the map is simple: <code>{ &quot;1&quot;: 1, &quot;2&quot;: 2, ... &quot;9&quot;: 9 }</code>.</p>
 <p>For part two, we extend it: <code>{ &quot;1&quot;: 1, &quot;one&quot;: 1, &quot;2&quot;: 2, &quot;two&quot;: 2, ... }</code>.</p>
-<pre><code class="language-typescript">const partTwoMap: Record&lt;string, number&gt; = {
-    &quot;1&quot;: 1, &quot;one&quot;: 1,
-    &quot;2&quot;: 2, &quot;two&quot;: 2,
-    &quot;3&quot;: 3, &quot;three&quot;: 3,
-    &quot;4&quot;: 4, &quot;four&quot;: 4,
-    &quot;5&quot;: 5, &quot;five&quot;: 5,
-    &quot;6&quot;: 6, &quot;six&quot;: 6,
-    &quot;7&quot;: 7, &quot;seven&quot;: 7,
-    &quot;8&quot;: 8, &quot;eight&quot;: 8,
-    &quot;9&quot;: 9, &quot;nine&quot;: 9,
-};
-
-const partTwo = (input: string[], debug: boolean) =&gt; {
-    let total = 0;
-    for (const line of input) {
-        const first = getFirstDigit(line, partTwoMap);
-        const last = getLastDigit(line, partTwoMap);
-        total += first * 10 + last;
-    }
-    return total;
+<pre><code class="language-typescript">const partTwo = (input: string[], debug: boolean) =&gt; {
+    const map: Record&lt;string, number&gt; = {
+        &quot;1&quot;: 1, &quot;2&quot;: 2, &quot;3&quot;: 3, &quot;4&quot;: 4, &quot;5&quot;: 5,
+        &quot;6&quot;: 6, &quot;7&quot;: 7, &quot;8&quot;: 8, &quot;9&quot;: 9,
+        &quot;one&quot;: 1, &quot;two&quot;: 2, &quot;three&quot;: 3, &quot;four&quot;: 4, &quot;five&quot;: 5,
+        &quot;six&quot;: 6, &quot;seven&quot;: 7, &quot;eight&quot;: 8, &quot;nine&quot;: 9
+    };
+    const fls = mapFirstLast(input, map);
+    const result = fls.sum(fl =&gt; fl.first * 10 + fl.last);
+    return result;
 };
 </code></pre>
 <p>Now <code>oneight</code> correctly returns <code>18</code>.</p>

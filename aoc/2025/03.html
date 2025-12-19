@@ -39,11 +39,12 @@
 <p>Each line is a sequence of digits representing a battery bank:</p>
 <pre><code class="language-typescript">type Bank = number[];
 
-const processInput = (day: number): Bank[] =&gt; {
+const processInput = (day: number) =&gt; {
     const lines = readInputLines(day);
-    const banks = lines.map(line =&gt; 
-        line.split(&quot;&quot;).map(c =&gt; Number(c))
-    );
+    const banks = lines.map(line =&gt; {
+        const bank = line.split(&quot;&quot;).map(num =&gt; parseInt(num, 10));
+        return bank;
+    });
     return banks;
 };
 </code></pre>
@@ -52,27 +53,33 @@ const processInput = (day: number): Bank[] =&gt; {
 <p>For part one, we need to select exactly two batteries from each bank to form a two-digit number, maximizing the result.</p>
 <p>The greedy insight: pick the largest digit that&#39;s not in the last position (so we have room for a second digit), then pick the largest digit after it.</p>
 <p>Why greedy works: <code>91</code> is always larger than <code>89</code>, regardless of what other digits are available. The first digit dominates.</p>
-<pre><code class="language-typescript">const getBankValue = (bank: Bank): number =&gt; {
+<pre><code class="language-typescript">const getBankValueOne = (bank: Bank) =&gt; {
     let first = 0;
-    let firstIndex = -1;
-    
-    // Find biggest digit not in last place
+    let findex = -1;
+    // find the biggest digit that&#39;s not in the last place
     for (let index = 0; index &lt; bank.length - 1; index++) {
         if (bank[index] &gt; first) {
             first = bank[index];
-            firstIndex = index;
+            findex = index;
         }
     }
-    
-    // Find biggest digit after the first
     let second = 0;
-    for (let index = firstIndex + 1; index &lt; bank.length; index++) {
+    // find the biggest digit after the first
+    for (let index = findex + 1; index &lt; bank.length; index++) {
         if (bank[index] &gt; second) {
             second = bank[index];
         }
     }
-    
     return 10 * first + second;
+};
+
+const partOne = (input: Bank[], debug: boolean) =&gt; {
+    let result = 0;
+    for (const bank of input) {
+        const bankValue = getBankValueOne(bank);
+        result += bankValue;
+    }
+    return result;
 };
 </code></pre>
 <p>One subtlety: we use strictly greater than (<code>&gt;</code>) when searching. If there are multiple 9s, we want the <em>first</em> one — that leaves more options for the second digit.</p>
@@ -91,30 +98,36 @@ const [twelfth, i12] = getNextBiggest(bank, i11 + 1, 0);
 <p>This works. It&#39;s correct. Copilot happily generated all 12 lines. But it&#39;s ugly and doesn&#39;t scale — what if we needed 20 digits?</p>
 <h3>The Refactored Version</h3>
 <p>After getting the star, I went back and fixed it:</p>
-<pre><code class="language-typescript">const getNextBiggest = (bank: Bank, startIndex: number, endOffset: number): [number, number] =&gt; {
+<pre><code class="language-typescript">const getNextBiggest = (bank: Bank, startIndex: number, endOffset: number) =&gt; {
     let biggest = 0;
-    let biggestIndex = startIndex;
-    
-    for (let index = startIndex; index &lt; bank.length - endOffset; index++) {
+    let bindex = -1;
+    const endIndex = bank.length - endOffset;
+    for (let index = startIndex; index &lt; endIndex; index++) {
         if (bank[index] &gt; biggest) {
             biggest = bank[index];
-            biggestIndex = index;
+            bindex = index;
         }
     }
-    
-    return [biggest, biggestIndex];
+    return [biggest, bindex];
 };
 
-const getBankValueTwo = (bank: Bank): number =&gt; {
+const getBankValueTwo = (bank: Bank) =&gt; {
     let result = 0;
     let startIndex = 0;
-    
-    for (let remaining = 11; remaining &gt;= 0; remaining--) {
-        const [biggest, index] = getNextBiggest(bank, startIndex, remaining);
+    for (let index = 11; index &gt;= 0; index--) {
+        const [biggest, bindex] = getNextBiggest(bank, startIndex, index);
+        startIndex = bindex + 1;
         result = result * 10 + biggest;
-        startIndex = index + 1;
     }
-    
+    return result;
+};
+
+const partTwo = (input: Bank[], debug: boolean) =&gt; {
+    let result = 0;
+    for (const bank of input) {
+        const bankValue = getBankValueTwo(bank);
+        result += bankValue;
+    }
     return result;
 };
 </code></pre>

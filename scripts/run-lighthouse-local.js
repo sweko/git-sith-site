@@ -33,9 +33,6 @@ async function waitForServer(url, attempts = 60, delay = 500) {
 
 (async () => {
   try {
-    // Build static site
-    runSync('npm', ['run', 'build']);
-
     // Start http-server: prefer local node_modules/.bin/http-server, otherwise fall back to npx
     const localBin = path.join(process.cwd(), 'node_modules', '.bin', process.platform === 'win32' ? 'http-server.cmd' : 'http-server');
     let server;

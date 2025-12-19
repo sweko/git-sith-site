@@ -47,43 +47,49 @@
 <p>The first elf has three items (1000 + 2000 + 3000 = 6000 calories), the second has one (4000), and so on.</p>
 <h2>Parsing the Input</h2>
 <p>The input format is the tricky part here. We have numbers separated by blank lines, where blank lines mark the boundary between elves. This requires a different approach than the typical &quot;one item per line&quot; parsing:</p>
-<pre><code class="language-typescript">const processInput = (lines: string[]): number[][] =&gt; {
-    const elves: number[][] = [[]];
-    
-    for (const line of lines) {
-        if (line === &quot;&quot;) {
-            elves.push([]); // Start a new elf
-        } else {
-            elves[elves.length - 1].push(Number(line));
-        }
-    }
-    
-    return elves;
+<pre><code class="language-typescript">const processInput = async (day: number) =&gt; {
+    const input = await readInputLines(day);
+    return input;
 };
 </code></pre>
+<p>The input is just lines of text — we do the grouping logic in the solution functions:</p>
 <p>We start with one empty array (the first elf), then either add to the current elf or start a new one when we hit a blank line. The result is an array of arrays — each inner array contains one elf&#39;s snack calories.</p>
 <h2>Part One: Hungriest Elf</h2>
-<p>Find the elf carrying the most total calories. Map each elf to their sum, then find the maximum:</p>
-<pre><code class="language-typescript">const partOne = (elves: number[][], debug: boolean) =&gt; {
-    const totals = elves.map(elf =&gt; elf.reduce((a, b) =&gt; a + b, 0));
-    return Math.max(...totals);
+<p>Find the elf carrying the most total calories. First group the lines into elves, then find the maximum sum:</p>
+<pre><code class="language-typescript">const partOne = (input: string[], debug: boolean) =&gt; {
+    const elves: number[][] = [[]];
+    let currentElf = elves[0];
+    for (const line of input) {
+        if (line === &quot;&quot;) {
+            currentElf = [];
+            elves.push(currentElf);
+        } else {
+            currentElf.push(parseInt(line));
+        }
+    }
+    const max = elves.map(elf =&gt; elf.sum()).max();
+    return max;
 };
 </code></pre>
-<p>I actually have a bunch of array helper methods I&#39;ve built up over time — <code>sum</code>, <code>max</code>, <code>maxBy</code>, and others. Slightly shameful prototype pollution, but incredibly useful for AoC:</p>
-<pre><code class="language-typescript">const partOne = (elves: number[][], debug: boolean) =&gt; {
-    return elves.map(elf =&gt; elf.sum()).max();
-};
-</code></pre>
-<p>Same logic, cleaner syntax.</p>
+<p>I have a bunch of array helper methods I&#39;ve built up over time — <code>sum</code>, <code>max</code>, <code>maxBy</code>, and others. They&#39;re prototype extensions (slightly shameful pollution), but incredibly useful for AoC.</p>
 <h2>Part Two: Top Three</h2>
-<p>Find the sum of calories carried by the top three elves. Sort the totals in descending order, take the first three, sum them:</p>
-<pre><code class="language-typescript">const partTwo = (elves: number[][], debug: boolean) =&gt; {
-    const totals = elves.map(elf =&gt; elf.reduce((a, b) =&gt; a + b, 0));
-    const sorted = totals.sort((a, b) =&gt; b - a);
-    return sorted[0] + sorted[1] + sorted[2];
+<p>Find the sum of calories carried by the top three elves:</p>
+<pre><code class="language-typescript">const partTwo = (input: string[], debug: boolean) =&gt; {
+    const elves: number[][] = [[]];
+    let currentElf = elves[0];
+    for (const line of input) {
+        if (line === &quot;&quot;) {
+            currentElf = [];
+            elves.push(currentElf);
+        } else {
+            currentElf.push(parseInt(line));
+        }
+    }
+    const elvesTotal = elves.map(elf =&gt; elf.sum()).sort((a, b) =&gt; b - a);
+    return elvesTotal[0] + elvesTotal[1] + elvesTotal[2];
 };
 </code></pre>
-<p>Note: this code assumes we have at least three elves. In production, you&#39;d add a check. For AoC, I know the input has plenty of elves, so I&#39;m comfortable with this &quot;bad code that makes documented assumptions.&quot;</p>
+<p>Yes, I duplicate the elf-grouping logic between parts. I keep parts independent — it makes timing easier and lets me mutate freely.</p>
 <h2>Performance</h2>
 <p>Both parts run instantly. We&#39;re just summing arrays and finding maximums — O(n) operations on small data.</p>
 <h2>Takeaways</h2>

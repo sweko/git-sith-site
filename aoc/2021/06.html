@@ -80,33 +80,29 @@
 <h2>The Insight: Fish Are Fungible</h2>
 <p>Here&#39;s the key realization: <strong>individual fish don&#39;t matter</strong>. A fish with timer 3 is identical to every other fish with timer 3. We don&#39;t need to track them separately.</p>
 <p>There are only 9 possible states (timers 0-8). Instead of an array of millions of fish, use an array of 9 counts:</p>
-<pre><code class="language-typescript">const calculateFishes = (input: number[], days: number): number =&gt; {
-    const FISH_CYCLE = 6;
-    const NEW_FISH_CYCLE = 8;
-    
-    // State: count of fish at each timer value (0-8)
-    let state = new Array(NEW_FISH_CYCLE + 1).fill(0);
-    for (const fish of input) {
-        state[fish]++;
+<pre><code class="language-typescript">function calculateFishes(fishes: number[], days: number) {
+    const fishCycle = 6;
+    const newFishCycle = 8;
+    let dayIndex = 0;
+
+    let state = new Array(newFishCycle).fill(0);
+    for (const fish of fishes) {
+        state[fish] += 1;
     }
-    
-    for (let day = 0; day &lt; days; day++) {
-        const newState = new Array(NEW_FISH_CYCLE + 1).fill(0);
-        
-        // Fish at timer N become fish at timer N-1
-        for (let i = 1; i &lt;= NEW_FISH_CYCLE; i++) {
+
+    while (dayIndex &lt; days) {
+        const newState = new Array(newFishCycle + 1).fill(0);
+        for (let i = 1; i &lt; state.length; i++) {
             newState[i - 1] = state[i];
         }
-        
-        // Fish at timer 0: spawn new fish at 8, reset to 6
-        newState[NEW_FISH_CYCLE] = state[0];  // New fish
-        newState[FISH_CYCLE] += state[0];      // Reset parents
-        
+        newState[newFishCycle] = state[0];  // New fish start at 8
+        newState[fishCycle] += state[0];     // Parents reset to 6
+
         state = newState;
+        dayIndex += 1;
     }
-    
     return state.reduce((a, b) =&gt; a + b, 0);
-};
+}
 </code></pre>
 <p>Each day:</p>
 <ol>

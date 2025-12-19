@@ -42,16 +42,15 @@
     values: string[];
 }
 
-const processInput = (day: number): Mapping[] =&gt; {
-    const lines = readInputLines(day);
-    return lines.map(line =&gt; {
-        const [digitPart, valuePart] = line.split(&quot; | &quot;);
-        const digits = digitPart.split(&quot; &quot;).map(d =&gt; d.split(&quot;&quot;).sort().join(&quot;&quot;));
-        const values = valuePart.split(&quot; &quot;).map(v =&gt; v.split(&quot;&quot;).sort().join(&quot;&quot;));
-        return { digits, values };
-    });
+const processInput = async (day: number) =&gt; {
+    const lines = await readInputLines(day);
+    return lines.map(line =&gt; ({
+        digits: line.substring(0, 58).split(&quot; &quot;).map(d =&gt; d.split(&quot;&quot;).sort().join(&quot;&quot;)),
+        values: line.substring(61).split(&quot; &quot;).map(v =&gt; v.split(&quot;&quot;).sort().join(&quot;&quot;))
+    }));
 };
 </code></pre>
+<p>The hardcoded positions (0-58 for digits, 61 onwards for values) are a bit brittle, but the input format is fixed. Each line has exactly 10 digit patterns of known total length, a <code>|</code> separator, then 4 output values.</p>
 <p>Critical step: <strong>sort each pattern alphabetically</strong>. Without this, <code>acf</code> and <code>fca</code> look different when they represent the same digit. Canonical form eliminates ambiguity.</p>
 <h2>Part One: The Easy Digits</h2>
 <p>Some digits have unique segment counts:</p>

@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 12/2021 - Passage Pathing — AoC 2021 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Graph traversal through caves with small/big cave rules. Recursion, path counting, and accepting slow solutions.">
+  <link rel="canonical" href="/aoc/2021/12/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 12/2021 - Passage Pathing</h1>
+        <div class="article-meta"><time datetime="2021">2021</time> · 5 min read</div>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="10.html" rel="prev" aria-label="Previous: Day 10 — Syntax Scoring">← Day 10 — Syntax Scoring</a></nav>
+      </header>
+      <div class="article-content">
+        <p>Day twelve of AoC 2021 (available at <a href="https://adventofcode.com/2021/day/12">https://adventofcode.com/2021/day/12</a>) drops us into a cave system. The passages branch underground like <a href="https://www.youtube.com/watch?v=F_6IjeprfEs" target="_blank">roots</a>, and we need to trace every possible path from start to end.</p>
+<p>The input is a list of connections: <code>start-A</code>, <code>A-b</code>, <code>b-end</code>, etc.</p>
+<h2>Cave Rules</h2>
+<p>Two types of caves:</p>
+<ul>
+<li><strong>Big caves</strong> (uppercase): can be visited any number of times</li>
+<li><strong>Small caves</strong> (lowercase): can be visited at most once per path</li>
+</ul>
+<p>Special caves <code>start</code> and <code>end</code> can only be visited exactly once — you can&#39;t return to start, and reaching end finishes the path.</p>
+<h2>Building the Graph</h2>
+<p>First, parse the connections into a graph structure:</p>
+<pre><code class="language-typescript">interface Input {
+    start: string;
+    end: string;
+}
+
+type Caves = {[key: string]: Node};
+type NodeType = &#39;start&#39; | &#39;end&#39; | &#39;big&#39; | &#39;small&#39;;
+
+interface Node {
+    type: NodeType;
+    name: string;
+    connections: string[];
+}
+
+const getCaves = (input: Input[]) =&gt; {
+    const caves: Caves = {};
+    const nodeNames = [...new Set(input.map(item =&gt; [item.start, item.end]).flat())];
+    
+    for (const nodeName of nodeNames) {
+        let type: NodeType = &#39;small&#39;;
+        if (nodeName === nodeName.toUpperCase()) {
+            type = &#39;big&#39;;
+        }
+        caves[nodeName] = {
+            type,
+            name: nodeName,
+            connections: [],
+        };
+    }
+
+    for (const link of input) {
+        caves[link.start].connections.push(link.end);
+        caves[link.end].connections.push(link.start);
+    }
+    return caves;
+};
+</code></pre>
+<p>Note: I use a plain object <code>{[key: string]: Node}</code> instead of a Map here — it makes the copy operation simpler.</p>
+<p>Connections are bidirectional: <code>A-b</code> means A connects to b AND b connects to A.</p>
+<h2>Part One: Finding All Paths</h2>
+<p>Recursive depth-first search. When leaving a small cave, remove it from the graph so we don&#39;t revisit:</p>
+<pre><code class="language-typescript">const copyCaves = (input: Caves): Caves =&gt; {
+    const result: Caves = {};
+    for (const node in input) {
+        result[node] = {
+            type: input[node].type,
+            name: input[node].name,
+            connections: [...input[node].connections],
+        };
+    }
+    return result;
+};
+
+const getPathsOne = (caves: Caves, start: string, end: string): string[][] =&gt; {
+    const startNode = caves[start];
+    const nexts = startNode.connections;
+    const result = [];
+    const nextCaves = copyCaves(caves);
+    
+    if (startNode.type === &#39;small&#39;) {
+        delete nextCaves[start];
+        for (const key in nextCaves) {
+            nextCaves[key].connections = nextCaves[key].connections.filter(item =&gt; item !== start);
+        }
+    }
+    
+    for (const next of nexts) {
+        if (next === end) {
+            result.push([start, end]);
+            continue;
+        }
+        const nodePaths = getPathsOne(nextCaves, next, end);
+        for (const nodePath of nodePaths) {
+            result.push([start, ...nodePath]);
+        }
+    }
+    return result;
+};
+</code></pre>
+<p>The <code>copyCaves</code> function does a proper deep copy — spreading the connections array so modifications don&#39;t affect the original.</p>
+<h2>Part Two: One Bonus Visit</h2>
+<p>Now we can visit <strong>one</strong> small cave twice. This adds a &quot;bonus&quot; flag to the recursion:</p>
+<pre><code class="language-typescript">const processTwo = (caves: Caves, start: Node, end: string, usedBonus = false) =&gt; {
+    const result: string[][] = [];
+    for (const next of start.connections) {
+        if (next === end) {
+            result.push([start.name, end]);
+            continue;
+        }
+        if (next === &quot;start&quot;) continue;
+        
+        const nodePaths = getPathsTwo(caves, next, end, usedBonus);
+        for (const nodePath of nodePaths) {
+            result.push([start.name, ...nodePath]);
+        }
+    }
+    return result;
+};
+
+const getPathsTwo = (caves: Caves, start: string, end: string, usedBonus = false): string[][] =&gt; {
+    const startNode = caves[start];
+    const nextCaves = copyCaves(caves);
+    
+    if (startNode.type === &#39;small&#39;) {
+        if (usedBonus) {
+            delete nextCaves[start];
+            for (const key in nextCaves) {
+                nextCaves[key].connections = nextCaves[key].connections.filter(item =&gt; item !== start);
+            }
+            return processTwo(nextCaves, startNode, end, true);
+        } else {
+            // Option 1: Use bonus now (don&#39;t remove cave)
+            const pathsOne = processTwo(nextCaves, startNode, end, true);
+
+            // Option 2: No bonus (remove cave as usual)
+            delete nextCaves[start];
+            for (const key in nextCaves) {
+                nextCaves[key].connections = nextCaves[key].connections.filter(item =&gt; item !== start);
+            }
+            const pathsTwo = processTwo(nextCaves, startNode, end, false);
+
+            return [...pathsOne, ...pathsTwo];
+        }
+    } else {
+        return processTwo(nextCaves, startNode, end, usedBonus);
+    }
+};
+</code></pre>
+<p>The branching creates duplicate paths, so the final answer deduplicates using a Set on joined path strings:</p>
+<h2>Performance: Not Great</h2>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Time</th>
+<th>Paths Found</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Part 1</td>
+<td>~300ms</td>
+<td>3,292</td>
+</tr>
+<tr>
+<td>Part 2</td>
+<td>~13,000ms</td>
+<td>89,000+</td>
+</tr>
+</tbody></table>
+<p>Part two takes 13 seconds — 96% of the total runtime across all puzzles so far. That&#39;s... not good.</p>
+<p>The problems:</p>
+<ol>
+<li><strong>Excessive copying</strong>: Deep-copying the entire cave graph on every recursive call</li>
+<li><strong>Duplicate work</strong>: The branching logic explores the same paths multiple times</li>
+<li><strong>No memoization</strong>: We don&#39;t cache results for equivalent states</li>
+</ol>
+<p>I could optimize by:</p>
+<ul>
+<li>Tracking visited nodes in a Set instead of modifying the graph</li>
+<li>Using an iterative approach with an explicit stack</li>
+<li>Memoizing based on (current position, visited set, bonus used)</li>
+</ul>
+<p>But the solution is correct, and 13 seconds is tolerable for a one-shot puzzle. The first rule of optimization: <strong>measure first</strong>. I know part two is slow. Whether it&#39;s worth optimizing depends on context.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Graphs from edge lists</strong>: Parse connections, extract unique nodes, build adjacency lists. Standard pattern.</p>
+</li>
+<li><p><strong>Recursion for path enumeration</strong>: DFS naturally explores all paths. Return lists of paths, prepend current node.</p>
+</li>
+<li><p><strong>State modification vs. state tracking</strong>: I modified the graph (removing visited caves). Tracking visited nodes in a separate Set would be cleaner and faster.</p>
+</li>
+<li><p><strong>Deep copy is expensive</strong>: <code>JSON.parse(JSON.stringify())</code> works but is slow. For hot paths, use targeted copying or immutable updates.</p>
+</li>
+<li><p><strong>Correct first, fast later</strong>: A 13-second solution that gives the right answer beats a fast solution that doesn&#39;t. Optimize when it matters.</p>
+</li>
+<li><p><strong>Deduplicate at the end</strong>: When branching logic creates duplicates, sometimes it&#39;s easier to just dedupe the results than to prevent duplicates in the first place.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/blob/master/2021/code/day-12.ts">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2021 — Day 12</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="10.html" rel="prev" aria-label="Previous: Day 10 — Syntax Scoring">← Day 10 — Syntax Scoring</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

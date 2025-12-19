@@ -42,35 +42,29 @@
 
 const processInput = (day: number): Range[] =&gt; {
     const line = readInput(day);
-    return line.split(&quot;,&quot;).map(part =&gt; 
-        part.split(&quot;-&quot;).map(s =&gt; Number(s)) as Range
-    );
+    return line.split(&quot;,&quot;).map(s =&gt; s.split(&quot;-&quot;).map(Number) as Range);
 };
 </code></pre>
 <p>We split on commas to get individual ranges, then split each range on the dash to get start and end values. The <code>as Range</code> assertion tells TypeScript this is a tuple of exactly two numbers. In production code I&#39;d add validation, but for AoC we trust the input.</p>
 <h2>Part One: Finding Doubles</h2>
 <p>For part one, we need to find numbers where the <a href="https://www.youtube.com/watch?v=dD-SpHH7qDA" target="_blank">first half of digits equals the second half</a>, then sum them. Numbers like <code>1212</code>, <code>5555</code>, or <code>123123</code> qualify.</p>
-<p>The approach is straightforward:</p>
-<pre><code class="language-typescript">const checkDouble = (value: string): boolean =&gt; {
-    if (value.length % 2 !== 0) {
-        return false; // Odd length can never be a &quot;double&quot;
-    }
-    const half = value.length / 2;
-    const firstHalf = value.substring(0, half);
-    const secondHalf = value.substring(half);
-    return firstHalf === secondHalf;
-};
-
-const partOne = (input: Range[], debug: boolean) =&gt; {
+<p>The approach is straightforward — the check is done inline:</p>
+<pre><code class="language-typescript">const partOne = (input: Range[], debug: boolean) =&gt; {
     let total = 0;
     for (const [start, end] of input) {
-        for (let nValue = start; nValue &lt;= end; nValue++) {
-            const value = nValue.toString();
-            if (checkDouble(value)) {
-                total += nValue;
+        for (let nvalue = start; nvalue &lt;= end; nvalue++) {
+            const value = nvalue.toString();
+            if (value.length % 2 !== 0) {
+                continue;
+            }
+            const firstHalf = value.slice(0, value.length / 2);
+            const secondHalf = value.slice(value.length / 2);
+            if (firstHalf === secondHalf) {
+                total += nvalue;
             }
         }
     }
+
     return total;
 };
 </code></pre>
@@ -83,27 +77,36 @@ const partOne = (input: Range[], debug: boolean) =&gt; {
 <h2>Part Two: Finding Repeated Sequences</h2>
 <p>Part two ups the ante. Now we need to find numbers composed of <em>any</em> sequence repeated at least twice. So <code>123123</code> (period 3, repeated twice), <code>111111</code> (period 1, repeated six times), and <code>21212121</code> (period 2, repeated four times) all qualify.</p>
 <p>The key insight is that for a number with <code>n</code> digits, we only need to check periods that evenly divide <code>n</code>. A 12-digit number could have periods of 1, 2, 3, 4, or 6.</p>
-<pre><code class="language-typescript">const checkMultiple = (value: string): boolean =&gt; {
-    const len = value.length;
-    
-    for (let period = 1; period &lt;= len / 2; period++) {
-        if (len % period !== 0) {
-            continue; // Period must evenly divide the length
+<pre><code class="language-typescript">const checkMultiple = (nvalue: number): boolean =&gt; {
+    const value = nvalue.toString();
+
+    for (let len = 1; len &lt;= value.length / 2; len++) {
+        if (value.length % len !== 0) {
+            continue;
         }
-        
-        const segment = value.substring(0, period);
-        const repetitions = len / period;
-        const target = segment.repeat(repetitions);
-        
+        const segment = value.slice(0, len);
+        const target = segment.repeat(value.length / len);
         if (target === value) {
             return true;
         }
     }
-    
     return false;
 };
+
+const partTwo = (input: Range[], debug: boolean) =&gt; {
+    let total = 0;
+    for (const [start, end] of input) {
+        for (let nvalue = start; nvalue &lt;= end; nvalue++) {
+            if (checkMultiple(nvalue)) {
+                total += nvalue;
+            }
+        }
+    }
+
+    return total;
+};
 </code></pre>
-<p>JavaScript&#39;s <code>String.prototype.repeat()</code> does the heavy lifting here. We extract the first <code>period</code> characters, repeat them enough times to match the original length, and compare.</p>
+<p>JavaScript&#39;s <code>String.prototype.repeat()</code> does the heavy lifting here. We extract the first <code>len</code> characters, repeat them enough times to match the original length, and compare.</p>
 <p>Note that we don&#39;t need to worry about double-counting. If <code>111111</code> matches for period 1, we return immediately — we don&#39;t care that it would also match for period 2 or 3.</p>
 <h2>Performance</h2>
 <p>The brute force approach iterates through every number in every range. With ranges potentially spanning millions of numbers, this could be slow.</p>

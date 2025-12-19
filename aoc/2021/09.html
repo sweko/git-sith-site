@@ -29,7 +29,7 @@
     <div class="article-container container">
       <header class="article-header">
         <h1>Day 9/2021 - Smoke Basin</h1>
-        <div class="article-meta"><time datetime="2021">2021</time> · 5 min read</div>
+        <div class="article-meta"><time datetime="2021">2021</time> · 6 min read</div>
         <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="08.html" rel="prev" aria-label="Previous: Day 8 — Seven Segment Search">← Day 8 — Seven Segment Search</a>
 <a class="next" href="10.html" rel="next" aria-label="Next: Day 10 — Syntax Scoring">Day 10 — Syntax Scoring →</a></nav>
       </header>
@@ -45,102 +45,94 @@ if (col &lt; width-1 &amp;&amp; grid[row][col+1] &lt; current) { ... }
 <p>My solution: <strong>pad the grid with walls</strong>.</p>
 <h2>Parsing with Padding</h2>
 <p>Surround the input with 9s (the maximum height, effectively walls):</p>
-<pre><code class="language-typescript">const processInput = (day: number): number[][] =&gt; {
-    const lines = readInputLines(day);
-    const input = lines.map(line =&gt; 
-        line.split(&quot;&quot;).map(n =&gt; parseInt(n, 10))
-    );
-    
-    const width = input[0].length + 2;
-    const padRow = new Array(width).fill(9);
-    
-    const expanded = [
-        padRow,
-        ...input.map(row =&gt; [9, ...row, 9]),
-        padRow
-    ];
-    
-    return expanded;
+<pre><code class="language-typescript">const processInput = async (day: number) =&gt; {
+    const input = await readInputLines(day);
+    const lines = input.map(line =&gt; line.split(&quot;&quot;).map(n =&gt; parseInt(n, 10)));
+    return lines;
 };
 </code></pre>
+<p>Note that the padding happens in the solution functions, not during parsing. This keeps the input clean.</p>
 <p>Now every cell has 4 neighbors. The 9s act as walls — no cell is ever lower than them, so they never affect our calculations.</p>
 <h2>Part One: Finding Low Points</h2>
-<p>A low point is lower than all four neighbors. With padding, we can start from index 1 and stop before the last index:</p>
-<pre><code class="language-typescript">const partOne = (expanded: number[][], debug: boolean) =&gt; {
+<p>A low point is lower than all four neighbors. We pad with 99 (part one uses a higher value for clarity) and can then start from index 1:</p>
+<pre><code class="language-typescript">const partOne = (input: number[][], debug: boolean) =&gt; {
+    const expanded = [
+        Array(input[0].length + 2).fill(99),
+        ...input.map(row =&gt; [99, ...row, 99]),
+        Array(input[0].length + 2).fill(99),
+    ];
+
     let total = 0;
-    
-    for (let row = 1; row &lt; expanded.length - 1; row++) {
-        for (let col = 1; col &lt; expanded[row].length - 1; col++) {
-            const cell = expanded[row][col];
-            const top = expanded[row - 1][col];
-            const bottom = expanded[row + 1][col];
-            const left = expanded[row][col - 1];
-            const right = expanded[row][col + 1];
-            
+    for (let rindex = 1; rindex &lt; expanded.length - 1; rindex++) {
+        const row = expanded[rindex];
+        for (let cindex = 1; cindex &lt; row.length - 1; cindex++) {
+            const cell = row[cindex];
+            const top = expanded[rindex - 1][cindex];
             if (top &lt;= cell) continue;
-            if (bottom &lt;= cell) continue;
+            const left = expanded[rindex][cindex - 1];
             if (left &lt;= cell) continue;
+            const bottom = expanded[rindex + 1][cindex];
+            if (bottom &lt;= cell) continue;
+            const right = expanded[rindex][cindex + 1];
             if (right &lt;= cell) continue;
-            
-            // Risk level is height + 1
             total += cell + 1;
         }
     }
-    
+
     return total;
 };
 </code></pre>
-<p>No boundary checks needed. Clean nested loops.</p>
+<p>No boundary checks needed — the padding handles it. The early <code>continue</code> statements short-circuit as soon as we find a neighbor that&#39;s not higher.</p>
 <h2>Part Two: Flood Fill</h2>
 <p>A basin is all cells that flow down to a low point. The puzzle guarantees that 9s act as walls — every basin is distinct, separated by ridges of 9s.</p>
 <p>The algorithm: find an unvisited non-wall cell, flood fill from it (counting cells), mark all visited cells as walls.</p>
 <pre><code class="language-typescript">const partTwo = (input: number[][], debug: boolean) =&gt; {
-    // Create a mutable copy with 9s as walls
-    const expanded = input.map(row =&gt; [...row]);
+    const expanded = [
+        Array(input[0].length + 2).fill(9),
+        ...input.map(row =&gt; [9, ...row, 9]),
+        Array(input[0].length + 2).fill(9),
+    ];
+
     const basins: number[] = [];
-    
+
     while (true) {
-        // Find first non-wall cell
-        let startRow = -1, startCol = -1;
-        
-        outer: for (let row = 1; row &lt; expanded.length - 1; row++) {
-            for (let col = 1; col &lt; expanded[row].length - 1; col++) {
-                if (expanded[row][col] !== 9) {
-                    startRow = row;
-                    startCol = col;
-                    break outer;
+        // Find a non-wall cell
+        let srcx = -1;
+        let srcy = -1;
+        for (let rindex = 1; rindex &lt; expanded.length - 1; rindex++) {
+            const row = expanded[rindex];
+            for (let cindex = 1; cindex &lt; row.length - 1; cindex++) {
+                const cell = row[cindex];
+                if (cell !== 9) {
+                    srcx = rindex;
+                    srcy = cindex;
+                    break;
                 }
             }
+            if (srcx !== -1) break;
         }
-        
-        // No more non-wall cells? We&#39;re done
-        if (startRow === -1) break;
-        
-        // Flood fill from this cell
+
+        if (srcx === -1) break;  // No more basins
+
         let basinSize = 0;
-        const queue: [number, number][] = [[startRow, startCol]];
-        
-        while (queue.length &gt; 0) {
-            const [row, col] = queue.shift()!;
-            
-            // Already processed? Skip
-            if (expanded[row][col] === 9) continue;
-            
-            // Mark as wall (visited) and count
-            expanded[row][col] = 9;
-            basinSize++;
-            
-            // Add non-wall neighbors to queue
-            if (expanded[row - 1][col] !== 9) queue.push([row - 1, col]);
-            if (expanded[row + 1][col] !== 9) queue.push([row + 1, col]);
-            if (expanded[row][col - 1] !== 9) queue.push([row, col - 1]);
-            if (expanded[row][col + 1] !== 9) queue.push([row, col + 1]);
+        const cells = [{x: srcx, y: srcy}];
+        while (cells.length &gt; 0) {
+            const {x, y} = cells.shift()!;
+            const cell = expanded[x][y];
+            if (cell === 9) continue;
+
+            // Enqueue non-wall neighbors
+            if (expanded[x - 1][y] !== 9) cells.push({x: x - 1, y});
+            if (expanded[x][y - 1] !== 9) cells.push({x, y: y - 1});
+            if (expanded[x + 1][y] !== 9) cells.push({x: x + 1, y});
+            if (expanded[x][y + 1] !== 9) cells.push({x, y: y + 1});
+
+            expanded[x][y] = 9;  // Mark as visited
+            basinSize += 1;
         }
-        
         basins.push(basinSize);
     }
-    
-    // Multiply three largest basins
+
     basins.sort((a, b) =&gt; b - a);
     return basins[0] * basins[1] * basins[2];
 };

@@ -37,38 +37,35 @@
 <p>The input gives us two columns of numbers — left list and right list — separated by spaces.</p>
 <h2>Parsing the Input</h2>
 <p>The format looks simple, but there&#39;s a catch: the spacing isn&#39;t consistent. Some inputs have two spaces between columns, others have three. I hardcoded the split on the spaces I saw:</p>
-<pre><code class="language-typescript">type Pair = [number[], number[]];
+<pre><code class="language-typescript">type NumberArrayPair = [number[], number[]];
 
-const processInput = (day: number): Pair =&gt; {
+const processInput = (day: number) =&gt; {
     const lines = readInputLines(day);
     const first: number[] = [];
     const second: number[] = [];
-    
     for (const line of lines) {
-        const [left, right] = line.split(&quot;   &quot;); // Three spaces
-        first.push(Number(left));
-        second.push(Number(right));
+        const parts = line.split(&quot;   &quot;);  // Three spaces
+        first.push(parseInt(parts[0]));
+        second.push(parseInt(parts[1]));
     }
-    
-    return [first, second];
+    return [first, second] as NumberArrayPair;
 };
 </code></pre>
 <p>A regex split on <code>\s+</code> would be more robust, but this worked for the actual input.</p>
 <h2>Part One: Total Distance</h2>
 <p>We need to pair up the smallest number in the left list with the smallest in the right list, then the second-smallest with second-smallest, and so on. For each pair, calculate the distance (absolute difference) and sum them all.</p>
 <p>The approach: sort both lists, then iterate through them in parallel.</p>
-<pre><code class="language-typescript">const partOne = (input: Pair, debug: boolean) =&gt; {
-    const [first, second] = input;
-    
-    const fSorted = first.toSorted((a, b) =&gt; a - b);
-    const sSorted = second.toSorted((a, b) =&gt; a - b);
+<pre><code class="language-typescript">const partOne = (input: NumberArrayPair, debug: boolean) =&gt; {
+    const fsort = input[0].toSorted((f, s) =&gt; f - s);
+    const ssort = input[1].toSorted((f, s) =&gt; f - s);
     
     let totalDistance = 0;
-    for (let index = 0; index &lt; fSorted.length; index++) {
-        const distance = Math.abs(fSorted[index] - sSorted[index]);
+    for (let index = 0; index &lt; fsort.length; index++) {
+        const f = fsort[index];
+        const s = ssort[index];
+        const distance = Math.abs(f - s);
         totalDistance += distance;
     }
-    
     return totalDistance;
 };
 </code></pre>
@@ -83,28 +80,26 @@ const processInput = (day: number): Pair =&gt; {
 <h2>Part Two: Similarity Score</h2>
 <p>Part two changes the metric entirely. Now we calculate a &quot;similarity score&quot; by multiplying each number in the left list by how many times it appears in the right list.</p>
 <p>This screams &quot;histogram&quot; — build a frequency map of the right list, then iterate through the left list:</p>
-<pre><code class="language-typescript">const histogram = (input: number[]): Map&lt;number, number&gt; =&gt; {
-    const result = new Map&lt;number, number&gt;();
-    for (const num of input) {
-        const count = result.get(num) ?? 0;
-        result.set(num, count + 1);
+<pre><code class="language-typescript">const toHistogram = (input: number[]) =&gt; {
+    const histogram = new Map&lt;number, number&gt;();
+    for (const element of input) {
+        const count = histogram.get(element) || 0;
+        histogram.set(element, count + 1);
     }
-    return result;
+    return histogram;
 };
 
-const partTwo = (input: Pair, debug: boolean) =&gt; {
-    const [first, second] = input;
-    
-    const fHist = histogram(first);
-    const sHist = histogram(second);
-    
+const partTwo = (input: NumberArrayPair, debug: boolean) =&gt; {
+    const fhist = toHistogram(input[0]);
+    const shist = toHistogram(input[1]);
+
     let similarity = 0;
-    for (const [key, times] of fHist) {
-        const occurrences = sHist.get(key) ?? 0;
-        const score = key * times * occurrences;
+    for (const [key, times] of fhist) {
+        const occurences = shist.get(key) || 0;
+        const score = key * times * occurences;
         similarity += score;
     }
-    
+
     return similarity;
 };
 </code></pre>

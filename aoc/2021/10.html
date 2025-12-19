@@ -30,70 +30,77 @@
       <header class="article-header">
         <h1>Day 10/2021 - Syntax Scoring</h1>
         <div class="article-meta"><time datetime="2021">2021</time> · 4 min read</div>
-        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="09.html" rel="prev" aria-label="Previous: Day 9 — Smoke Basin">← Day 9 — Smoke Basin</a></nav>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="09.html" rel="prev" aria-label="Previous: Day 9 — Smoke Basin">← Day 9 — Smoke Basin</a>
+<a class="next" href="12.html" rel="next" aria-label="Next: Day 12 — Passage Pathing">Day 12 — Passage Pathing →</a></nav>
       </header>
       <div class="article-content">
         <p>Day ten of AoC 2021 (available at <a href="https://adventofcode.com/2021/day/10">https://adventofcode.com/2021/day/10</a>) brings us to every developer&#39;s favorite game: finding the missing parenthesis. Time to go <a href="https://www.youtube.com/watch?v=Gd9OhYroLN0" target="_blank">crawling</a> through brackets, braces, and angle brackets.</p>
 <p>The input has lines of nested brackets. Some lines are <strong>corrupted</strong> (wrong closing bracket), others are <strong>incomplete</strong> (missing closing brackets).</p>
 <h2>The Stack Solution</h2>
 <p>When someone says &quot;match nested brackets,&quot; experienced developers reach for a stack. Push opening brackets, pop when you see closers. If the popped opener doesn&#39;t match the closer, you&#39;ve found corruption.</p>
-<pre><code class="language-typescript">const openers = &quot;([{&lt;&quot;;
-const closers = &quot;)]}&gt;&quot;;
-
-interface ParseResult {
-    success: boolean;
+<pre><code class="language-typescript">interface InvalidParseResult {
     line: string;
-    errorIndex?: number;
-    completion?: string[];
+    success: false;
+    errorIndex: number;
 }
 
+interface ValidParseResult {
+    line: string;
+    success: true;
+    completion: string[];
+}
+
+type ParseResult = InvalidParseResult | ValidParseResult;
+
 const parseLine = (line: string): ParseResult =&gt; {
-    const stack: string[] = [];
+    const stack = [];
+    const openers = [&#39;(&#39;, &#39;{&#39;, &#39;[&#39;, &#39;&lt;&#39;];
+    const closers = [&#39;)&#39;, &#39;}&#39;, &#39;]&#39;, &#39;&gt;&#39;];
     
-    for (let i = 0; i &lt; line.length; i++) {
-        const char = line[i];
-        
+    for (let index = 0; index &lt; line.length; index++) {
+        const char = line[index];
         if (openers.includes(char)) {
             stack.push(char);
         } else if (closers.includes(char)) {
-            const opener = stack.pop()!;
-            const expectedCloser = closers[openers.indexOf(opener)];
-            
-            if (char !== expectedCloser) {
+            const opener = stack.pop();
+            const closerIndex = closers.indexOf(char);
+            if (opener !== openers[closerIndex]) {
                 return {
+                    line: line,
                     success: false,
-                    line,
-                    errorIndex: i
+                    errorIndex: index,
                 };
             }
+        } else {
+            throw new Error(`Invalid character ${char}`);
         }
     }
-    
-    // Line is valid (possibly incomplete)
-    const completion = stack
-        .reverse()
-        .map(c =&gt; closers[openers.indexOf(c)]);
-    
-    return { success: true, line, completion };
+
+    return {
+        line,
+        success: true,
+        completion: stack.reverse().map(c =&gt; closers[openers.indexOf(c)]),
+    };
 };
 </code></pre>
+<p>The discriminated union type (<code>ParseResult = InvalidParseResult | ValidParseResult</code>) lets TypeScript narrow the type based on the <code>success</code> property.</p>
 <p>The key insight: openers and closers are parallel arrays. <code>openers[0]</code> matches <code>closers[0]</code>, etc. Index lookup gives us the matching pair.</p>
 <h2>Part One: Finding Corruption</h2>
 <p>Filter to corrupted lines, score them by which wrong character appeared:</p>
-<pre><code class="language-typescript">const costs: Record&lt;string, number&gt; = {
-    &quot;)&quot;: 3,
-    &quot;]&quot;: 57,
-    &quot;}&quot;: 1197,
-    &quot;&gt;&quot;: 25137
-};
+<pre><code class="language-typescript">const partOne = (input: string[], debug: boolean) =&gt; {
+    const costs = {
+        &#39;)&#39;: 3,
+        &#39;]&#39;: 57,
+        &#39;}&#39;: 1197,
+        &#39;&gt;&#39;: 25137,
+    };
 
-const partOne = (input: string[], debug: boolean) =&gt; {
-    const results = input.map(parseLine);
-    const invalids = results.filter(r =&gt; !r.success);
-    
-    return invalids
-        .map(r =&gt; costs[r.line[r.errorIndex!]])
-        .reduce((a, b) =&gt; a + b, 0);
+    const parsed = input.map(line =&gt; parseLine(line));
+    const invalids = parsed.filter(pr =&gt; !pr.success) as InvalidParseResult[];
+    const result = invalids
+        .map(pr =&gt; pr.line[pr.errorIndex])
+        .reduce((acc, cur) =&gt; acc + costs[cur], 0);
+    return result;
 };
 </code></pre>
 <h3>The Transcription Bug</h3>
@@ -104,31 +111,25 @@ const partOne = (input: string[], debug: boolean) =&gt; {
 <p>I spent way too long debugging my reduce function and verifying my counts in Excel, when the actual bug was a simple typo in a constant. Always double-check your magic numbers.</p>
 <h2>Part Two: Completing Lines</h2>
 <p>For valid (incomplete) lines, the stack contains all unmatched openers. Reverse it and convert each to its corresponding closer:</p>
-<pre><code class="language-typescript">const completionCosts: Record&lt;string, number&gt; = {
-    &quot;)&quot;: 1,
-    &quot;]&quot;: 2,
-    &quot;}&quot;: 3,
-    &quot;&gt;&quot;: 4
-};
+<pre><code class="language-typescript">const scoreCompletion = (completion: string[]) =&gt; {
+    const costs = {
+        &#39;)&#39;: 1,
+        &#39;]&#39;: 2,
+        &#39;}&#39;: 3,
+        &#39;&gt;&#39;: 4,
+    };
 
-const scoreCompletion = (completion: string[]): number =&gt; {
-    return completion.reduce(
-        (total, char) =&gt; total * 5 + completionCosts[char],
-        0
-    );
+    return completion.reduce((acc, cur) =&gt; 5 * acc + costs[cur], 0);
 };
 
 const partTwo = (input: string[], debug: boolean) =&gt; {
-    const results = input.map(parseLine);
-    const valids = results.filter(r =&gt; r.success);
-    
+    const parsed = input.map(line =&gt; parseLine(line));
+    const valids = parsed.filter(pr =&gt; pr.success) as ValidParseResult[];
     const scores = valids
-        .map(r =&gt; scoreCompletion(r.completion!))
+        .map(pr =&gt; scoreCompletion(pr.completion))
         .sort((a, b) =&gt; a - b);
-    
-    // Take the middle score
-    const middleIndex = Math.floor(scores.length / 2);
-    return scores[middleIndex];
+    const result = scores[(scores.length - 1) / 2];
+    return result;
 };
 </code></pre>
 <p>The scoring is base-5 encoding: multiply by 5, add the character value. This ensures longer completions score higher, and earlier characters matter more.</p>
@@ -171,7 +172,8 @@ const partTwo = (input: string[], debug: boolean) =&gt; {
       </div>
       <footer class="article-footer">
         <p>Advent Of Code 2021 — Day 10</p>
-        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="09.html" rel="prev" aria-label="Previous: Day 9 — Smoke Basin">← Day 9 — Smoke Basin</a></nav>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="09.html" rel="prev" aria-label="Previous: Day 9 — Smoke Basin">← Day 9 — Smoke Basin</a>
+<a class="next" href="12.html" rel="next" aria-label="Next: Day 12 — Passage Pathing">Day 12 — Passage Pathing →</a></nav>
       </footer>
     </div>
   </main>
