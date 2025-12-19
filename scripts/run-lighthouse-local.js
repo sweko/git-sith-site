@@ -2,6 +2,7 @@ const { spawnSync, spawn } = require('child_process');
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
 function runSync(cmd, args, opts = {}) {
   console.log(`> ${cmd} ${args.join(' ')}`);
@@ -113,10 +114,59 @@ async function waitForServer(url, attempts = 60, delay = 500) {
       `--chrome-path="${CHROME_PATH}"`
     ];
 
+    // Cleanup: remove recent Chrome/Puppeteer temp directories (safe, age-limited, retried)
+    function cleanupChromeTempDirs({ ageMinutes = 10, retries = 5, delayMs = 500 } = {}) {
+      const tmp = os.tmpdir();
+      const now = Date.now();
+      const cutoff = now - ageMinutes * 60 * 1000;
+      let touched = [];
+      try {
+        const entries = fs.readdirSync(tmp, { withFileTypes: true });
+        const candidates = entries
+          .filter(e => e.isDirectory())
+          .map(e => path.join(tmp, e.name))
+          .filter(p => /chrome|puppeteer|lighthouse/i.test(path.basename(p)));
+
+        for (const dir of candidates) {
+          try {
+            const stat = fs.statSync(dir);
+            if (stat.mtimeMs < cutoff) continue; // skip old dirs
+          } catch (e) { continue; }
+
+          let removed = false;
+          for (let i = 0; i < retries; i++) {
+            try {
+              fs.rmSync(dir, { recursive: true, force: true });
+              console.log(`Removed temp dir: ${dir}`);
+              removed = true;
+              touched.push({ dir, removed: true });
+              break;
+            } catch (err) {
+              // on Windows, concurrent handles can cause EPERM; wait and retry
+              const wait = delayMs * (i + 1);
+              console.warn(`Failed to remove ${dir} (attempt ${i + 1}/${retries}): ${err.code || err}. Retrying in ${wait}ms`);
+              Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, wait);
+            }
+          }
+          if (!removed) {
+            console.warn(`Could not remove temp dir after ${retries} attempts: ${dir}`);
+            touched.push({ dir, removed: false });
+          }
+        }
+      } catch (e) {
+        console.warn('Error during temp dir cleanup:', e.message || e);
+      }
+      return touched;
+    }
+
     function runLighthouse(outPath, url, emulation) {
       try {
         runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags(outPath, url, emulation)]);
+        // Best-effort cleanup after success
+        try { cleanupChromeTempDirs(); } catch (e) { /* ignore */ }
       } catch (err) {
+        // Try cleanup if Lighthouse errored (often due to Chrome cleanup problems)
+        try { cleanupChromeTempDirs({ retries: 6, delayMs: 600 }); } catch (e) { /* ignore */ }
         if (fs.existsSync(outPath)) {
           console.warn(`Lighthouse failed but produced a report at ${outPath}; proceeding and ignoring cleanup errors.`);
         } else {

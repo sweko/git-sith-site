@@ -101,7 +101,7 @@
   line-height: 1.6;
   white-space: pre;
 }
-@media (max-width: 420px) {
+@media (max-width: 640px) {
   .article-content pre { white-space: pre-wrap; word-break: break-word; }
 }
 .article-content pre code { background: transparent; padding: 0; display: block; }
@@ -202,6 +202,21 @@
 @media (max-width: 640px) {
   .article-header h1 { font-size: 1.6rem; }
   .article-container { padding: 1rem; margin: 0.5rem; }
+}
+
+/* Prevent long unbroken strings (URLs) from breaking layout on small screens */
+.article-container, .article-content { min-width: 0; }
+.article-content a,
+.article-content p,
+.article-content li,
+.article-content td,
+.article-content th,
+.article-content code,
+.article-content pre {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
 }
 
 /* Collapsible code blocks for mobile */
