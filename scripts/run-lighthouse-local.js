@@ -1,6 +1,7 @@
 const { spawnSync, spawn } = require('child_process');
 const http = require('http');
 const path = require('path');
+const fs = require('fs');
 
 function runSync(cmd, args, opts = {}) {
   console.log(`> ${cmd} ${args.join(' ')}`);
@@ -34,12 +35,24 @@ async function waitForServer(url, attempts = 60, delay = 500) {
     // Build static site
     runSync('npm', ['run', 'build']);
 
-    // Start a local static server via npx http-server
-    console.log('Starting local http-server on port 8080... (using npx --yes to avoid install prompt)');
-    const server = spawn('npx', ['--yes','http-server', './', '-p', '8080'], { stdio: 'inherit' });
-
-    // If the server process exits early, fail fast
+    // Start http-server: prefer local node_modules/.bin/http-server, otherwise fall back to npx
+    const localBin = path.join(process.cwd(), 'node_modules', '.bin', process.platform === 'win32' ? 'http-server.cmd' : 'http-server');
+    let server;
     let serverExited = false;
+
+    if (fs.existsSync(localBin)) {
+      console.log(`Starting http-server from ${localBin} on port 8080...`);
+      // spawn via shell so it works cross-platform when giving the exec string
+      server = spawn(`${localBin} ./ -p 8080`, { shell: true, stdio: 'inherit' });
+    } else {
+      console.log('Starting http-server via npx --yes http-server ./ -p 8080 ...');
+      try {
+        server = spawn('npx --yes http-server ./ -p 8080', { shell: true, stdio: 'inherit' });
+      } catch (err) {
+        throw new Error("Failed to spawn 'npx' to run http-server. Install 'http-server' locally (npm i -D http-server) or ensure npx is available in your PATH.");
+      }
+    }
+
     server.on('exit', (code, sig) => {
       serverExited = true;
       console.error(`Local server process exited early (code=${code}, signal=${sig})`);
@@ -93,7 +106,7 @@ async function waitForServer(url, attempts = 60, delay = 500) {
     runSync('node', [path.join('scripts','capture-screenshots.js')]);
 
     console.log('\nAll checks complete. Shutting down local server.');
-    server.kill();
+    try { server.close(); } catch (e) {}
     process.exit(0);
   } catch (err) {
     console.error('Local lighthouse run failed:', err.message || err);
