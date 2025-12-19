@@ -10,6 +10,8 @@ const SITE_TITLE = 'GitSith - Advent Of Code';
 const CSS_PATH = '/assets/css/main.css';
 const ARTICLE_CSS_PATH = '/assets/css/article.css';
 
+const BASE_URL = (process.env.BASE_URL || 'https://gitsith.com').replace(/\/$/, '');
+
 type DayRecord = {
   year: string;
   day: string; // two-digit
@@ -83,7 +85,7 @@ const indexHtml = `<!doctype html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Advent Of Code — ${SITE_TITLE}</title>  <link rel="canonical" href="/aoc/">
+  <title>Advent Of Code — ${SITE_TITLE}</title>  <link rel="canonical" href="${BASE_URL}/aoc/">
   <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
   <script src="/assets/js/theme-switcher.js" defer></script>
@@ -128,7 +130,7 @@ for (const y of Object.keys(years)) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AoC ${y} — ${SITE_TITLE}</title>
-  <link rel="canonical" href="/aoc/${y}/">
+  <link rel="canonical" href="${BASE_URL}/aoc/${y}/">
   <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
   <script src="/assets/js/theme-switcher.js" defer></script>
@@ -190,7 +192,7 @@ for (const y of Object.keys(years)) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Day ${parseInt(d.day,10)}/${y} - ${escapeHtml(d.title)} — AoC ${y} — ${SITE_TITLE}</title>
   <meta name="description" content="${escapeHtml(d.description || excerpt)}">
-  <link rel="canonical" href="/aoc/${y}/${d.day}/">
+  <link rel="canonical" href="${BASE_URL}/aoc/${y}/${d.day}/">
   <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
   <script src="/assets/js/theme-switcher.js" defer></script>
