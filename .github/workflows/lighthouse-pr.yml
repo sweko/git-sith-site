@@ -39,6 +39,9 @@ jobs:
       - name: Create reports dir
         run: mkdir -p ./dev/lighthouse-reports
 
+      - name: Verify collapsible code blocks
+        run: node scripts/check-collapsible.js
+
       - name: Lighthouse — AoC Day 7 (mobile)
         run: |
           # Use Puppeteer's bundled Chromium to avoid X server display issues in the runner
@@ -104,10 +107,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lighthouse-reports
-          path: ./dev/lighthouse-reports
+          path: ./dev/lighthouse/reports
 
       - name: Upload mobile screenshots
         uses: actions/upload-artifact@v4
         with:
           name: mobile-screenshots
-          path: ./dev/screenshots
+          path: ./dev/lighthouse/screenshots

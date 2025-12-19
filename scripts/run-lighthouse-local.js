@@ -65,16 +65,16 @@ async function waitForServer(url, attempts = 10, delay = 500) {
     ];
 
     console.log('\nRunning Lighthouse (mobile) for AoC Day 7...');
-    runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags('./dev/lighthouse-reports/aoc-day07-mobile.html', 'http://127.0.0.1:8080/aoc/2025/07.html', 'mobile')]);
+    runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags('./dev/lighthouse/reports/aoc-day07-mobile.html', 'http://127.0.0.1:8080/aoc/2025/07.html', 'mobile')]);
 
     console.log('Running Lighthouse (mobile) for Introducing GitSith...');
-    runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags('./dev/lighthouse-reports/introducing-gitsith-mobile.html', 'http://127.0.0.1:8080/articles/introducing-gitsith.html', 'mobile')]);
+    runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags('./dev/lighthouse/reports/introducing-gitsith-mobile.html', 'http://127.0.0.1:8080/articles/introducing-gitsith.html', 'mobile')]);
 
     console.log('Running Lighthouse (desktop) for AoC Day 7...');
-    runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags('./dev/lighthouse-reports/aoc-day07-desktop.html', 'http://127.0.0.1:8080/aoc/2025/07.html', 'desktop')]);
+    runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags('./dev/lighthouse/reports/aoc-day07-desktop.html', 'http://127.0.0.1:8080/aoc/2025/07.html', 'desktop')]);
 
     console.log('Running Lighthouse (desktop) for Introducing GitSith...');
-    runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags('./dev/lighthouse-reports/introducing-gitsith-desktop.html', 'http://127.0.0.1:8080/articles/introducing-gitsith.html', 'desktop')]);
+    runSync('npx', ['-y', 'lighthouse', ...lighthouseFlags('./dev/lighthouse/reports/introducing-gitsith-desktop.html', 'http://127.0.0.1:8080/articles/introducing-gitsith.html', 'desktop')]);
 
     // Capture screenshots
     console.log('\nCapturing screenshots (mobile + desktop)...');

@@ -3,7 +3,7 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 
 (async () => {
-  const outDir = path.resolve(__dirname, '..', 'dev', 'screenshots');
+  const outDir = path.resolve(__dirname, '..', 'dev', 'lighthouse', 'screenshots');
   fs.mkdirSync(outDir, { recursive: true });
 
   const urls = [
