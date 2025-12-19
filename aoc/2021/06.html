@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 6/2021 - Lanternfish — AoC 2021 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Exponential growth, the limits of simulation, and why counting states beats tracking individuals.">
+  <link rel="canonical" href="/aoc/2021/06/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 6/2021 - Lanternfish</h1>
+        <div class="article-meta"><time datetime="2021">2021</time> · 4 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day six of AoC 2021 (available at <a href="https://adventofcode.com/2021/day/6">https://adventofcode.com/2021/day/6</a>) introduces us to lanternfish — bioluminescent creatures <a href="https://www.youtube.com/watch?v=lbq4G1TjKYg" target="_blank">down by the water</a> that reproduce exponentially. Each fish has an internal timer. When it hits zero, it resets to 6 and spawns a new fish with timer 8.</p>
+<p>The input is a list of initial timer values: <code>3,4,3,1,2</code>.</p>
+<h2>Part One: Naive Simulation</h2>
+<p>For 80 days, simulation works fine. Track each fish, decrement timers, spawn new fish:</p>
+<pre><code class="language-typescript">const partOne = (input: number[], debug: boolean) =&gt; {
+    const fishes = [...input].sort((a, b) =&gt; a - b);
+    
+    for (let day = 0; day &lt; 80; day++) {
+        let newFish = 0;
+        let fishIndex = 0;
+        
+        // Process fish at zero (they&#39;re sorted, so zeros are first)
+        while (fishes[fishIndex] === 0) {
+            fishes[fishIndex] = 6; // Reset timer
+            newFish++;
+            fishIndex++;
+        }
+        
+        // Decrement all other fish
+        while (fishIndex &lt; fishes.length) {
+            fishes[fishIndex]--;
+            fishIndex++;
+        }
+        
+        // Add new fish
+        for (let i = 0; i &lt; newFish; i++) {
+            fishes.push(8);
+        }
+    }
+    
+    return fishes.length;
+};
+</code></pre>
+<p>After 80 days: 5934 fish for the example. My real input: some large but manageable number. Runs in ~300ms.</p>
+<h2>Part Two: The Wall</h2>
+<p>Part two asks for 256 days instead of 80. &quot;Just change the constant,&quot; I thought.</p>
+<p>The simulation slows down around day 140. By day 150, it&#39;s crawling. I watched the array grow: 9 million fish... 10 million... 13 million...</p>
+<p>This is the nature of exponential growth. The population roughly doubles every 7-8 days. At that rate:</p>
+<ul>
+<li>80 days: ~thousands of fish</li>
+<li>256 days: ~trillions of fish</li>
+</ul>
+<p>No computer can store trillions of individual fish in an array. The naive approach is mathematically impossible.</p>
+<h2>The Insight: Fish Are Fungible</h2>
+<p>Here&#39;s the key realization: <strong>individual fish don&#39;t matter</strong>. A fish with timer 3 is identical to every other fish with timer 3. We don&#39;t need to track them separately.</p>
+<p>There are only 9 possible states (timers 0-8). Instead of an array of millions of fish, use an array of 9 counts:</p>
+<pre><code class="language-typescript">const calculateFishes = (input: number[], days: number): number =&gt; {
+    const FISH_CYCLE = 6;
+    const NEW_FISH_CYCLE = 8;
+    
+    // State: count of fish at each timer value (0-8)
+    let state = new Array(NEW_FISH_CYCLE + 1).fill(0);
+    for (const fish of input) {
+        state[fish]++;
+    }
+    
+    for (let day = 0; day &lt; days; day++) {
+        const newState = new Array(NEW_FISH_CYCLE + 1).fill(0);
+        
+        // Fish at timer N become fish at timer N-1
+        for (let i = 1; i &lt;= NEW_FISH_CYCLE; i++) {
+            newState[i - 1] = state[i];
+        }
+        
+        // Fish at timer 0: spawn new fish at 8, reset to 6
+        newState[NEW_FISH_CYCLE] = state[0];  // New fish
+        newState[FISH_CYCLE] += state[0];      // Reset parents
+        
+        state = newState;
+    }
+    
+    return state.reduce((a, b) =&gt; a + b, 0);
+};
+</code></pre>
+<p>Each day:</p>
+<ol>
+<li>Shift all counts left (timer 5 fish become timer 4 fish, etc.)</li>
+<li>Fish at timer 0 spawn new fish at timer 8</li>
+<li>Fish at timer 0 reset to timer 6 (add to existing count)</li>
+</ol>
+<p>That&#39;s it. Nine numbers, updated 256 times. Runs in 3 milliseconds.</p>
+<h2>The Numbers</h2>
+<p>The result for 256 days is an 11-digit number. JavaScript handles integers safely up to about 16 digits (<code>Number.MAX_SAFE_INTEGER</code> ≈ 9×10¹⁵), so we&#39;re fine. If the answer were larger, we&#39;d need BigInt.</p>
+<p>Always check your result against MAX_SAFE_INTEGER when dealing with exponential growth. An off-by-one error in the last digit means a wrong answer.</p>
+<h2>Performance Comparison</h2>
+<table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>80 days</th>
+<th>256 days</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Simulation</td>
+<td>~300ms</td>
+<td>∞ (impossible)</td>
+</tr>
+<tr>
+<td>State counting</td>
+<td>~1ms</td>
+<td>~3ms</td>
+</tr>
+</tbody></table>
+<p>The state-counting approach is O(days × states) = O(256 × 9) = O(2304). The simulation is O(days × fish_count), where fish_count grows exponentially.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Recognize when simulation won&#39;t scale</strong>: If the problem involves exponential growth and a large number of iterations, simulation is probably not the answer.</p>
+</li>
+<li><p><strong>Look for equivalence classes</strong>: When individuals are interchangeable, count them instead of tracking them. This is a fundamental technique in combinatorics.</p>
+</li>
+<li><p><strong>The constants are chosen deliberately</strong>: Eric (the puzzle creator) picked 256 days specifically because it&#39;s just beyond what brute force can handle. Part one&#39;s 80 days is a trap to make you think simulation works.</p>
+</li>
+<li><p><strong>Check integer limits</strong>: JavaScript&#39;s safe integer range is large but not infinite. Know when you might overflow.</p>
+</li>
+<li><p><strong>Refactor after solving</strong>: Once both parts work, extract the common logic. The final solution uses the same function for both parts, just with different day counts.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2021/ts/day-06">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2021 — Day 6</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="05.html" rel="prev" aria-label="Previous: Day 5 — Hydrothermal Venture">← Day 5 — Hydrothermal Venture</a>
+<a class="next" href="07.html" rel="next" aria-label="Next: Day 7 — The Treachery of Whales">Day 7 — The Treachery of Whales →</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

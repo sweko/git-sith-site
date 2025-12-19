@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 8/2021 - Seven Segment Search — AoC 2021 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Decoding scrambled seven-segment displays through logical deduction. Like Sudoku, but with wires.">
+  <link rel="canonical" href="/aoc/2021/08/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 8/2021 - Seven Segment Search</h1>
+        <div class="article-meta"><time datetime="2021">2021</time> · 5 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day eight of AoC 2021 (available at <a href="https://adventofcode.com/2021/day/8">https://adventofcode.com/2021/day/8</a>) throws us into the world of <a href="https://www.youtube.com/watch?v=0J2QdDbelmY" target="_blank">seven-segment</a> displays — those classic digital readouts you see on alarm clocks, calculators, and air conditioners. The catch: the wires are scrambled differently for each display.</p>
+<p>Each line of input has 10 signal patterns (the digits 0-9 in scrambled form) and 4 output values we need to decode.</p>
+<h2>Parsing the Input</h2>
+<pre><code class="language-typescript">interface Mapping {
+    digits: string[];
+    values: string[];
+}
+
+const processInput = (day: number): Mapping[] =&gt; {
+    const lines = readInputLines(day);
+    return lines.map(line =&gt; {
+        const [digitPart, valuePart] = line.split(&quot; | &quot;);
+        const digits = digitPart.split(&quot; &quot;).map(d =&gt; d.split(&quot;&quot;).sort().join(&quot;&quot;));
+        const values = valuePart.split(&quot; &quot;).map(v =&gt; v.split(&quot;&quot;).sort().join(&quot;&quot;));
+        return { digits, values };
+    });
+};
+</code></pre>
+<p>Critical step: <strong>sort each pattern alphabetically</strong>. Without this, <code>acf</code> and <code>fca</code> look different when they represent the same digit. Canonical form eliminates ambiguity.</p>
+<h2>Part One: The Easy Digits</h2>
+<p>Some digits have unique segment counts:</p>
+<ul>
+<li><strong>1</strong> uses 2 segments</li>
+<li><strong>4</strong> uses 4 segments  </li>
+<li><strong>7</strong> uses 3 segments</li>
+<li><strong>8</strong> uses 7 segments</li>
+</ul>
+<p>Part one just asks: how many times do these easy digits appear in the output values?</p>
+<pre><code class="language-typescript">const partOne = (input: Mapping[], debug: boolean) =&gt; {
+    const uniqueLengths = [2, 3, 4, 7];
+    
+    return input
+        .map(m =&gt; m.values.filter(v =&gt; uniqueLengths.includes(v.length)).length)
+        .reduce((a, b) =&gt; a + b, 0);
+};
+</code></pre>
+<p>We don&#39;t need to decode anything — just count by length.</p>
+<h2>Part Two: Full Deduction</h2>
+<p>Now we need to actually decode each display. This is where it gets interesting.</p>
+<p>The approach: use the unique digits (1, 4, 7, 8) to deduce segment mappings, then identify the remaining digits through set operations.</p>
+<h3>The Deduction Chain</h3>
+<p>First, identify the easy ones by length:</p>
+<pre><code class="language-typescript">const one = digits.find(d =&gt; d.length === 2)!.split(&quot;&quot;);
+const four = digits.find(d =&gt; d.length === 4)!.split(&quot;&quot;);
+const seven = digits.find(d =&gt; d.length === 3)!.split(&quot;&quot;);
+const eight = digits.find(d =&gt; d.length === 7)!.split(&quot;&quot;);
+</code></pre>
+<p>The <strong>top segment</strong> is in 7 but not in 1:</p>
+<pre><code class="language-typescript">const topSegment = seven.find(s =&gt; !one.includes(s))!;
+</code></pre>
+<p>The <strong>middle and top-left segments</strong> are in 4 but not in 1:</p>
+<pre><code class="language-typescript">const midLeft = four.filter(s =&gt; !one.includes(s));
+</code></pre>
+<p>For the six-segment digits (0, 6, 9), we can identify <strong>9</strong> as the only one containing all segments from both 4 and 7:</p>
+<pre><code class="language-typescript">const sixes = digits.filter(d =&gt; d.length === 6).map(d =&gt; d.split(&quot;&quot;));
+const nine = sixes.find(d =&gt; 
+    seven.every(s =&gt; d.includes(s)) &amp;&amp; four.every(s =&gt; d.includes(s))
+)!;
+</code></pre>
+<p>The <strong>bottom segment</strong> is in 9 but not in 4 or 7:</p>
+<pre><code class="language-typescript">const bottomSegment = nine.find(s =&gt; !seven.includes(s) &amp;&amp; !four.includes(s))!;
+</code></pre>
+<p>And so on. Each deduction unlocks the next, like a logic puzzle.</p>
+<h3>Building the Decoder</h3>
+<p>After all that deduction, we can construct each digit&#39;s canonical form:</p>
+<pre><code class="language-typescript">const zero = [topSegment, highLeft, highRight, lowLeft, lowRight, bottomSegment].sort().join(&quot;&quot;);
+const one = [...one].sort().join(&quot;&quot;);
+const two = [topSegment, highRight, centerSegment, lowLeft, bottomSegment].sort().join(&quot;&quot;);
+// ... and so on for 3, 4, 5, 6, 7, 8, 9
+
+const digitPatterns = [zero, one, two, three, four, five, six, seven, eight, nine];
+</code></pre>
+<h3>Decoding the Output</h3>
+<p>With the decoder built, converting output values to a number is straightforward:</p>
+<pre><code class="language-typescript">const outputValue = 
+    digitPatterns.indexOf(values[0]) * 1000 +
+    digitPatterns.indexOf(values[1]) * 100 +
+    digitPatterns.indexOf(values[2]) * 10 +
+    digitPatterns.indexOf(values[3]);
+</code></pre>
+<p>Sum all the output values for the answer.</p>
+<h2>The Code Is Ugly (And That&#39;s OK)</h2>
+<p>This solution is heavily hardcoded. There&#39;s no elegant general algorithm — just a chain of specific deductions based on how seven-segment digits work.</p>
+<pre><code class="language-typescript">// This is terribly specific but it works
+const highRight = one.find(s =&gt; !six.includes(s))!;
+const lowRight = one.find(s =&gt; s !== highRight)!;
+</code></pre>
+<p>In production, I&#39;d never write code this brittle. But for AoC, correctness beats elegance. The puzzle has exactly one structure, and my code solves exactly that structure.</p>
+<h2>Performance</h2>
+<p>Both parts run in about 5 milliseconds. The deduction logic is O(1) per display (constant number of comparisons), and we have a few hundred displays. No optimization needed.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Canonical form eliminates ambiguity</strong>: Sorting each pattern alphabetically means <code>acf</code> and <code>fca</code> become the same string. This is essential for comparison.</p>
+</li>
+<li><p><strong>Unique properties identify elements</strong>: Digit 1 is the only one with 2 segments. Digit 9 is the only 6-segment digit containing all of 4 and 7. Use these unique properties as anchors.</p>
+</li>
+<li><p><strong>Chain your deductions</strong>: Each discovery enables the next. Top segment → bottom segment → nine → high-right segment, and so on.</p>
+</li>
+<li><p><strong>Hardcoded solutions are fine for puzzles</strong>: This code would be unmaintainable in production, but AoC puzzles don&#39;t change. Write code that solves the problem in front of you.</p>
+</li>
+<li><p><strong>Set operations are your friend</strong>: &quot;Find the segment in A but not in B&quot; is a set difference. JavaScript&#39;s <code>filter</code> and <code>includes</code> make this readable.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2021/ts/day-08">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2021 — Day 8</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="07.html" rel="prev" aria-label="Previous: Day 7 — The Treachery of Whales">← Day 7 — The Treachery of Whales</a>
+<a class="next" href="09.html" rel="next" aria-label="Next: Day 9 — Smoke Basin">Day 9 — Smoke Basin →</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

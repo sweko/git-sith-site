@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 9/2021 - Smoke Basin — AoC 2021 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Finding low points in height maps, flood-filling basins, and padding matrices to avoid boundary checks.">
+  <link rel="canonical" href="/aoc/2021/09/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 9/2021 - Smoke Basin</h1>
+        <div class="article-meta"><time datetime="2021">2021</time> · 5 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day nine of AoC 2021 (available at <a href="https://adventofcode.com/2021/day/9">https://adventofcode.com/2021/day/9</a>) takes us deeper into the <a href="https://www.youtube.com/watch?v=LnHoqHscTKE" target="_blank">caves</a>. We have a height map where smoke flows to the lowest points, and we need to find those local minima.</p>
+<p>The input is a grid of single digits (0-9) representing heights.</p>
+<h2>The Boundary Problem</h2>
+<p>When checking neighbors in a grid, corners and edges are annoying. A cell in the middle has 4 neighbors; a corner has 2. You end up with ugly boundary checks everywhere:</p>
+<pre><code class="language-typescript">// Ugly: check if neighbor exists before accessing
+if (row &gt; 0 &amp;&amp; grid[row-1][col] &lt; current) { ... }
+if (col &lt; width-1 &amp;&amp; grid[row][col+1] &lt; current) { ... }
+</code></pre>
+<p>My solution: <strong>pad the grid with walls</strong>.</p>
+<h2>Parsing with Padding</h2>
+<p>Surround the input with 9s (the maximum height, effectively walls):</p>
+<pre><code class="language-typescript">const processInput = (day: number): number[][] =&gt; {
+    const lines = readInputLines(day);
+    const input = lines.map(line =&gt; 
+        line.split(&quot;&quot;).map(n =&gt; parseInt(n, 10))
+    );
+    
+    const width = input[0].length + 2;
+    const padRow = new Array(width).fill(9);
+    
+    const expanded = [
+        padRow,
+        ...input.map(row =&gt; [9, ...row, 9]),
+        padRow
+    ];
+    
+    return expanded;
+};
+</code></pre>
+<p>Now every cell has 4 neighbors. The 9s act as walls — no cell is ever lower than them, so they never affect our calculations.</p>
+<h2>Part One: Finding Low Points</h2>
+<p>A low point is lower than all four neighbors. With padding, we can start from index 1 and stop before the last index:</p>
+<pre><code class="language-typescript">const partOne = (expanded: number[][], debug: boolean) =&gt; {
+    let total = 0;
+    
+    for (let row = 1; row &lt; expanded.length - 1; row++) {
+        for (let col = 1; col &lt; expanded[row].length - 1; col++) {
+            const cell = expanded[row][col];
+            const top = expanded[row - 1][col];
+            const bottom = expanded[row + 1][col];
+            const left = expanded[row][col - 1];
+            const right = expanded[row][col + 1];
+            
+            if (top &lt;= cell) continue;
+            if (bottom &lt;= cell) continue;
+            if (left &lt;= cell) continue;
+            if (right &lt;= cell) continue;
+            
+            // Risk level is height + 1
+            total += cell + 1;
+        }
+    }
+    
+    return total;
+};
+</code></pre>
+<p>No boundary checks needed. Clean nested loops.</p>
+<h2>Part Two: Flood Fill</h2>
+<p>A basin is all cells that flow down to a low point. The puzzle guarantees that 9s act as walls — every basin is distinct, separated by ridges of 9s.</p>
+<p>The algorithm: find an unvisited non-wall cell, flood fill from it (counting cells), mark all visited cells as walls.</p>
+<pre><code class="language-typescript">const partTwo = (input: number[][], debug: boolean) =&gt; {
+    // Create a mutable copy with 9s as walls
+    const expanded = input.map(row =&gt; [...row]);
+    const basins: number[] = [];
+    
+    while (true) {
+        // Find first non-wall cell
+        let startRow = -1, startCol = -1;
+        
+        outer: for (let row = 1; row &lt; expanded.length - 1; row++) {
+            for (let col = 1; col &lt; expanded[row].length - 1; col++) {
+                if (expanded[row][col] !== 9) {
+                    startRow = row;
+                    startCol = col;
+                    break outer;
+                }
+            }
+        }
+        
+        // No more non-wall cells? We&#39;re done
+        if (startRow === -1) break;
+        
+        // Flood fill from this cell
+        let basinSize = 0;
+        const queue: [number, number][] = [[startRow, startCol]];
+        
+        while (queue.length &gt; 0) {
+            const [row, col] = queue.shift()!;
+            
+            // Already processed? Skip
+            if (expanded[row][col] === 9) continue;
+            
+            // Mark as wall (visited) and count
+            expanded[row][col] = 9;
+            basinSize++;
+            
+            // Add non-wall neighbors to queue
+            if (expanded[row - 1][col] !== 9) queue.push([row - 1, col]);
+            if (expanded[row + 1][col] !== 9) queue.push([row + 1, col]);
+            if (expanded[row][col - 1] !== 9) queue.push([row, col - 1]);
+            if (expanded[row][col + 1] !== 9) queue.push([row, col + 1]);
+        }
+        
+        basins.push(basinSize);
+    }
+    
+    // Multiply three largest basins
+    basins.sort((a, b) =&gt; b - a);
+    return basins[0] * basins[1] * basins[2];
+};
+</code></pre>
+<h3>The Double-Counting Bug</h3>
+<p>My first attempt had a bug: the same cell could be added to the queue multiple times. Consider a cell that&#39;s a neighbor to two already-queued cells — it gets queued twice, counted twice.</p>
+<p>The fix: check if the cell is already a wall (visited) <em>when dequeuing</em>, not just when enqueuing. If we&#39;ve already processed it, skip:</p>
+<pre><code class="language-typescript">if (expanded[row][col] === 9) continue;
+</code></pre>
+<p>This handles duplicates gracefully. We might enqueue a cell 4 times (once from each neighbor), but we only count it once.</p>
+<h2>Why &quot;Pave Over&quot; Works</h2>
+<p>Instead of tracking visited cells in a separate data structure, I mutate the grid itself — turning processed cells into 9s (walls). This has a nice property: the flood fill naturally stops at already-processed cells, and the outer loop naturally skips them when searching for the next basin.</p>
+<p>It&#39;s destructive (we lose the original data), but we don&#39;t need it after processing.</p>
+<h2>Performance</h2>
+<p>Part one: ~4ms for a 100×100 grid. Simple nested loops.</p>
+<p>Part two: ~26ms. The flood fill is efficient, but finding the &quot;first non-wall cell&quot; by scanning from the top-left every time is wasteful. We could optimize by tracking where we left off. But 26ms is fast enough.</p>
+<p>The comment in my code:</p>
+<pre><code class="language-typescript">// Can be optimized by not starting from top-left each time
+// but if it&#39;s not too slow, don&#39;t fix it
+</code></pre>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Pad grids to avoid boundary checks</strong>: Adding a border of &quot;wall&quot; values means every interior cell has all neighbors. Cleaner code, fewer edge cases.</p>
+</li>
+<li><p><strong>Flood fill is a classic</strong>: BFS/DFS to explore connected regions appears constantly in grid problems. Know it cold.</p>
+</li>
+<li><p><strong>Mutate to mark visited</strong>: If you don&#39;t need the original data, mutating the grid to mark visited cells is simpler than maintaining a separate visited set.</p>
+</li>
+<li><p><strong>Check on dequeue, not enqueue</strong>: When the same cell can be added to a queue multiple times, filter duplicates when removing, not when adding.</p>
+</li>
+<li><p><strong>26ms is fast enough</strong>: The optimization to continue from the last position would save maybe 12ms. Not worth the added complexity for a one-shot puzzle.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2021/ts/day-09">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2021 — Day 9</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="08.html" rel="prev" aria-label="Previous: Day 8 — Seven Segment Search">← Day 8 — Seven Segment Search</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

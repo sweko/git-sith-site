@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 7/2021 - The Treachery of Whales — AoC 2021 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Aligning crab submarines, brute force optimization, and rediscovering Gauss&#39;s childhood trick.">
+  <link rel="canonical" href="/aoc/2021/07/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 7/2021 - The Treachery of Whales</h1>
+        <div class="article-meta"><time datetime="2021">2021</time> · 4 min read</div>
+      </header>
+      <div class="article-content">
+        <p>Day seven of AoC 2021 (available at <a href="https://adventofcode.com/2021/day/7">https://adventofcode.com/2021/day/7</a>) puts us in mortal peril: a giant <a href="https://youtu.be/TsdIO8RHMTc" target="_blank">whale</a> is chasing our submarine! Fortunately, a swarm of crabs in tiny &quot;crabmarines&quot; arrives to help. They&#39;ll blast a hole in the ocean floor — but first they need to align horizontally.</p>
+<p>The input is a list of horizontal positions for each crab submarine.</p>
+<h2>Parsing the Input</h2>
+<p>Simple comma-separated integers:</p>
+<pre><code class="language-typescript">const processInput = (day: number): number[] =&gt; {
+    const input = readInput(day);
+    return input.split(&quot;,&quot;).map(n =&gt; parseInt(n, 10));
+};
+</code></pre>
+<h2>Part One: Linear Fuel Cost</h2>
+<p>Each step costs 1 fuel. Find the position where aligning all crabs costs the least total fuel.</p>
+<p>Brute force: try every position from minimum to maximum, calculate total fuel for each:</p>
+<pre><code class="language-typescript">const partOne = (input: number[], debug: boolean) =&gt; {
+    const min = Math.min(...input);
+    const max = Math.max(...input);
+    
+    let minFuel = Infinity;
+    
+    for (let position = min; position &lt;= max; position++) {
+        let fuel = 0;
+        for (const crab of input) {
+            fuel += Math.abs(crab - position);
+        }
+        if (fuel &lt; minFuel) {
+            minFuel = fuel;
+        }
+    }
+    
+    return minFuel;
+};
+</code></pre>
+<p>This is O(n × range) — for ~1000 crabs across ~2000 positions, that&#39;s ~2 million operations. Fast enough.</p>
+<p><strong>Math note</strong>: The optimal position for part one is actually the <strong>median</strong> of the input. Moving away from the median always increases total distance. But brute force works fine here.</p>
+<h2>Part Two: Triangular Fuel Cost</h2>
+<p>Now each step costs more than the last: moving 1 step costs 1, moving 2 steps costs 1+2=3, moving 3 steps costs 1+2+3=6, and so on.</p>
+<p>The cost to move <code>n</code> steps is the sum of integers from 1 to n. This is where Gauss comes in.</p>
+<p>Legend has it that young Gauss was asked to sum the numbers 1 to 100. Instead of adding laboriously, he noticed: 1+100=101, 2+99=101, 3+98=101... There are 50 such pairs, so the answer is 50×101=5050.</p>
+<p>The general formula: <strong>sum(1 to n) = n × (n+1) / 2</strong></p>
+<pre><code class="language-typescript">const triangularCost = (distance: number): number =&gt; {
+    return (distance * (distance + 1)) / 2;
+};
+
+const partTwo = (input: number[], debug: boolean) =&gt; {
+    const min = Math.min(...input);
+    const max = Math.max(...input);
+    
+    let minFuel = Infinity;
+    
+    for (let position = min; position &lt;= max; position++) {
+        let fuel = 0;
+        for (const crab of input) {
+            const distance = Math.abs(crab - position);
+            fuel += triangularCost(distance);
+        }
+        if (fuel &lt; minFuel) {
+            minFuel = fuel;
+        }
+    }
+    
+    return minFuel;
+};
+</code></pre>
+<p>Same brute force structure, different cost function.</p>
+<p><strong>Math note</strong>: For part two, the optimal position is close to the <strong>mean</strong> (average) of the input — though rounding can be tricky. Some inputs need floor, others need ceiling. Brute force avoids this ambiguity entirely.</p>
+<h2>Why Brute Force Works</h2>
+<p>With ~1000 crabs and ~2000 positions:</p>
+<ul>
+<li>Part 1: 2 million additions</li>
+<li>Part 2: 2 million multiplications and additions</li>
+</ul>
+<p>Both complete in milliseconds. Sometimes the naive approach is good enough.</p>
+<p>I always consider: is the brute force O(n²) or worse? Is n small enough that it doesn&#39;t matter? Here, n×range is around 2 million — modern computers eat that for breakfast.</p>
+<h2>The Gauss Formula in Practice</h2>
+<p>This formula appears constantly in programming:</p>
+<ul>
+<li>Summing consecutive integers</li>
+<li>Calculating triangular numbers</li>
+<li>Handshake problems (how many handshakes in a room of n people?)</li>
+<li>Counting pairs</li>
+</ul>
+<p>It&#39;s worth committing to memory: <strong>n × (n+1) / 2</strong></p>
+<p>You could also compute it iteratively with a loop or <code>Array.from({length: n}, (_, i) =&gt; i + 1).reduce((a,b) =&gt; a+b)</code>, but the formula is O(1) versus O(n). For small n it doesn&#39;t matter; for large n it&#39;s essential.</p>
+<h2>Performance</h2>
+<p>Both parts run in under 100 milliseconds. The input processing is trivial, and the double loop is fast despite being quadratic in theory.</p>
+<p>No optimization needed. Ship it.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Brute force first</strong>: If the search space is small (thousands, not billions), just try everything. It&#39;s simple, correct, and often fast enough.</p>
+</li>
+<li><p><strong>Know your classic formulas</strong>: Gauss&#39;s sum formula turns O(n) summation into O(1) arithmetic. These tricks compound over a programming career.</p>
+</li>
+<li><p><strong>Median vs mean</strong>: Part one&#39;s optimal is the median (minimizes absolute deviations). Part two&#39;s optimal is near the mean (minimizes squared-ish deviations). Different cost functions, different optima.</p>
+</li>
+<li><p><strong>Don&#39;t optimize prematurely</strong>: The brute force solution runs in milliseconds. Implementing a clever median/mean solution would save... milliseconds. Not worth the debugging risk.</p>
+</li>
+<li><p><strong>Crabs move sideways</strong>: Just like in real life. 🦀</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/tree/master/2021/ts/day-07">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2021 — Day 7</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="06.html" rel="prev" aria-label="Previous: Day 6 — Lanternfish">← Day 6 — Lanternfish</a>
+<a class="next" href="08.html" rel="next" aria-label="Next: Day 8 — Seven Segment Search">Day 8 — Seven Segment Search →</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
