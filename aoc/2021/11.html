@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 11/2021 - Dumbo Octopus — AoC 2021 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Cascading flashes in an octopus grid. Padding matrices, sentinel values, and waiting for synchronization.">
+  <link rel="canonical" href="https://gitsith.com/aoc/2021/11/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 11/2021 - Dumbo Octopus</h1>
+        <div class="article-meta"><time datetime="2021">2021</time> · 6 min read</div>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="10.html" rel="prev" aria-label="Previous: Day 10 — Syntax Scoring">← Day 10 — Syntax Scoring</a>
+<a class="next" href="12.html" rel="next" aria-label="Next: Day 12 — Passage Pathing">Day 12 — Passage Pathing →</a></nav>
+      </header>
+      <div class="article-content">
+        <p>Day eleven of AoC 2021 (available at <a href="https://adventofcode.com/2021/day/11">https://adventofcode.com/2021/day/11</a>) introduces us to bioluminescent octopuses (octopi? octopodes?) in a cavern. Each octopus has an energy level from 0 to 9, and when it exceeds 9, it <a href="https://www.youtube.com/watch?v=LfmrHTdXgK4" target="_blank">flashes</a> — increasing all eight neighbors&#39; energy by one.</p>
+<p>The cascading nature is the interesting part: if a neighbor&#39;s energy goes above 9 from a flash, it also flashes, potentially triggering more flashes. But each octopus can only flash once per step.</p>
+<h2>Parsing the Input</h2>
+<p>The input is a 10×10 grid of single digits:</p>
+<pre><code class="language-typescript">const processInput = async (day: number) =&gt; {
+    const input = await readInputLines(day);
+    const lines = input.map(line =&gt; line.split(&quot;&quot;).map(char =&gt; parseInt(char, 10)));
+    return lines;
+};
+</code></pre>
+<h2>The Cascading Flash Problem</h2>
+<p>The tricky part is handling the cascade correctly:</p>
+<ol>
+<li>Increment all energy levels by 1</li>
+<li>Any octopus with energy &gt; 9 flashes</li>
+<li>Flashing increases all 8 neighbors</li>
+<li>Neighbors that exceed 9 also flash</li>
+<li>Each octopus can only flash once per step</li>
+<li>After all flashes, reset flashed octopuses to 0</li>
+</ol>
+<p>The &quot;only flash once&quot; constraint is critical. If octopus A flashes and triggers B, then B flashes and would trigger A again — A shouldn&#39;t flash twice.</p>
+<h2>The Padding Trick (Again)</h2>
+<p>Just like Day 9, I pad the grid to avoid boundary checks. A 10×10 grid becomes 12×12, with zeros around the border:</p>
+<pre><code class="language-typescript">const executeStep = (grid: number[][]): [number[][], number] =&gt; {
+    const fillValue = 0;
+    const expanded = [
+        Array(grid[0].length + 2).fill(fillValue),
+        ...grid.map(row =&gt; [fillValue, ...row, fillValue]),
+        Array(grid[0].length + 2).fill(fillValue),
+    ];
+    // ...
+};
+</code></pre>
+<p>Why is zero safe for the border? Corner cells have only 3 real neighbors, edge cells have 5. Even if all neighbors flash, the border cell reaches at most 5 — never exceeding 9. And we recreate the border each step anyway.</p>
+<h2>The Sentinel Value Trick</h2>
+<p>Here&#39;s the clever part: when an octopus flashes, I set its energy to -100 instead of 0. Why?</p>
+<pre><code class="language-typescript">const fulls = [];
+let flashes = 0;
+
+// First pass: increment everything, find initial flashers
+for (let rindex = 1; rindex &lt; expanded.length - 1; rindex++) {
+    const row = expanded[rindex];
+    for (let cindex = 1; cindex &lt; row.length - 1; cindex++) {
+        row[cindex] += 1;
+        if (row[cindex] &gt; 9) {
+            fulls.push({x: rindex, y: cindex});
+        }
+    }
+}
+
+// Process cascading flashes
+while (fulls.length &gt; 0) {
+    const {x, y} = fulls.shift();
+    if (expanded[x][y] &lt; 0) {
+        continue;  // Already flashed
+    }
+    expanded[x][y] = -100;  // Mark as flashed
+    flashes += 1;
+    
+    // Increase all 8 neighbors and queue if they exceed 9
+    expanded[x-1][y] += 1;
+    if (expanded[x-1][y] &gt; 9) {
+        fulls.push({x: x-1, y: y});
+    }
+    expanded[x+1][y] += 1;
+    if (expanded[x+1][y] &gt; 9) {
+        fulls.push({x: x+1, y: y});
+    }
+    // ... (6 more neighbors)
+}
+</code></pre>
+<p>The -100 sentinel serves two purposes:</p>
+<ol>
+<li><strong>Prevents re-flashing</strong>: The <code>if (expanded[x][y] &lt; 0) continue</code> check skips already-flashed octopuses</li>
+<li><strong>Survives multiple triggers</strong>: An octopus can be added to the queue up to 8 times (once per neighbor). Even if triggered 8 times, -100 + 8 = -92, still negative.</li>
+</ol>
+<p>After processing, reset all negative values to zero:</p>
+<pre><code class="language-typescript">for (let rindex = 1; rindex &lt; expanded.length - 1; rindex++) {
+    const row = expanded[rindex];
+    for (let cindex = 1; cindex &lt; row.length - 1; cindex++) {
+        if (row[cindex] &lt; 0) 
+            row[cindex] = 0;
+    }
+}
+</code></pre>
+<h2>The Eight Neighbors</h2>
+<p>Yes, the code explicitly handles all 8 neighbors. It&#39;s verbose but clear:</p>
+<pre><code class="language-typescript">expanded[x-1][y] += 1;     // top
+expanded[x+1][y] += 1;     // bottom
+expanded[x][y-1] += 1;     // left
+expanded[x][y+1] += 1;     // right
+expanded[x-1][y-1] += 1;   // top-left
+expanded[x+1][y-1] += 1;   // bottom-left
+expanded[x-1][y+1] += 1;   // top-right
+expanded[x+1][y+1] += 1;   // bottom-right
+</code></pre>
+<p>Could use nested loops from -1 to +1, but it wouldn&#39;t be any prettier. Sometimes explicit is better than clever.</p>
+<h2>Part One: Counting Flashes</h2>
+<p>Run 100 steps, sum all flashes:</p>
+<pre><code class="language-typescript">const partOne = (input: number[][], debug: boolean) =&gt; {
+    let grid = input;
+    let flashes = 0;
+    let totalFlashes = 0;
+    for (let index = 0; index &lt; 100; index++) {
+        [grid, flashes] = executeStep(grid);
+        totalFlashes += flashes;
+    }
+
+    return totalFlashes;
+};
+</code></pre>
+<p>The destructuring assignment <code>[grid, flashes] = executeStep(grid)</code> unpacks the tuple returned by <code>executeStep</code>.</p>
+<h2>Part Two: Synchronization</h2>
+<p>I suspected this was coming: find the first step where all 100 octopuses flash simultaneously. When that happens, all energy levels are zero.</p>
+<pre><code class="language-typescript">const partTwo = (input: number[][], debug: boolean) =&gt; {
+    let grid = input;
+    let flashes = 0;
+    let index = 0;
+    while (true) {
+        [grid, flashes] = executeStep(grid);
+        index += 1;
+        const gridSum = grid.reduce((acc, row) =&gt; acc + row.reduce((acc, cell) =&gt; acc + cell, 0), 0);
+        if (gridSum === 0) {
+            break;
+        }
+    }
+
+    return index;
+};
+</code></pre>
+<p>The check is elegant: if the sum of all cells is zero, every octopus is at zero, meaning they all just flashed. A nested reduce computes the sum.</p>
+<h2>Performance</h2>
+<p>Part one runs in about 18ms, part two in about 24ms. The example synchronizes at step 195; my input synchronized at step 354.</p>
+<p>I noted in the video that this could be problematic if the synchronization took billions of steps — but the puzzle designers are kind. The inputs are chosen to converge reasonably quickly.</p>
+<h2>A Bug I Almost Made</h2>
+<p>In my first attempt, I accidentally referenced the original <code>grid</code> variable instead of <code>expanded</code> in the processing loop. TypeScript caught it immediately when I renamed the variable — the undeclared reference became a compile error. TypeScript to the rescue.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Sentinel values prevent re-processing</strong>: Using -100 instead of 0 for flashed octopuses elegantly handles the &quot;flash once per step&quot; constraint.</p>
+</li>
+<li><p><strong>Padding matrices generalizes well</strong>: This is the third time (days 5, 9, 11) this pattern has been useful. Worth having in your toolkit.</p>
+</li>
+<li><p><strong>Tuples for multiple return values</strong>: TypeScript&#39;s tuple destructuring makes it clean to return both the new grid and the flash count.</p>
+</li>
+<li><p><strong>Sum-to-zero is a clever sync check</strong>: Instead of checking 100 individual cells, sum them. Zero sum means all zeros.</p>
+</li>
+<li><p><strong>Trust the puzzle designers</strong>: The synchronization could theoretically take forever, but AoC puzzles are designed to be solvable. Don&#39;t over-engineer for edge cases that won&#39;t appear.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/blob/master/2021/code/day-11.ts">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2021 — Day 11</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="10.html" rel="prev" aria-label="Previous: Day 10 — Syntax Scoring">← Day 10 — Syntax Scoring</a>
+<a class="next" href="12.html" rel="next" aria-label="Next: Day 12 — Passage Pathing">Day 12 — Passage Pathing →</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
