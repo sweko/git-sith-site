@@ -6,7 +6,8 @@
     "build": "npm run build:articles && npm run build:aoc",
     "build:articles": "ts-node scripts/build-articles.ts",
     "build:aoc": "ts-node scripts/build-aoc.ts",
-    "screenshots": "node scripts/capture-screenshots.js"
+    "screenshots": "node scripts/capture-screenshots.js",
+    "lighthouse": "node scripts/run-lighthouse-local.js"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
