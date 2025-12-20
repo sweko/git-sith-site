@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 13/2021 - Advent of Code 2021, Day 13 - Transparent Origami — AoC 2021 — GitSith - Advent Of Code</title>
+  <meta name="description" content="Folding transparent paper and watching dots overlap. Sometimes the answer is literally spelled out for you.">
+  <link rel="canonical" href="https://gitsith.com/aoc/2021/13/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 13/2021 - Advent of Code 2021, Day 13 - Transparent Origami</h1>
+        <div class="article-meta"><time datetime="2021">2021</time> · 5 min read</div>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="12.html" rel="prev" aria-label="Previous: Day 12 — Passage Pathing">← Day 12 — Passage Pathing</a></nav>
+      </header>
+      <div class="article-content">
+        <p>Day thirteen of AoC 2021 (available at <a href="https://adventofcode.com/2021/day/13">https://adventofcode.com/2021/day/13</a>) marks the halfway point of the contest. We&#39;re activating a thermal imaging camera by folding a sheet of transparent paper marked with dots.</p>
+<p>The input has two sections: coordinates of dots, and fold instructions. The folds are either along an x-axis (vertical fold, left) or y-axis (horizontal fold, up).</p>
+<h2>Parsing Two Sections</h2>
+<p>The input has dots, a blank line, then folds. My <code>takeWhile</code> helper comes in handy:</p>
+<pre><code class="language-typescript">interface Dot {
+    x: number;
+    y: number;
+}
+
+interface Fold {
+    direction: &quot;x&quot; | &quot;y&quot;; 
+    amount: number;
+}
+
+const processInput = async (day: number) =&gt; {
+    const input = await readInputLines(day);
+    const dots = input.takeWhile(line =&gt; line !== &quot;&quot;).map(line =&gt; {
+        const [x, y] = line.split(&quot;,&quot;).map(n =&gt; parseInt(n, 10));
+        return { x, y };
+    });
+    
+    const folds = input.slice(dots.length + 1).map(line =&gt; {
+        const direction = line[11] as &quot;x&quot; | &quot;y&quot;;
+        const amount = parseInt(line.slice(13), 10);
+        return { direction, amount };
+    });
+    
+    return { dots, folds };
+};
+</code></pre>
+<p>The fold parsing uses substring extraction rather than regex. Each fold instruction is <code>fold along x=123</code> or <code>fold along y=45</code>. Character 11 is always the direction (x or y), and character 13 onwards is the number. Regex would work, but this is simple enough that substring access is cleaner.</p>
+<p>The <code>as &quot;x&quot; | &quot;y&quot;</code> cast tells TypeScript we know what we&#39;re doing. It can&#39;t verify at compile time that character 11 will always be x or y, but we can.</p>
+<h2>The Folding Math</h2>
+<p>When you fold paper, points on the near side stay put, and points on the far side <a href="https://www.youtube.com/watch?v=3mKMQZGuhK4" target="_blank">mirror</a> across the fold line.</p>
+<p>The puzzle guarantees that dots never appear exactly on a fold line. This is important — it means we can skip that edge case entirely.</p>
+<pre><code class="language-typescript">function foldDot(fold: Fold, dot: Dot): Dot {
+    if (fold.direction === &quot;x&quot;) {
+        if (dot.x === fold.amount) {
+            throw new Error(`Dot at the fold line x = ${fold.amount}`);
+        }
+        if (dot.x &lt; fold.amount) {
+            return dot;
+        }
+        const x = 2 * fold.amount - dot.x;
+        return { x, y: dot.y };
+    } else {
+        if (dot.y === fold.amount) {
+            throw new Error(`Dot at the fold line y = ${fold.amount}`);
+        }
+        if (dot.y &lt; fold.amount) {
+            return dot;
+        }
+        const y = 2 * fold.amount - dot.y;
+        return { x: dot.x, y };
+    }
+}
+</code></pre>
+<p>The formula <code>2 * fold.amount - dot.x</code> handles the reflection. If you fold at position 5 and have a dot at position 7, it moves to position 3. At position 9, it moves to position 1. The math works out cleanly.</p>
+<p>I verified this analytically during the solve: if a dot is at position 7 and we fold at 5, the difference is 2, so the new position is 5 - 2 = 3. Generalizing: <code>fold - (dot - fold) = 2 * fold - dot</code>.</p>
+<h2>Part One: Single Fold</h2>
+<p>Part one asks for the number of unique dots after just the first fold:</p>
+<pre><code class="language-typescript">const partOne = (input: Input, debug: boolean) =&gt; {
+    const fold = input.folds[0];
+    const dots = input.dots.map(dot =&gt; foldDot(fold, dot));
+    
+    const uniqueDots = [...new Set(dots.map(dot =&gt; dot.x + &quot;,&quot; + dot.y))];
+    return uniqueDots.length;
+};
+</code></pre>
+<p>The uniqueness check converts dots to strings and uses a Set. JavaScript objects don&#39;t have value equality, so <code>{x: 1, y: 2}</code> and <code>{x: 1, y: 2}</code> are different objects. String serialization gives us the comparison we need.</p>
+<h2>Part Two: Reveal the Code</h2>
+<p>Part two applies all folds, then asks us to read the result. This is one of those puzzles where the answer is literally spelled out — we need to render the final dot pattern and read the letters:</p>
+<pre><code class="language-typescript">const partTwo = (input: Input, debug: boolean) =&gt; {
+    let dots = input.dots.map(dot =&gt; ({...dot}));
+    
+    for (const fold of input.folds) {
+        dots = dots.map(dot =&gt; foldDot(fold, dot));
+    }
+    
+    const maxx = dots.max(dot =&gt; dot.x);
+    const maxy = dots.max(dot =&gt; dot.y);
+    
+    const matrix = Array(maxy + 1).fill(0).map(() =&gt; Array(maxx + 1).fill(0));
+    for (const dot of dots) {
+        matrix[dot.y][dot.x] = 1;
+    }
+    printMatrix(matrix, x =&gt; x ? &quot;#&quot; : &quot; &quot;);
+    return 0;
+};
+</code></pre>
+<p>Note the spread operator <code>({...dot})</code> to copy the dots — I don&#39;t want to mutate the original input in case I need to inspect it later.</p>
+<p>One gotcha: I initially had the x and y flipped when building the matrix. Copilot helpfully &quot;fixed&quot; my code in exactly the wrong direction. The matrix is indexed as <code>matrix[y][x]</code> (row first, then column), which is the opposite of how we usually think about x/y coordinates.</p>
+<p>The final output rendered as <code>FJAHJGAH</code> — sounds like Klingon, but it activated the thermal camera.</p>
+<h2>Performance</h2>
+<p>Both parts run nearly instantly. We could optimize by deduplicating dots between folds, but with only 12 folds and a manageable number of dots, there&#39;s no need. Most of the execution time is actually spent printing the final grid.</p>
+<h2>Takeaways</h2>
+<ol>
+<li><p><strong>Abuse stated guarantees</strong>: The puzzle says dots never appear on fold lines. Instead of handling that edge case gracefully, I threw an error. If the guarantee is violated, I want to know immediately.</p>
+</li>
+<li><p><strong>Substring parsing has its place</strong>: Regex is powerful, but for fixed-format strings like <code>fold along x=7</code>, character indexing is faster to write and easier to read.</p>
+</li>
+<li><p><strong>Work through the math</strong>: Rather than guess-and-check the reflection formula, taking a minute to derive it analytically (<code>2 * fold - position</code>) made the implementation straightforward.</p>
+</li>
+<li><p><strong>Watch your axes</strong>: Matrix indexing (<code>[row][col]</code>) and coordinate systems (<code>x, y</code>) are natural opposites. This will bite you at least once per Advent of Code.</p>
+</li>
+</ol>
+<p>The full solution is available in the <a href="https://github.com/sweko/AdventOfCode/blob/master/2021/code/day-13.ts">repository</a>.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2021 — Day 13</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="12.html" rel="prev" aria-label="Previous: Day 12 — Passage Pathing">← Day 12 — Passage Pathing</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
