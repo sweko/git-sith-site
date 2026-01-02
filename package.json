@@ -6,6 +6,7 @@
     "build": "npm run build:articles && npm run build:aoc && npm run build:sitemap",
     "build:articles": "tsx scripts/build-articles.ts",
     "build:aoc": "tsx scripts/build-aoc.ts",
+    "build:student-projects": "tsx scripts/build-student-projects.ts",
     "build:sitemap": "tsx scripts/build-sitemap.ts",
     "screenshots": "tsx scripts/capture-screenshots.ts",
     "lighthouse": "tsx scripts/run-lighthouse-local.ts",

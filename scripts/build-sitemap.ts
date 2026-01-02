@@ -4,7 +4,7 @@ import path from 'path';
 const BASE_URL = process.env.BASE_URL || 'https://gitsith.com';
 const OUT = 'sitemap.xml';
 
-const EXCLUDE_DIRS = new Set(['dev', 'docs', '.github', 'scripts', 'content', 'assets', 'node_modules', '.git']);
+const EXCLUDE_DIRS = new Set(['dev', 'docs', '.github', 'scripts', 'content', 'assets', 'node_modules', '.git', 'student-projects']);
 
 async function walk(dir: string): Promise<string[]> {
   const entries = await fs.readdir(dir, { withFileTypes: true });

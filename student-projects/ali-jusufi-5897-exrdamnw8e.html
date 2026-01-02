@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ali-jusufi-5897-exrdamnw8e — GitSith - Student Projects</title>
+  <meta name="description" content="Student: Ali Jusufi (5897)Project: Tourist Guide - Angular Travel Planning ApplicationSubmission Date: December 28, 2025Evaluation Date: January 2, 2026">
+  <meta property="og:title" content="ali-jusufi-5897-exrdamnw8e">
+  <meta property="og:description" content="Student: Ali Jusufi (5897)Project: Tourist Guide - Angular Travel Planning ApplicationSubmission Date: December 28, 2025Evaluation Date: January 2, 2026">
+  <link rel="canonical" href="https://gitsith.com/student-projects/ali-jusufi-5897-exrdamnw8e/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>ali-jusufi-5897-exrdamnw8e</h1>
+        <div class="article-meta">11 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Evaluation: Tourist Guide Application</h1>
+<p><strong>Student</strong>: Ali Jusufi (5897)<br><strong>Project</strong>: Tourist Guide - Angular Travel Planning Application<br><strong>Submission Date</strong>: December 28, 2025<br><strong>Evaluation Date</strong>: January 2, 2026</p>
+<hr>
+<h2>Overall Assessment</h2>
+<p><strong>Points: 57/100</strong></p>
+<p>Your Tourist Guide application demonstrates solid visual design and basic Angular functionality. The UI is polished and professional-looking, and the application runs smoothly with the mock data implementation. However, there are significant gaps between the claimed features and what actually works, particularly around Firebase integration and asynchronous data handling.</p>
+<hr>
+<h2>What Works Well ✅</h2>
+<h3>1. Visual Design &amp; User Experience</h3>
+<p><strong>Score: 18/20</strong></p>
+<p>Your application looks professional and polished:</p>
+<ul>
+<li>Clean, consistent color scheme using CSS custom properties</li>
+<li>Good typography choices (Georgia/Merriweather serif fonts)</li>
+<li>Intuitive navigation with clear iconography</li>
+<li>Responsive layout that adapts well to different screen sizes</li>
+<li>Nice hover effects and transitions</li>
+<li>Loading states and empty states are well-designed</li>
+</ul>
+<p><strong>This is the strongest aspect of your project.</strong></p>
+<h3>2. Project Structure &amp; Organization</h3>
+<p>Your code is well-organized:</p>
+<ul>
+<li>Clear separation of components, services, and models</li>
+<li>Logical file structure</li>
+<li>Good use of TypeScript interfaces</li>
+<li>Consistent naming conventions</li>
+</ul>
+<h3>3. Basic Functionality</h3>
+<p>The core features work correctly:</p>
+<ul>
+<li>Routing and navigation function properly</li>
+<li>Filtering and sorting of destinations works</li>
+<li>Search functionality operates as expected</li>
+<li>Mobile menu toggles correctly</li>
+<li>Route parameters are handled properly</li>
+</ul>
+<h3>4. TypeScript Usage</h3>
+<ul>
+<li>Proper use of interfaces and types</li>
+<li>No <code>any</code> types found (good practice)</li>
+<li>Union types for categories implemented correctly</li>
+</ul>
+<hr>
+<h2>Areas Requiring Improvement ⚠️</h2>
+<h3>1. Firebase Integration (Critical Issue)</h3>
+<p><strong>Score: 3/10</strong></p>
+<p><strong>The Problem:</strong>
+Your Firebase integration is non-functional and appears to have never worked:</p>
+<pre><code class="language-typescript">// environment.ts still has placeholder values:
+firebase: {
+  apiKey: &quot;YOUR_API_KEY&quot;,
+  authDomain: &quot;YOUR_AUTH_DOMAIN&quot;,
+  projectId: &quot;YOUR_PROJECT_ID&quot;,
+  // ...
+}
+</code></pre>
+<p>Additionally, there&#39;s a <strong>version compatibility issue</strong>: you&#39;re using <code>@angular/fire@20.0.1</code> with Angular 21, which can cause installation problems.</p>
+<p><strong>What This Means:</strong></p>
+<ul>
+<li>The DestinationService with Firebase methods is never actually called</li>
+<li>All the Firebase code in components is commented out</li>
+<li>The application only works because it falls back to mock data</li>
+</ul>
+<p><strong>To Fix:</strong></p>
+<ol>
+<li>Either fully implement Firebase with correct configuration and compatible version</li>
+<li>Or remove the Firebase dependencies and acknowledge the project uses mock data only</li>
+<li>Don&#39;t keep dead code that gives the impression of functionality that doesn&#39;t exist</li>
+</ol>
+<h3>2. Asynchronous Data Handling</h3>
+<p><strong>Score: 10/35</strong></p>
+<p><strong>The Problem:</strong>
+The project requirements include &quot;asynchronous data handling,&quot; but your implementation uses hardcoded arrays:</p>
+<pre><code class="language-typescript">// This is synchronous, not asynchronous:
+setTimeout(() =&gt; {
+  this.loadMockDestinations(); // Just assigns a hardcoded array
+}, 500);
+</code></pre>
+<p>The <code>setTimeout()</code> creates the appearance of async behavior, but you&#39;re just setting a variable to a hardcoded array.</p>
+<p><strong>What&#39;s Missing:</strong></p>
+<ul>
+<li>No actual HTTP calls or database queries</li>
+<li>No real Observable subscriptions to external data sources</li>
+<li>No genuine async/await patterns with external APIs</li>
+</ul>
+<p><strong>To Improve:</strong>
+If using mock data is your approach, that&#39;s fine for a demo, but the code should be honest about it. Remove the fake async patterns and commented-out Firebase code.</p>
+<h3>3. Forms Implementation</h3>
+<p><strong>Score: 15/40</strong></p>
+<p><strong>What&#39;s Acceptable:</strong>
+You&#39;re using template-driven forms with <code>[(ngModel)]</code>, which is fine for simple forms like yours:</p>
+<pre><code class="language-typescript">[(ngModel)]=&quot;searchTerm&quot;
+[(ngModel)]=&quot;selectedCategory&quot;
+</code></pre>
+<p>Template-driven forms are appropriate when you have straightforward input handling without complex validation logic.</p>
+<p><strong>The Problem:</strong>
+The issue isn&#39;t the form type, but the <strong>lack of validation and user feedback</strong>:</p>
+<ul>
+<li>No validation on inputs (e.g., budget should be positive)</li>
+<li>No error messages when users enter invalid data</li>
+<li>No visual feedback for form state</li>
+<li>No handling of edge cases</li>
+</ul>
+<p><strong>To Improve:</strong>
+Add validation to your template-driven forms:</p>
+<pre><code class="language-html">&lt;input 
+  type=&quot;number&quot; 
+  [(ngModel)]=&quot;maxBudget&quot; 
+  name=&quot;maxBudget&quot;
+  #budgetInput=&quot;ngModel&quot;
+  min=&quot;0&quot;
+  required&gt;
+&lt;div *ngIf=&quot;budgetInput.invalid &amp;&amp; budgetInput.touched&quot;&gt;
+  &lt;span *ngIf=&quot;budgetInput.errors?.[&#39;min&#39;]&quot;&gt;Budget must be positive&lt;/span&gt;
+  &lt;span *ngIf=&quot;budgetInput.errors?.[&#39;required&#39;]&quot;&gt;Budget is required&lt;/span&gt;
+&lt;/div&gt;
+</code></pre>
+<h3>4. Observable Memory Management</h3>
+<p><strong>Score: 0/15</strong></p>
+<p><strong>Critical Issue:</strong>
+You have memory leaks throughout your application. Observable subscriptions are never cleaned up:</p>
+<pre><code class="language-typescript">// In destination-detail.component.ts:
+this.route.params.subscribe(params =&gt; {
+  const id = params[&#39;id&#39;];
+  if (id) {
+    this.loadDestination(id);
+  }
+});
+// ❌ This subscription is never unsubscribed!
+</code></pre>
+<p><strong>Why This Matters:</strong>
+Every time a user navigates to and away from a component, you&#39;re creating new subscriptions without cleaning up old ones. This causes memory leaks that will slow down your application over time.</p>
+<p><strong>To Fix:</strong>
+Implement proper cleanup:</p>
+<p><strong>Option 1 - ngOnDestroy:</strong></p>
+<pre><code class="language-typescript">private destroy$ = new Subject&lt;void&gt;();
+
+ngOnInit() {
+  this.route.params
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(params =&gt; { ... });
+}
+
+ngOnDestroy() {
+  this.destroy$.next();
+  this.destroy$.complete();
+}
+</code></pre>
+<p><strong>Option 2 - async pipe (recommended):</strong></p>
+<pre><code class="language-typescript">// Component:
+params$ = this.route.params;
+
+// Template:
+&lt;div *ngIf=&quot;params$ | async as params&quot;&gt;
+  {{ params.id }}
+&lt;/div&gt;
+</code></pre>
+<h3>5. Form Validation</h3>
+<p><strong>Score: 7/15</strong></p>
+<p>Your forms have minimal validation:</p>
+<ul>
+<li>No required field validation</li>
+<li>No error messages displayed to users</li>
+<li>No visual feedback for invalid inputs</li>
+<li>No handling of edge cases (negative budgets, etc.)</li>
+</ul>
+<p><strong>To Improve:</strong>
+Add validation to your template-driven forms:</p>
+<pre><code class="language-html">&lt;!-- Add validation attributes --&gt;
+&lt;input 
+  type=&quot;text&quot; 
+  [(ngModel)]=&quot;searchTerm&quot;
+  name=&quot;searchTerm&quot;
+  #search=&quot;ngModel&quot;
+  minlength=&quot;2&quot;
+  required&gt;
+
+&lt;!-- Show error messages --&gt;
+&lt;div *ngIf=&quot;search.invalid &amp;&amp; search.touched&quot; class=&quot;error&quot;&gt;
+  &lt;span *ngIf=&quot;search.errors?.[&#39;required&#39;]&quot;&gt;Search is required&lt;/span&gt;
+  &lt;span *ngIf=&quot;search.errors?.[&#39;minlength&#39;]&quot;&gt;At least 2 characters needed&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;!-- Disable submit when form is invalid --&gt;
+&lt;button [disabled]=&quot;searchForm.invalid&quot;&gt;Search&lt;/button&gt;
+</code></pre>
+<hr>
+<h2>Service Architecture Issues</h2>
+<h3>The DestinationService Problem</h3>
+<p>You have an elaborate <code>DestinationService</code> with Firebase methods, but it&#39;s never actually used:</p>
+<pre><code class="language-typescript">// These methods exist but are never called:
+getDestinations(): Observable&lt;Destination[]&gt; { ... }
+getDestination(id: string): Observable&lt;Destination | null&gt; { ... }
+addDestination(destination: Destination): Observable&lt;string&gt; { ... }
+</code></pre>
+<p>Instead, your components directly load mock data:</p>
+<pre><code class="language-typescript">loadMockDestinations() {
+  const mockDestinations: Destination[] = [ ... ]; // Hardcoded array
+  this.stateService.setDestinations(mockDestinations);
+}
+</code></pre>
+<p><strong>The Issue:</strong>
+Having unused service code suggests either:</p>
+<ol>
+<li>You generated code you didn&#39;t understand how to integrate</li>
+<li>You couldn&#39;t get the service working and worked around it</li>
+<li>You kept non-functional code to appear more sophisticated</li>
+</ol>
+<p><strong>Better Approach:</strong>
+Either make the service work or simplify your architecture to match what you actually implemented.</p>
+<hr>
+<h2>Components Assessment</h2>
+<h3>What&#39;s Good:</h3>
+<ul>
+<li>7 components created (exceeds requirement)</li>
+<li>Components are reasonably well-structured</li>
+<li>Basic component lifecycle understood</li>
+</ul>
+<h3>What Could Be Better:</h3>
+<p><strong>1. Component Communication</strong>
+Limited use of <code>@Input()</code> and <code>@Output()</code> decorators. You rely heavily on shared services, which works but doesn&#39;t demonstrate component communication patterns.</p>
+<p><strong>2. Component Complexity</strong>
+Many components are relatively simple display components. For example:</p>
+<ul>
+<li><code>SuggestionsComponent</code> uses <code>alert()</code> for user feedback (poor UX)</li>
+<li><code>DashboardComponent</code> mostly just displays computed values</li>
+<li>Limited interactive features beyond filtering</li>
+</ul>
+<p><strong>3. Suggestions for Improvement:</strong></p>
+<pre><code class="language-typescript">// Instead of alert():
+alert(`Added ${suggestion.name} to itinerary!`);
+
+// Create a proper toast/notification service:
+this.notificationService.show({
+  type: &#39;success&#39;,
+  message: `${suggestion.name} added to itinerary!`
+});
+</code></pre>
+<hr>
+<h2>Documentation vs. Reality</h2>
+<p>Your README and PROJECT_SUMMARY are very comprehensive, but they overclaim what&#39;s actually functional:</p>
+<p><strong>Claims in Documentation:</strong></p>
+<ul>
+<li>✗ &quot;Firebase/Firestore integration&quot; - Not functional</li>
+<li>✗ &quot;Async data handling&quot; - Only mock data</li>
+<li>✗ &quot;Production-ready backend integration&quot; - No real backend</li>
+<li>✗ &quot;Interesting technical challenge&quot; - Main challenge (Firebase) doesn&#39;t work</li>
+</ul>
+<p><strong>Better Approach:</strong>
+Be honest about the project scope:</p>
+<ul>
+<li>&quot;Mock data implementation with prepared structure for future Firebase integration&quot;</li>
+<li>&quot;Demonstrates Angular fundamentals with client-side data management&quot;</li>
+<li>&quot;UI-focused travel planning application prototype&quot;</li>
+</ul>
+<hr>
+<h2>Positive Aspects Worth Noting</h2>
+<h3>1. Signal Usage</h3>
+<p>You&#39;re using Angular Signals, which is a modern feature:</p>
+<pre><code class="language-typescript">searchTerm = signal(&#39;&#39;);
+selectedCategory = signal&lt;string&gt;(&#39;&#39;);
+</code></pre>
+<p>While you&#39;re using them mostly for simple state, this shows you&#39;re aware of current Angular patterns.</p>
+<h3>2. State Service Pattern</h3>
+<p>Your <code>StateService</code> with computed values is a good architectural choice:</p>
+<pre><code class="language-typescript">readonly filteredDestinations = computed(() =&gt; {
+  const destinations = this.destinationsSignal();
+  const filters = this.filtersSignal();
+  // ... filtering logic
+});
+</code></pre>
+<p>This separation of concerns is good practice.</p>
+<h3>3. Responsive Design</h3>
+<p>The mobile menu and responsive layout work well. The UI adapts nicely to different screen sizes.</p>
+<h3>4. Code Organization</h3>
+<p>Your file structure and component organization follow Angular best practices.</p>
+<hr>
+<h2>Detailed Scoring Breakdown</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Your Score</th>
+<th>Max</th>
+<th>Percentage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Application Runs/Builds</td>
+<td>15</td>
+<td>20</td>
+<td>75%</td>
+</tr>
+<tr>
+<td>Design / UX</td>
+<td>18</td>
+<td>20</td>
+<td>90%</td>
+</tr>
+<tr>
+<td>Models / Data Structures</td>
+<td>12</td>
+<td>15</td>
+<td>80%</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td>32</td>
+<td>40</td>
+<td>80%</td>
+</tr>
+<tr>
+<td>Components</td>
+<td>42</td>
+<td>80</td>
+<td>53%</td>
+</tr>
+<tr>
+<td>Services</td>
+<td>18</td>
+<td>35</td>
+<td>51%</td>
+</tr>
+<tr>
+<td>Forms</td>
+<td>15</td>
+<td>40</td>
+<td>38%</td>
+</tr>
+<tr>
+<td>Observables / Async</td>
+<td>10</td>
+<td>35</td>
+<td>29%</td>
+</tr>
+<tr>
+<td>Extra / Advanced Features</td>
+<td>5</td>
+<td>50</td>
+<td>10%</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>127</strong></td>
+<td><strong>335</strong></td>
+<td><strong>38%</strong></td>
+</tr>
+</tbody></table>
+<p><strong>After scaling (×0.45): 57.2 points</strong></p>
+<p><strong>Final Score: 57/100</strong></p>
+<hr>
+<h2>Recommendations for Improvement</h2>
+<h3>Immediate Fixes (Must Do):</h3>
+<ol>
+<li><p><strong>Fix or Remove Firebase</strong></p>
+<ul>
+<li>Either get it working with proper configuration</li>
+<li>Or remove the dependencies and dead code</li>
+<li>Update documentation to match reality</li>
+</ul>
+</li>
+<li><p><strong>Add Form Validation</strong></p>
+<ul>
+<li>Add validation attributes to your template-driven forms</li>
+<li>Display error messages for invalid inputs</li>
+<li>Provide visual feedback for form state</li>
+<li>Handle edge cases (negative numbers, empty required fields)</li>
+</ul>
+</li>
+<li><p><strong>Add Observable Cleanup</strong></p>
+<ul>
+<li>Implement ngOnDestroy with unsubscribe</li>
+<li>Or use async pipe in templates</li>
+<li>This prevents memory leaks</li>
+</ul>
+</li>
+<li><p><strong>Be Honest in Documentation</strong></p>
+<ul>
+<li>Don&#39;t claim features that don&#39;t work</li>
+<li>Accurately describe what you built</li>
+<li>This shows professional integrity</li>
+</ul>
+</li>
+</ol>
+<h3>For Better Understanding:</h3>
+<ol start="5">
+<li><p><strong>Learn the Difference Between Sync and Async</strong></p>
+<ul>
+<li>Hardcoded arrays are not async</li>
+<li><code>setTimeout()</code> doesn&#39;t make code asynchronous</li>
+<li>Study Observables, Promises, and HTTP calls</li>
+</ul>
+</li>
+<li><p><strong>Understand Service Layer Purpose</strong></p>
+<ul>
+<li>Services should actually be used</li>
+<li>Don&#39;t keep dead code</li>
+<li>If you can&#39;t integrate it, don&#39;t include it</li>
+</ul>
+</li>
+<li><p><strong>Study Component Communication</strong></p>
+<ul>
+<li>Learn @Input() and @Output()</li>
+<li>Practice parent-child component patterns</li>
+<li>Not everything needs to go through services</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2>What You Demonstrated</h2>
+<h3>Successfully:</h3>
+<p>✅ Basic Angular project structure<br>✅ Component creation and routing<br>✅ TypeScript fundamentals<br>✅ CSS and responsive design<br>✅ Basic state management<br>✅ UI/UX design sense<br>✅ Appropriate use of template-driven forms for simple cases  </p>
+<h3>Needs Work:</h3>
+<p>⚠️ Form validation and error handling<br>⚠️ Observable lifecycle management<br>⚠️ Async data handling concepts<br>⚠️ Service integration<br>⚠️ Distinguishing between functional and non-functional code<br>⚠️ Realistic project documentation  </p>
+<hr>
+<h2>Looking Forward</h2>
+<h3>What This Score Means:</h3>
+<p>A score of <strong>57/100</strong> indicates that you have basic competency but significant gaps in understanding. You can create a visually appealing application, but you struggle with core Angular concepts like reactive forms, observable management, and true async data handling.</p>
+<h3>To Improve:</h3>
+<ol>
+<li><strong>Focus on fundamentals</strong> before adding advanced features</li>
+<li><strong>Test your code</strong> - make sure things actually work before claiming they do</li>
+<li><strong>Learn from documentation</strong> - read official Angular guides on forms and observables</li>
+<li><strong>Practice integration</strong> - don&#39;t just generate code, understand how pieces connect</li>
+<li><strong>Be realistic</strong> - it&#39;s better to do simple things well than complex things poorly</li>
+</ol>
+<h3>Resources to Study:</h3>
+<ul>
+<li>Angular Reactive Forms documentation</li>
+<li>RxJS Observable patterns and lifecycle</li>
+<li>Angular HTTP Client and async operations</li>
+<li>Firebase + Angular integration tutorials</li>
+<li>Memory management in Angular applications</li>
+</ul>
+<hr>
+<h2>Final Thoughts</h2>
+<p>You have a good eye for design and can create professional-looking applications. The UI of your project is genuinely impressive. However, software development isn&#39;t just about appearances - it&#39;s about making things actually work.</p>
+<p>The gap between your documentation claims and actual functionality suggests you may have relied heavily on code generation tools without fully understanding the output. This is okay for learning, but you need to take the next step: understanding what the generated code does and being able to integrate it properly.</p>
+<p><strong>Your next project should focus on:</strong></p>
+<ul>
+<li>Doing fewer things, but doing them correctly</li>
+<li>Making sure claimed features actually work</li>
+<li>Understanding the code you write/generate</li>
+<li>Building real async functionality from scratch</li>
+</ul>
+<p>You have potential, especially in UI/UX design. Now work on making the backend and functionality match the quality of your frontend.</p>
+<hr>
+<p><strong>Evaluator</strong>: Wekoslav<br><strong>Date</strong>: January 2, 2026</p>
+<p>If you have questions about this evaluation or want to discuss how to improve, please reach out during office hours.</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

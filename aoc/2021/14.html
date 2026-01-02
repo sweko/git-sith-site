@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 14/2021 - Extended Polymerization — AoC 2021 — GitSith - Advent Of Code</title>
+  <meta name="description" content="When your string explodes exponentially, it&#39;s time to break the chains.">
+  <link rel="canonical" href="https://gitsith.com/aoc/2021/14/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+  <script src="/assets/js/aoc-nav.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>Day 14/2021 - Extended Polymerization</h1>
+        <div class="article-meta"><time datetime="2021">2021</time> · 3 min read</div>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="13.html" rel="prev" aria-label="Previous: Day 13 — Transparent Origami">← Day 13 — Transparent Origami</a></nav>
+      </header>
+      <div class="article-content">
+        <p>Day fourteen of AoC 2021 (see <a href="https://adventofcode.com/2021/day/14">https://adventofcode.com/2021/day/14</a>) is what happens when chemistry class meets combinatorics and your RAM is the first casualty. The submarine’s polymerization equipment is supposed to reinforce the hull, but after reading the puzzle, I was more worried about reinforcing my patience.</p>
+<p>The task: take a humble polymer template and, using a set of pair insertion rules, mutate it step by step. At first, it’s a simple string transformation. But after a few rounds, the polymer starts to grow like a <a href="https://www.youtube.com/watch?v=3Qh1q0rZcJw" target="_blank">chain</a> reaction—doubling, tripling, and soon threatening to eat all available memory. (If you’ve ever tried to brute-force a problem and watched your computer beg for mercy, you know the feeling.)</p>
+<h2>Parsing the Input</h2>
+<p>The input is classic AoC: a starting string, a blank line, and then a list of rules like <code>AB -&gt; C</code>. Each rule means: whenever you see the pair <code>AB</code>, insert <code>C</code> between them. I parsed the template as a string and the rules as a lookup object for fast access. (If you’re not using hash maps for AoC, are you even trying?)</p>
+<pre><code class="language-typescript">const processInput = async (day: number) =&gt; {
+    const lines = await readInputLines(day);
+    const polymer = lines[0];
+    const rules = Object.fromEntries(
+        lines.slice(2).map(line =&gt; {
+            const [pair, insert] = line.split(&#39; -&gt; &#39;);
+            return [pair, insert];
+        })
+    );
+    return { polymer, rules };
+};
+</code></pre>
+<h2>Part One: Naive Simulation (a.k.a. The Brute Force Blues)</h2>
+<p>My first instinct: just simulate the process. Loop through the string, apply the rules, build a new string, repeat. For 10 steps, this works fine. For 20 steps, you start to see the problem. For 40 steps, you start to see your life flash before your eyes. (Spoiler: the string length grows exponentially. By step 20, you’re looking at millions of characters. By step 40, you’re looking at a new computer.)</p>
+<p>Still, for part one, brute force is enough. After 10 steps, count the frequency of each element, subtract the least from the most, and you’re golden. It’s a classic AoC move: get the star, then realize you need a new plan for part two.</p>
+<h2>Part Two: When Brute Force Breaks (a.k.a. Enter the Hash Map)</h2>
+<p>Part two asks for 40 steps. At this point, brute force is a <a href="https://www.youtube.com/watch?v=3Qh1q0rZcJw" target="_blank">chain</a> around your neck. Time to get clever.</p>
+<p>The key insight: you don’t need the whole string, just the counts of each pair. Instead of tracking the actual polymer, track how many times each pair appears. Each step, update the pair counts according to the rules. This keeps the data manageable, and suddenly, 40 steps is no big deal.</p>
+<p>It’s a beautiful moment when you realize you can outsmart the exponential growth. The code goes from “please don’t crash” to “bring it on.”</p>
+<h2>Performance Notes</h2>
+<ul>
+<li>Part one (10 steps): ~6ms, brute force, lots of string copying</li>
+<li>Part two (40 steps): ~50ms, pair counting, barely a blip on the CPU</li>
+<li>Memory usage: no longer measured in gigabytes of regret</li>
+</ul>
+<h2>Takeaways</h2>
+<ol>
+<li>Exponential growth is a classic AoC gotcha—if your code feels slow, it probably is.</li>
+<li>Hash maps (objects) are the unsung heroes of Advent of Code.</li>
+<li>Sometimes you have to break the <a href="https://www.youtube.com/watch?v=3Qh1q0rZcJw" target="_blank">chains</a> of brute force and riff on a smarter solution.</li>
+<li>If you’re seeing “out of memory” errors, you’re probably doing something interesting.</li>
+</ol>
+<p><a href="https://github.com/sweko/AdventOfCode">See the code on GitHub</a></p>
+<p><a href="https://github.com/sweko/AdventOfCode">See the code on GitHub</a></p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Advent Of Code 2021 — Day 14</p>
+        <nav class="aoc-nav" aria-label="Advent Of Code navigation"><a class="prev" href="13.html" rel="prev" aria-label="Previous: Day 13 — Transparent Origami">← Day 13 — Transparent Origami</a></nav>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
