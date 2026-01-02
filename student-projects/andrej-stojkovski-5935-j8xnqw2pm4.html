@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>andrej-stojkovski-5935-j8xnqw2pm4 — GitSith - Student Projects</title>
+  <meta name="description" content="Student: Andrej StojkovskiProject: Playmanity - Gaming Store Web ApplicationCourse: Internet Programming (Frontend Development)Date: January 2, 2026">
+  <meta property="og:title" content="andrej-stojkovski-5935-j8xnqw2pm4">
+  <meta property="og:description" content="Student: Andrej StojkovskiProject: Playmanity - Gaming Store Web ApplicationCourse: Internet Programming (Frontend Development)Date: January 2, 2026">
+  <link rel="canonical" href="https://gitsith.com/student-projects/andrej-stojkovski-5935-j8xnqw2pm4/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>andrej-stojkovski-5935-j8xnqw2pm4</h1>
+        <div class="article-meta">11 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Grading - Playmanity Gaming Store</h1>
+<p><strong>Student</strong>: Andrej Stojkovski<br><strong>Project</strong>: Playmanity - Gaming Store Web Application<br><strong>Course</strong>: Internet Programming (Frontend Development)<br><strong>Date</strong>: January 2, 2026</p>
+<hr>
+<h2>Final Grade: 40/100 (F - Does Not Meet Requirements)</h2>
+<p>Your project shows genuine programming ability, especially in the backend, but there&#39;s an important gap in meeting the modern frontend development requirements for this course.</p>
+<hr>
+<h2>The Core Issue</h2>
+<p><strong>Course Expectation</strong>: Modern frontend web application with component architecture and client-side routing</p>
+<p><strong>What You Delivered</strong>: Traditional multi-page website with jQuery and a Node.js backend</p>
+<p>You built a <strong>traditional web application</strong> (jQuery + server-side pages) rather than a <strong>modern frontend application</strong> (components + client-side routing + state management).</p>
+<h3>What Modern Frontend Development Requires</h3>
+<ul>
+<li>✅ Component-based architecture (reusable building blocks)</li>
+<li>✅ Client-side routing (single-page application)</li>
+<li>✅ State management patterns</li>
+<li>✅ Modern build tools and workflow</li>
+<li>✅ TypeScript (recommended)</li>
+</ul>
+<h3>What You Delivered</h3>
+<ul>
+<li>❌ Traditional HTML pages with full page reloads</li>
+<li>❌ jQuery for DOM manipulation</li>
+<li>❌ No component architecture</li>
+<li>❌ No client-side routing</li>
+<li>❌ Traditional multi-page navigation</li>
+</ul>
+<p><strong>Important</strong>: While frameworks like React/Angular/Vue aren&#39;t explicitly mandatory, the project requirements clearly expect component-based architecture and modern patterns that these frameworks provide.</p>
+<hr>
+<h2>What You Did Very Well</h2>
+<p>Let me start with the positives - there&#39;s genuine quality here:</p>
+<h3>✅ Backend Implementation (This is really good!)</h3>
+<p>Your Node.js/Express API is well-structured:</p>
+<pre><code class="language-javascript">// Your API endpoints are clean and professional
+app.get(&quot;/api/products&quot;, (req, res) =&gt; { ... })
+app.post(&quot;/api/products&quot;, requireLogin, (req, res) =&gt; { ... })
+app.put(&quot;/api/products/:id&quot;, requireLogin, (req, res) =&gt; { ... })
+app.delete(&quot;/api/products/:id&quot;, requireLogin, (req, res) =&gt; { ... })
+</code></pre>
+<p><strong>This shows you understand</strong>:</p>
+<ul>
+<li>REST API principles ✅</li>
+<li>CRUD operations ✅</li>
+<li>Middleware and authentication ✅</li>
+<li>Error handling ✅</li>
+<li>JSON data flow ✅</li>
+</ul>
+<p><strong>This backend would get top marks in a backend course.</strong></p>
+<h3>✅ Real Async Data Handling</h3>
+<p>Your <code>store.js</code> properly implements async operations:</p>
+<pre><code class="language-javascript">async function loadProducts() {
+  const res = await fetch(&quot;/api/products&quot;);
+  const products = await res.json();
+  // Dynamically renders to DOM
+}
+</code></pre>
+<p>This demonstrates:</p>
+<ul>
+<li>Proper async/await usage ✅</li>
+<li>Fetch API understanding ✅</li>
+<li>Promise handling ✅</li>
+<li>Dynamic content rendering ✅</li>
+</ul>
+<p><strong>This is real async, not fake setTimeout() tricks.</strong> Many students don&#39;t achieve this.</p>
+<h3>✅ Functional Shopping Cart</h3>
+<p>The cart logic is solid:</p>
+<ul>
+<li>Add items (works correctly)</li>
+<li>Update quantities (proper calculation)</li>
+<li>Remove items (clean removal)</li>
+<li>Calculate totals (accurate math)</li>
+<li>Prevent duplicates (good UX)</li>
+</ul>
+<h3>✅ Clean, Working Code</h3>
+<p>Your code is readable, organized, and functional. The application works as intended.</p>
+<hr>
+<h2>What&#39;s Missing</h2>
+<h3>1. No Component Architecture</h3>
+<p>Modern web apps are built from reusable components. This is the fundamental paradigm of modern frontend development.</p>
+<p><strong>What components look like</strong> (React example):</p>
+<pre><code class="language-javascript">function ProductCard({ product, onAddToCart }) {
+  return (
+    &lt;div className=&quot;shop-item&quot;&gt;
+      &lt;h3&gt;{product.title}&lt;/h3&gt;
+      &lt;img src={product.image} alt={product.title} /&gt;
+      &lt;p&gt;${product.price}&lt;/p&gt;
+      &lt;button onClick={() =&gt; onAddToCart(product)}&gt;
+        Add to Cart
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+// Then reuse it:
+{products.map(product =&gt; (
+  &lt;ProductCard key={product.id} product={product} /&gt;
+))}
+</code></pre>
+<p><strong>What you have</strong>: Monolithic HTML files with jQuery manipulating the DOM directly.</p>
+<p><strong>Why this matters</strong>: Component thinking is how modern frontends are built. It&#39;s reusable, testable, and maintainable.</p>
+<h3>2. No Client-Side Routing</h3>
+<p>You use traditional page navigation:</p>
+<pre><code class="language-html">&lt;a href=&quot;index1.html&quot;&gt;Home&lt;/a&gt;
+&lt;a href=&quot;store.html&quot;&gt;Store&lt;/a&gt;
+</code></pre>
+<p>Every click causes a full page reload. This is how websites worked in 2005, not how modern single-page applications work.</p>
+<p><strong>What you should have</strong> (React Router example):</p>
+<pre><code class="language-javascript">&lt;Routes&gt;
+  &lt;Route path=&quot;/&quot; element={&lt;Home /&gt;} /&gt;
+  &lt;Route path=&quot;/store&quot; element={&lt;Store /&gt;} /&gt;
+  &lt;Route path=&quot;/cart&quot; element={&lt;Cart /&gt;} /&gt;
+&lt;/Routes&gt;
+</code></pre>
+<p><strong>Why this matters</strong>: Single-page applications don&#39;t reload the page. They swap components in and out, creating a smoother, faster experience.</p>
+<h3>3. Login Doesn&#39;t Use Your API</h3>
+<p>This is particularly puzzling. You built a login API endpoint:</p>
+<p><strong>Backend (exists but unused)</strong>:</p>
+<pre><code class="language-javascript">app.post(&quot;/api/login&quot;, (req, res) =&gt; {
+  if (username === &quot;admin&quot; &amp;&amp; password === &quot;user&quot;) {
+    req.session.user = { username: &quot;admin&quot; };
+    return res.json({ ok: true });
+  }
+});
+</code></pre>
+<p><strong>Frontend (what actually runs)</strong>:</p>
+<pre><code class="language-javascript">function validate() {
+  if (username === &quot;admin&quot; &amp;&amp; password === &quot;user&quot;) {
+    alert(&quot;Successfully logged in!&quot;);
+    window.location.href = &quot;index1.html&quot;;
+  }
+}
+</code></pre>
+<p>Your frontend just checks credentials and redirects - it never calls your backend! This means:</p>
+<ul>
+<li>❌ No actual authentication</li>
+<li>❌ No session management</li>
+<li>❌ Login is just client-side theater</li>
+</ul>
+<p><strong>How to fix</strong>:</p>
+<pre><code class="language-javascript">async function handleLogin(username, password) {
+  const res = await fetch(&#39;/api/login&#39;, {
+    method: &#39;POST&#39;,
+    headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+    body: JSON.stringify({ username, password })
+  });
+  
+  const data = await res.json();
+  if (data.ok) {
+    // Actually authenticated!
+    navigate(&#39;/home&#39;);
+  }
+}
+</code></pre>
+<h3>4. Committed node_modules (-2 points)</h3>
+<p>You committed the <code>node_modules</code> folder to git. This is a common beginner mistake:</p>
+<pre><code class="language-bash"># Should be in .gitignore
+node_modules/
+</code></pre>
+<p><strong>Why this matters</strong>:</p>
+<ul>
+<li>Bloats repository (thousands of unnecessary files)</li>
+<li>Others can just run <code>npm install</code> to get dependencies</li>
+<li>Makes git operations slower</li>
+</ul>
+<h3>5. Unused React Starter</h3>
+<p>You have a <code>gaming_store-starter/gaming/</code> folder with React dependencies. Were you planning to use React? What happened?</p>
+<hr>
+<h2>Scoring Breakdown</h2>
+<p>Here&#39;s how your project maps to the grading rubric:</p>
+<h3>1. Application Runs (17/20)</h3>
+<ul>
+<li>✅ Runs perfectly with <code>node app.js</code></li>
+<li>✅ All features work</li>
+<li>✅ No crashes or errors</li>
+<li><strong>-3</strong>: Traditional build, not modern frontend architecture</li>
+</ul>
+<h3>2. Design/UX (16/20)</h3>
+<ul>
+<li>Clean, functional interface</li>
+<li>Basic responsive layout</li>
+<li>Good use of Macedonian language</li>
+<li>Dated aesthetic (jQuery era)</li>
+<li>Works but not polished</li>
+</ul>
+<h3>3. Models/Data Structures (5/15)</h3>
+<ul>
+<li>No TypeScript interfaces</li>
+<li>No formal models</li>
+<li>Just plain JavaScript objects</li>
+<li>Backend has decent structure</li>
+</ul>
+<h3>4. Routing (5/40)</h3>
+<ul>
+<li>No client-side routing</li>
+<li>Just <code>&lt;a href&gt;</code> links (full reloads)</li>
+<li>No route guards</li>
+<li>No route parameters</li>
+<li><strong>Minimal credit for having multiple pages</strong></li>
+</ul>
+<h3>5. Components (10/80)</h3>
+<ul>
+<li>No component architecture</li>
+<li>No reusable components</li>
+<li>Just HTML files</li>
+<li><strong>Minimal credit for organized files</strong></li>
+</ul>
+<h3>6. Services (22/35)</h3>
+<p><strong>Backend</strong>: Excellent (20 points)
+<strong>Frontend</strong>: Basic (2 points) - direct fetch calls, no service abstraction</p>
+<h3>7. Forms (5/40)</h3>
+<ul>
+<li>Login uses basic HTML validation only</li>
+<li>No form framework</li>
+<li>No validation library</li>
+<li>Store has no forms</li>
+</ul>
+<h3>8. Async Handling (12/35)</h3>
+<ul>
+<li>✅ Proper <code>async/await</code> (good!)</li>
+<li>✅ Real HTTP calls (good!)</li>
+<li>❌ No RxJS patterns</li>
+<li>❌ No observable management</li>
+<li><strong>Better than many students, but no framework patterns</strong></li>
+</ul>
+<h3>9. Technical Challenge (18/50)</h3>
+<ul>
+<li>Built functional REST API (solid)</li>
+<li>Frontend-backend integration works</li>
+<li>Dynamic content loading</li>
+<li>Shopping cart logic</li>
+<li><strong>But</strong>: Traditional architecture, not modern challenge</li>
+</ul>
+<p><strong>Raw Total</strong>: 110/335<br><strong>Adjustments</strong>: -2 (node_modules), -10 (missing modern frontend patterns), -9 (unused login API)<br><strong>Adjusted</strong>: 89/335<br><strong>Scaled (×0.45)</strong>: <strong>40/100</strong></p>
+<hr>
+<h2>Why 40 Instead of Higher?</h2>
+<p>You might wonder: &quot;My code works, why such a low grade?&quot;</p>
+<p><strong>Answer</strong>: Because this course is specifically about <strong>modern frontend architecture</strong>, and your project uses <strong>traditional web development patterns</strong>.</p>
+<p>Think of it this way:</p>
+<ul>
+<li>If this were 2010, your project would be cutting-edge ✅</li>
+<li>If this were a general web dev course, you&#39;d score much higher ✅</li>
+<li>If this were a backend course, your backend would be excellent ✅</li>
+</ul>
+<p>But in 2025, in a modern frontend course, we expect:</p>
+<ul>
+<li>Component-based thinking</li>
+<li>Client-side routing</li>
+<li>Modern state management</li>
+<li>Single-page application patterns</li>
+</ul>
+<p><strong>You have the skills to succeed</strong> - you just need to apply them to modern frontend architecture.</p>
+<hr>
+<h2>Path Forward</h2>
+<h3>Option 1: Rebuild with Modern Architecture (Recommended)</h3>
+<p><strong>Keep your backend</strong> - it&#39;s already excellent!</p>
+<p><strong>Add modern frontend</strong>:</p>
+<ol>
+<li><p><strong>Choose an approach</strong>:</p>
+<ul>
+<li><strong>React</strong> (most popular, great ecosystem)</li>
+<li><strong>Angular</strong> (comprehensive, TypeScript built-in)</li>
+<li><strong>Vue</strong> (gentle learning curve)</li>
+<li><strong>Web Components</strong> (native, no framework needed)</li>
+</ul>
+</li>
+<li><p><strong>Create components</strong>:</p>
+<pre><code>ProductCard - displays one product
+ProductList - displays all products
+CartItem - one item in cart
+Cart - full shopping cart
+Login - login form
+Header - navigation
+</code></pre>
+</li>
+<li><p><strong>Add client-side routing</strong>:</p>
+<pre><code>/ - home page
+/store - product listing
+/cart - shopping cart
+/login - login page
+</code></pre>
+</li>
+<li><p><strong>Connect to your existing API</strong>:
+Your backend already works! Just make the frontend call it properly.</p>
+</li>
+<li><p><strong>Add state management</strong>:</p>
+<ul>
+<li>React: Context API or Redux</li>
+<li>Angular: Services with RxJS</li>
+<li>Vue: Pinia or Vuex</li>
+</ul>
+</li>
+</ol>
+<p><strong>Estimated time</strong>: 15-20 hours if you focus on learning one framework</p>
+<h3>Option 2: Accept the Grade</h3>
+<p>If you don&#39;t want to redo it, the grade stands. However, you won&#39;t have learned the modern frontend skills the course teaches.</p>
+<hr>
+<h2>Learning Resources</h2>
+<h3>React (Recommended for Your Case)</h3>
+<p>Since you already have async/API understanding, React will feel natural:</p>
+<ul>
+<li><a href="https://react.dev/learn">React Official Tutorial</a> - Start here</li>
+<li><a href="https://reactrouter.com/">React Router</a> - For routing</li>
+<li>Your existing backend API - Already done!</li>
+</ul>
+<p><strong>Quick React version of your project</strong>:</p>
+<pre><code class="language-javascript">// ProductCard.jsx
+function ProductCard({ product }) {
+  return (
+    &lt;div className=&quot;product&quot;&gt;
+      &lt;h3&gt;{product.title}&lt;/h3&gt;
+      &lt;img src={product.image} alt={product.title} /&gt;
+      &lt;p&gt;${product.price}&lt;/p&gt;
+      &lt;button onClick={() =&gt; addToCart(product)}&gt;Add to Cart&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+// Store.jsx
+function Store() {
+  const [products, setProducts] = useState([]);
+  
+  useEffect(() =&gt; {
+    fetch(&#39;/api/products&#39;)
+      .then(res =&gt; res.json())
+      .then(data =&gt; setProducts(data));
+  }, []);
+  
+  return (
+    &lt;div&gt;
+      {products.map(p =&gt; &lt;ProductCard key={p.id} product={p} /&gt;)}
+    &lt;/div&gt;
+  );
+}
+</code></pre>
+<h3>Angular</h3>
+<ul>
+<li><a href="https://angular.io/tutorial">Angular Tour of Heroes</a></li>
+<li>Built-in TypeScript, routing, and architecture</li>
+</ul>
+<h3>Vue</h3>
+<ul>
+<li><a href="https://vuejs.org/guide/">Vue 3 Guide</a></li>
+<li>Simpler than React/Angular, but still modern</li>
+</ul>
+<h3>Web Components (If You Want to Stay Vanilla)</h3>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components">Web Components Guide</a></li>
+<li>Native browser support, no framework needed</li>
+<li>Still gives you component architecture</li>
+</ul>
+<hr>
+<h2>Practical Example: Converting Your Store</h2>
+<p>Here&#39;s how your store page would look in React:</p>
+<p><strong>Current (jQuery)</strong>:</p>
+<pre><code class="language-javascript">async function loadProducts() {
+  const res = await fetch(&quot;/api/products&quot;);
+  const products = await res.json();
+  
+  products.forEach((p) =&gt; {
+    const card = document.createElement(&quot;div&quot;);
+    card.innerHTML = `...`;
+    gamesList.appendChild(card);
+  });
+}
+</code></pre>
+<p><strong>Modern (React)</strong>:</p>
+<pre><code class="language-javascript">function Store() {
+  const [products, setProducts] = useState([]);
+  
+  useEffect(() =&gt; {
+    fetch(&#39;/api/products&#39;)
+      .then(res =&gt; res.json())
+      .then(setProducts);
+  }, []);
+  
+  return (
+    &lt;div&gt;
+      &lt;ProductList products={products} /&gt;
+    &lt;/div&gt;
+  );
+}
+
+function ProductList({ products }) {
+  return products.map(p =&gt; 
+    &lt;ProductCard key={p.id} product={p} /&gt;
+  );
+}
+</code></pre>
+<p><strong>Benefits</strong>:</p>
+<ul>
+<li>Reusable components ✅</li>
+<li>Declarative (what to show, not how to manipulate DOM) ✅</li>
+<li>Easier to test ✅</li>
+<li>Easier to maintain ✅</li>
+</ul>
+<hr>
+<h2>What You&#39;ve Proven</h2>
+<p>Despite the grade, you&#39;ve demonstrated:</p>
+<ol>
+<li><strong>Backend Competency</strong>: Your Express API is genuinely good</li>
+<li><strong>Async Understanding</strong>: You handle promises correctly</li>
+<li><strong>Problem Solving</strong>: Your cart logic works well</li>
+<li><strong>Integration Skills</strong>: Frontend and backend communicate</li>
+<li><strong>Code Quality</strong>: Your code is clean and readable</li>
+</ol>
+<p><strong>You have the foundation.</strong> You just need to learn modern frontend patterns.</p>
+<hr>
+<h2>Next Steps</h2>
+<ol>
+<li><strong>Schedule a meeting</strong> with me to discuss your options</li>
+<li><strong>Choose a framework</strong> (I recommend React given your background)</li>
+<li><strong>Do the official tutorial</strong> for that framework (4-6 hours)</li>
+<li><strong>Rebuild your frontend</strong> keeping the same backend (10-15 hours)</li>
+<li><strong>Resubmit</strong> and likely pass</li>
+</ol>
+<hr>
+<h2>Questions to Discuss</h2>
+<p>When we meet, I&#39;d like to understand:</p>
+<ol>
+<li><p><strong>What was your understanding of the requirements?</strong></p>
+<ul>
+<li>Did you think jQuery was acceptable?</li>
+<li>Were component/routing requirements unclear?</li>
+</ul>
+</li>
+<li><p><strong>Why didn&#39;t you use the React starter?</strong></p>
+<ul>
+<li>Was it too complicated?</li>
+<li>Did you get stuck and fall back to what you knew?</li>
+</ul>
+</li>
+<li><p><strong>Would you like help choosing a framework?</strong></p>
+<ul>
+<li>I can recommend based on your learning style</li>
+<li>Can provide resources and guidance</li>
+</ul>
+</li>
+<li><p><strong>Timeline for resubmission?</strong></p>
+<ul>
+<li>How much time do you need?</li>
+<li>When can you submit a revised version?</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2>Final Thoughts</h2>
+<p><strong>You built a working web application.</strong> That&#39;s not nothing. Many students can&#39;t even achieve that.</p>
+<p><strong>The issue isn&#39;t quality - it&#39;s era.</strong> You built a 2010-era web app. We need a 2025-era frontend app.</p>
+<p><strong>The good news</strong>: Your backend is done and works well. You don&#39;t need to throw anything away. You just need to add modern frontend architecture on top of what you&#39;ve already built.</p>
+<p><strong>With your demonstrated skills</strong>, learning React/Angular/Vue and rebuilding the frontend is absolutely achievable. It&#39;s not starting over - it&#39;s upgrading what you&#39;ve already built.</p>
+<p>I&#39;m here to help you succeed. Let&#39;s talk about the best path forward.</p>
+<hr>
+<p><strong>Contact</strong>: Email me or schedule office hours to discuss resubmission options.</p>
+<p><strong>Recommended Timeline</strong>: </p>
+<ul>
+<li>Week 1: Learn chosen framework (tutorials)</li>
+<li>Week 2: Rebuild frontend</li>
+<li>Week 3: Polish and resubmit</li>
+</ul>
+<p><strong>You can do this.</strong> 🚀</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
