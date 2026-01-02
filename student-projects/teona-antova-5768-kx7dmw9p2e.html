@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>teona-antova-5768-kx7dmw9p2e — GitSith - Student Projects</title>
-  <meta name="description" content="Student: Teona AntovaProject: HR Onboarding ApplicationFramework: Angular 21Points: 112/100 points">
+  <meta name="description" content="Student: Teona AntovaProject: HR Onboarding ApplicationFramework: Angular 21Grade: A (9) - 98/100 points">
   <meta property="og:title" content="teona-antova-5768-kx7dmw9p2e">
-  <meta property="og:description" content="Student: Teona AntovaProject: HR Onboarding ApplicationFramework: Angular 21Points: 112/100 points">
+  <meta property="og:description" content="Student: Teona AntovaProject: HR Onboarding ApplicationFramework: Angular 21Grade: A (9) - 98/100 points">
   <link rel="canonical" href="https://gitsith.com/student-projects/teona-antova-5768-kx7dmw9p2e/">
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/article.css">
@@ -30,82 +30,114 @@
     <div class="article-container container">
       <header class="article-header">
         <h1>teona-antova-5768-kx7dmw9p2e</h1>
-        <div class="article-meta">7 min read</div>
+        <div class="article-meta">6 min read</div>
         
       </header>
       <div class="article-content">
         <h1>Project Grading Report</h1>
-<p><strong>Student</strong>: Teona Antova<br><strong>Project</strong>: HR Onboarding Application<br><strong>Framework</strong>: Angular 21<br><strong>Points</strong>: 112/100 points</p>
+<p><strong>Student</strong>: Teona Antova<br><strong>Project</strong>: HR Onboarding Application<br><strong>Framework</strong>: Angular 21<br><strong>Grade</strong>: A (9) - 98/100 points</p>
 <hr>
 <h2>Overall Assessment</h2>
-<p>You&#39;ve created a <strong>professional-looking Angular application</strong> with clean architecture and modern patterns. Your frontend implementation demonstrates strong understanding of Angular concepts, component-based architecture, and Material Design. The service layer is well-designed and properly integrates with RESTful APIs following standard microservices patterns.</p>
-<p><strong>What You Did Well</strong>: Modern Angular patterns, clean code structure, professional UI/UX, proper API integration<br><strong>What Needs Work</strong>: Observable cleanup (memory leaks), comprehensive documentation</p>
+<p>You&#39;ve created an Angular application with clean architecture and professional appearance. The project structure follows modern patterns and uses Angular Material effectively. However, there are significant implementation gaps that prevent this from being a complete, functional application.</p>
+<p><strong>What You Did Well</strong>: Clean code structure, modern Angular patterns, professional UI appearance<br><strong>What Needs Significant Work</strong>: Edit functionality broken/missing, observable memory leaks, route parameter anti-pattern, minimal effort beyond basics</p>
 <hr>
-<h2>Strengths 🌟</h2>
-<h3>1. Excellent Project Structure</h3>
-<p>Your application follows enterprise-grade organization:</p>
-<pre><code>src/app/
-├── core/           # Services, models, guards, interceptors
-├── features/       # Feature modules (auth, employees)
-└── shared/         # Reusable components
+<h2>Critical Issues That Need Immediate Attention</h2>
+<h3>Issue #1: Edit Functionality Is Completely Broken 🚨</h3>
+<p><strong>The Problem</strong>: You have an edit route defined, but the feature is completely unusable.</p>
+<pre><code class="language-typescript">// app.routes.ts - Route exists
+{ path: &#39;employees/edit/:id&#39;, component: EmployeeFormComponent }
 </code></pre>
-<p>This shows mature understanding of Angular architecture and separation of concerns.</p>
-<h3>2. Modern Angular Patterns</h3>
-<p>You&#39;re using cutting-edge Angular 21 features:</p>
-<ul>
-<li><strong>Standalone components</strong> (no NgModules needed)</li>
-<li><strong>Functional guards</strong> with <code>inject()</code></li>
-<li><strong>HTTP interceptors</strong> as functions</li>
-<li><strong>Reactive forms</strong> with FormBuilder</li>
-</ul>
-<p>Example of your modern guard:</p>
-<pre><code class="language-typescript">export const authGuard = () =&gt; {
-  const authService = inject(AuthService);
-  const router = inject(Router);
-  // ...
+<p><strong>But</strong>:</p>
+<ol>
+<li><strong>NO EDIT BUTTON EXISTS</strong> - There&#39;s no way for users to access this feature</li>
+<li><strong>WRONG PATTERN</strong> - You use <code>route.snapshot</code> instead of the observable pattern</li>
+</ol>
+<p><strong>Current broken code</strong>:</p>
+<pre><code class="language-typescript">// employee-form.component.ts
+ngOnInit(): void {
+  const id = this.route.snapshot.paramMap.get(&#39;id&#39;);  // ❌ WRONG!
+  if (id) {
+    this.employeeId = +id;
+    this.loadEmployee(this.employeeId);
+  }
 }
 </code></pre>
-<h3>3. Professional UI/UX</h3>
-<p>Your interface is polished and user-friendly:</p>
+<p><strong>Why this is wrong</strong>:</p>
 <ul>
-<li>Loading states while data fetches</li>
-<li>Error notifications with snackbars</li>
-<li>Confirmation dialogs for destructive actions</li>
-<li>Clean Material Design throughout</li>
-<li>Responsive layout</li>
+<li><code>route.snapshot</code> is an anti-pattern in Angular</li>
+<li>Won&#39;t react if navigating between different employee edits</li>
+<li>Shows lack of understanding of Angular&#39;s reactive routing</li>
 </ul>
-<h3>4. Proper Form Implementation</h3>
-<p>Your forms demonstrate good practices:</p>
-<pre><code class="language-typescript">this.employeeForm = this.fb.group({
-  name: [&#39;&#39;, [Validators.required, Validators.minLength(2)]],
-  status: [&#39;Onboarding&#39;, [Validators.required]],
-  team: [&#39;&#39;, [Validators.maxLength(100)]],
-  mentor: [&#39;&#39;, [Validators.maxLength(100)]]
-});
+<p><strong>How to fix it properly</strong>:</p>
+<p><strong>Step 1</strong>: Add edit button in <code>employee-list.component.html</code>:</p>
+<pre><code class="language-html">&lt;td mat-cell *matCellDef=&quot;let employee&quot;&gt;
+  &lt;button mat-icon-button 
+          color=&quot;primary&quot;
+          (click)=&quot;editEmployee(employee)&quot;
+          matTooltip=&quot;Edit&quot;&gt;
+    &lt;mat-icon&gt;edit&lt;/mat-icon&gt;
+  &lt;/button&gt;
+  &lt;button mat-icon-button 
+          color=&quot;warn&quot; 
+          (click)=&quot;deleteEmployee(employee)&quot;
+          matTooltip=&quot;Delete&quot;&gt;
+    &lt;mat-icon&gt;delete&lt;/mat-icon&gt;
+  &lt;/button&gt;
+&lt;/td&gt;
 </code></pre>
-<p>You have validation, error messages, and proper form state management.</p>
+<p><strong>Step 2</strong>: Add navigation method:</p>
+<pre><code class="language-typescript">// employee-list.component.ts
+editEmployee(employee: Employee): void {
+  this.router.navigate([&#39;/employees/edit&#39;, employee.id]);
+}
+</code></pre>
+<p><strong>Step 3</strong>: Fix the route parameter handling (CORRECT PATTERN):</p>
+<pre><code class="language-typescript">// employee-form.component.ts
+private destroy$ = new Subject&lt;void&gt;();
+
+ngOnInit(): void {
+  this.route.paramMap
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(params =&gt; {
+      const id = params.get(&#39;id&#39;);
+      if (id) {
+        this.employeeId = +id;
+        this.loadEmployee(this.employeeId);
+      }
+    });
+}
+
+ngOnDestroy(): void {
+  this.destroy$.next();
+  this.destroy$.complete();
+}
+</code></pre>
+<p><strong>Impact</strong>: This single issue cost you -15 points (10 from Components, 5 from Routing)</p>
 <hr>
-<h2>Areas for Improvement 📚</h2>
-<h3>Critical Issue #1: Memory Leaks (No Observable Cleanup)</h3>
-<p><strong>Problem</strong>: You subscribe to observables but never unsubscribe, causing memory leaks.</p>
-<pre><code class="language-typescript">// Current code in employee-list.component.ts
+<h3>Issue #2: Memory Leaks Everywhere 🚨</h3>
+<p><strong>The Problem</strong>: You subscribe to observables but NEVER clean up.</p>
+<pre><code class="language-typescript">// employee-list.component.ts
 this.employeeService.getAllEmployees().subscribe({
   next: (employees) =&gt; { ... }
 });
-// When component is destroyed, subscription keeps running!
+// When component is destroyed, subscription keeps running = MEMORY LEAK
 </code></pre>
-<p><strong>How to Fix</strong>: You have three options:</p>
-<p><strong>Option 1: Use <code>async</code> Pipe (Recommended)</strong></p>
+<p><strong>This is a CRITICAL best practice violation</strong>. In a real application, this causes:</p>
+<ul>
+<li>Memory leaks</li>
+<li>Performance degradation</li>
+<li>Potential crashes</li>
+</ul>
+<p><strong>How to fix</strong> (choose ONE approach):</p>
+<p><strong>Option 1: async pipe (RECOMMENDED - easiest)</strong>:</p>
 <pre><code class="language-typescript">// Component
 employees$ = this.employeeService.getAllEmployees();
 
 // Template
-&lt;div *ngFor=&quot;let employee of employees$ | async&quot;&gt;
-  {{ employee.name }}
-&lt;/div&gt;
+&lt;tr mat-row *matRowDef=&quot;let row; columns: displayedColumns;&quot;
+    *ngFor=&quot;let employee of employees$ | async&quot;&gt;&lt;/tr&gt;
 </code></pre>
-<p>The <code>async</code> pipe automatically unsubscribes when the component is destroyed.</p>
-<p><strong>Option 2: Use <code>takeUntil</code> Pattern</strong></p>
+<p><strong>Option 2: takeUntil pattern</strong>:</p>
 <pre><code class="language-typescript">export class EmployeeListComponent implements OnDestroy {
   private destroy$ = new Subject&lt;void&gt;();
   
@@ -121,199 +153,94 @@ employees$ = this.employeeService.getAllEmployees();
   }
 }
 </code></pre>
-<p><strong>Option 3: Manual Unsubscribe</strong></p>
-<pre><code class="language-typescript">export class EmployeeListComponent implements OnDestroy {
-  private subscription?: Subscription;
-  
-  ngOnInit() {
-    this.subscription = this.employeeService.getAllEmployees()
-      .subscribe({ ... });
-  }
-  
-  ngOnDestroy() {
-    this.subscription?.unsubscribe();
-  }
-}
-</code></pre>
+<p><strong>Impact</strong>: -15 points from Observables section</p>
 <hr>
-<h3>Issue #2: Missing Documentation</h3>
-<p>You don&#39;t have a README file. Every project should include:</p>
-<p><strong>README.md Template</strong>:</p>
-<pre><code class="language-markdown"># HR Onboarding Application
-
-Angular 21 application for managing employee onboarding.
-
-## Features
-- User authentication (login/logout)
-- Employee list with search and sorting
-- Add new employees
-- Delete employees with confirmation
-
-## Setup
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Ensure backend API is running at http://localhost:8080
-4. Start the dev server: `npm start`
-5. Open http://localhost:4200
-
-## Login Credentials
-- Username: admin
-- Password: admin123
-
-## API Requirements
-Backend must provide the following endpoints:
-- GET /employees - List all employees
-- POST /employees - Create new employee
-- DELETE /employees/:id - Delete employee
-
-## Technologies
-- Angular 21
-- Angular Material
-- TypeScript
-- RxJS
-</code></pre>
+<h3>Issue #3: Vanilla/Minimal Effort</h3>
+<p>Your app does all the required basics but absolutely nothing more:</p>
+<ul>
+<li>Basic CRUD operations (create, delete)</li>
+<li>Standard Material Design</li>
+<li>No interesting technical challenge</li>
+<li>No creativity or innovation</li>
+<li>No features that stand out</li>
+</ul>
+<p>This feels like &quot;checkbox development&quot; - doing just enough to meet requirements without going beyond. The guidelines ask for an &quot;interesting technical challenge,&quot; and this project has none.</p>
+<p><strong>What you could have added</strong>:</p>
+<ul>
+<li>Search with debouncing and advanced filters</li>
+<li>Bulk operations (delete multiple, export)</li>
+<li>Dashboard with statistics/charts</li>
+<li>Drag-and-drop reordering</li>
+<li>Real-time updates</li>
+<li>Advanced validation (async validators)</li>
+<li>Pagination with server-side sorting</li>
+<li>Role-based access control beyond basic auth</li>
+</ul>
+<p><strong>Impact</strong>: -10 points from Extra/Advanced section</p>
 <hr>
-<h3>Issue #3: Incomplete Edit Functionality</h3>
-<p>You have routing prepared for editing employees:</p>
-<pre><code class="language-typescript">// In app.routes.ts - This route exists but isn&#39;t used
-{ path: &#39;employees/edit/:id&#39;, component: EmployeeFormComponent }
-</code></pre>
-<p>But you don&#39;t have an edit button in the employee list. To complete this:</p>
-<ol>
-<li>Add edit button in <code>employee-list.component.html</code>:</li>
-</ol>
-<pre><code class="language-html">&lt;td mat-cell *matCellDef=&quot;let employee&quot;&gt;
-  &lt;button mat-icon-button (click)=&quot;editEmployee(employee)&quot;&gt;
-    &lt;mat-icon&gt;edit&lt;/mat-icon&gt;
-  &lt;/button&gt;
-  &lt;button mat-icon-button color=&quot;warn&quot; (click)=&quot;deleteEmployee(employee)&quot;&gt;
-    &lt;mat-icon&gt;delete&lt;/mat-icon&gt;
-  &lt;/button&gt;
-&lt;/td&gt;
-</code></pre>
-<ol start="2">
-<li>Add method in component:</li>
-</ol>
-<pre><code class="language-typescript">editEmployee(employee: Employee): void {
-  this.router.navigate([&#39;/employees/edit&#39;, employee.id]);
-}
-</code></pre>
-<ol start="3">
-<li>Update form component to handle edit mode (you already have the logic, just need to wire the route).</li>
-</ol>
-<hr>
-<h2>Detailed Scoring Breakdown</h2>
-<h3>1. Application Runs (18/20 points)</h3>
-<p>✅ <strong>What worked:</strong></p>
+<h2>Detailed Scoring</h2>
+<h3>1. Application Runs (18/20 points) ✅</h3>
 <ul>
-<li>Project builds without errors</li>
-<li>Development server runs smoothly</li>
-<li>Login system functions properly</li>
-<li>UI is fully accessible</li>
-<li>All routes work correctly</li>
+<li>Builds and runs successfully</li>
+<li>Minor: Better error messages needed when backend unavailable</li>
 </ul>
-<p>⚠️ <strong>Minor issues:</strong></p>
+<h3>2. Design/UX (18/20 points) ✅</h3>
 <ul>
-<li>Would benefit from better error messages when backend unavailable</li>
+<li>Clean Material Design</li>
+<li>Consistent styling</li>
+<li>Loading states</li>
+<li>Could be better: Mobile optimization, more animations</li>
 </ul>
-<h3>2. Design/UX (18/20 points)</h3>
-<p>✅ <strong>Strengths:</strong></p>
+<h3>3. Data Models (15/15 points) ✅</h3>
 <ul>
-<li>Clean, professional Material Design</li>
-<li>Consistent styling across pages</li>
-<li>Loading states shown</li>
-<li>Error notifications</li>
-<li>Intuitive navigation</li>
+<li>Clean TypeScript interfaces</li>
+<li>Proper typing</li>
 </ul>
-<p>⚠️ <strong>Could be better:</strong></p>
+<h3>4. Routing (25/40 points) ❌</h3>
 <ul>
-<li>No mobile-specific optimizations</li>
-<li>Could use more animations</li>
+<li>Empty route handler ✅</li>
+<li>Default route ✅</li>
+<li>Multiple routes ✅</li>
+<li>Route guards ✅</li>
+<li><strong>Route parameters (0/10)</strong> ❌ - Uses snapshot anti-pattern</li>
+<li><strong>Programmatic routing (5/10)</strong> ⚠️ - Missing edit navigation</li>
 </ul>
-<h3>3. Data Models (15/15 points)</h3>
-<p>✅ <strong>Perfect implementation:</strong></p>
-<pre><code class="language-typescript">export interface Employee {
-  id?: number;
-  name: string;
-  status: string;
-  team: string;
-  mentor: string;
-}
-</code></pre>
-<p>Clean, well-typed interface.</p>
-<h3>4. Routing (35/40 points)</h3>
-<p>✅ <strong>What you did well:</strong></p>
+<h3>5. Components (50/80 points) ❌</h3>
 <ul>
-<li>Empty route redirects to login</li>
-<li>Wildcard route for 404s</li>
-<li>Multiple routes defined</li>
-<li>Auth guard protecting routes</li>
-<li>Programmatic navigation</li>
+<li>Structure is good (20/20) ✅</li>
+<li><strong>Employee list (10/25)</strong> ❌ - Missing edit button (-10)</li>
+<li><strong>Employee form (10/20)</strong> ❌ - Route snapshot anti-pattern (-5)</li>
+<li>Login, dialog good ✅</li>
 </ul>
-<p>⚠️ <strong>Minor issues:</strong></p>
+<h3>6. Services (32/35 points) ✅</h3>
 <ul>
-<li>Edit route prepared but not fully wired up</li>
+<li>Excellent service layer</li>
+<li>HTTP interceptor</li>
+<li>Proper DI</li>
+<li>Could improve: More error handling patterns</li>
 </ul>
-<h3>5. Components (60/80 points)</h3>
-<p>✅ <strong>Strong areas:</strong></p>
+<h3>7. Forms (32/40 points) ✅</h3>
 <ul>
-<li>Clean component structure</li>
-<li>Proper use of Input/Output for dialogs</li>
-<li>Standalone components</li>
-<li>Good separation of concerns</li>
+<li>Reactive forms ✅</li>
+<li>Validation ✅</li>
+<li>Could add: Custom validators, async validation</li>
 </ul>
-<p>⚠️ <strong>Could improve:</strong></p>
+<h3>8. Observables (15/35 points) ❌</h3>
 <ul>
-<li>More reusable components</li>
-<li>Extract table into separate component</li>
+<li>Subscribe usage good ✅</li>
+<li><strong>No cleanup (0/15)</strong> ❌ - Critical memory leak issue</li>
 </ul>
-<h3>6. Services (32/35 points)</h3>
-<p>✅ <strong>Strong areas:</strong></p>
+<h3>9. Advanced Features (15/50 points) ❌</h3>
 <ul>
-<li>Clean service layer with proper HttpClient usage</li>
-<li>Proper dependency injection with modern <code>inject()</code> pattern</li>
-<li>HTTP interceptor for API keys</li>
-<li>Error handling in subscriptions</li>
-<li>Well-structured REST endpoint definitions</li>
-</ul>
-<p>⚠️ <strong>Could improve:</strong></p>
-<ul>
-<li>More sophisticated error handling patterns</li>
-<li>Retry logic for failed requests</li>
-</ul>
-<h3>7. Forms (32/40 points)</h3>
-<p>✅ <strong>Excellent work:</strong></p>
-<ul>
-<li>Reactive forms with FormBuilder</li>
-<li>Validation rules</li>
-<li>Error messages displayed</li>
-<li>Form state management</li>
-</ul>
-<p>⚠️ <strong>Could be better:</strong></p>
-<ul>
-<li>Could add custom validators</li>
-<li>Could add async validators (check if name exists)</li>
-</ul>
-<h3>8. Observables (15/35 points)</h3>
-<p>✅ <strong>Good usage:</strong></p>
-<ul>
-<li>Properly using subscribe</li>
-<li>Error handling in subscriptions</li>
-</ul>
-<p>❌ <strong>Critical issue:</strong></p>
-<ul>
-<li>No cleanup anywhere (-15 points)</li>
-<li>This causes memory leaks</li>
-</ul>
-<h3>9. Advanced Features (25/50 points)</h3>
-<p>✅ <strong>Impressive additions:</strong></p>
-<ul>
-<li>Modern Angular 21 patterns (+5)</li>
-<li>HTTP interceptor implementation (+3)</li>
-<li>Functional auth guard (+2)</li>
-<li>Professional UX with loading states (+5)</li>
 <li>Clean architecture (+5)</li>
-<li>Confirm dialog component (+5)</li>
+<li>HTTP interceptor (+3)</li>
+<li>Auth guard (+2)</li>
+<li>Professional UX (+5)</li>
+<li><strong>No interesting challenge (5/25)</strong> ❌ - Vanilla CRUD only</li>
+</ul>
+<h3>10. Documentation (-2 points) ❌</h3>
+<ul>
+<li>No README</li>
 </ul>
 <hr>
 <h2>Final Score</h2>
@@ -321,8 +248,8 @@ Backend must provide the following endpoints:
 <thead>
 <tr>
 <th>Category</th>
-<th>Your Score</th>
-<th>Possible</th>
+<th>Points</th>
+<th>Max</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -342,12 +269,12 @@ Backend must provide the following endpoints:
 </tr>
 <tr>
 <td>Routing</td>
-<td>35</td>
+<td>25</td>
 <td>40</td>
 </tr>
 <tr>
 <td>Components</td>
-<td>60</td>
+<td>50</td>
 <td>80</td>
 </tr>
 <tr>
@@ -366,8 +293,8 @@ Backend must provide the following endpoints:
 <td>35</td>
 </tr>
 <tr>
-<td>Advanced Features</td>
-<td>25</td>
+<td>Advanced</td>
+<td>15</td>
 <td>50</td>
 </tr>
 <tr>
@@ -377,47 +304,56 @@ Backend must provide the following endpoints:
 </tr>
 <tr>
 <td><strong>TOTAL</strong></td>
-<td><strong>248</strong></td>
+<td><strong>218</strong></td>
 <td><strong>335</strong></td>
 </tr>
 </tbody></table>
-<p><strong>After 0.45 scaling: 112/150 points (74%)</strong></p>
-<p><strong>Letter Grade: A (9)</strong></p>
+<p><strong>After 0.45 scaling: 98 points</strong></p>
+<p><strong>Final Score: 98/100</strong>
+<strong>Letter Grade: A (9)</strong> - just 2 points shy of A+</p>
 <hr>
-<h2>Path Forward 🚀</h2>
-<p>To turn this into an <strong>A+ project</strong>, focus on these priorities:</p>
-<h3>Priority 1: Fix Memory Leaks</h3>
-<p>Add <code>ngOnDestroy</code> and proper cleanup to all components that subscribe to observables. The <code>async</code> pipe is the easiest solution and is considered best practice.</p>
-<h3>Priority 2: Add README</h3>
-<p>Document how to run your project, backend API requirements, login credentials, and setup instructions.</p>
-<h3>Priority 3: Complete Edit Feature</h3>
-<p>Wire up the edit functionality that you&#39;ve already prepared the routes for.</p>
-<h3>Priority 4: Enhanced Error Handling</h3>
-<p>Add more sophisticated error handling patterns, such as retry logic for failed HTTP requests.</p>
+<h2>What You Need To Do To Improve</h2>
+<h3>Priority 1: Fix Edit Functionality</h3>
+<p>This is the BIGGEST issue. Add the edit button and fix the route observable pattern. This alone would add ~15 points.</p>
+<h3>Priority 2: Fix Memory Leaks</h3>
+<p>Add proper cleanup to ALL observable subscriptions. Use async pipe or takeUntil pattern. This adds ~15 points.</p>
+<h3>Priority 3: Go Beyond The Minimum</h3>
+<p>Add at least ONE interesting feature that shows creativity:</p>
+<ul>
+<li>Advanced search/filtering</li>
+<li>Data visualization (charts)</li>
+<li>Bulk operations</li>
+<li>Something that makes your app stand out</li>
+</ul>
+<p>This would add ~10 points.</p>
+<h3>Priority 4: Add Documentation</h3>
+<p>Create a proper README with setup instructions, API requirements, and login credentials. This adds 2 points.</p>
+<p><strong>With these fixes: 98 + 15 + 15 + 10 + 2 = 140 points → 63 scaled = 126/100 = A+</strong></p>
 <hr>
-<h2>Additional Learning Resources</h2>
+<h2>Learning Resources</h2>
+<h3>Route Observables</h3>
+<ul>
+<li><a href="https://angular.dev/guide/routing/common-router-tasks#accessing-query-parameters-and-fragments">Angular Router Guide</a></li>
+<li><a href="https://angular.io/guide/router#activated-route">Avoid route.snapshot anti-pattern</a></li>
+</ul>
 <h3>Observable Cleanup</h3>
 <ul>
 <li><a href="https://blog.angular-university.io/rxjs-error-handling/">RxJS takeUntil Pattern</a></li>
 <li><a href="https://angular.dev/guide/pipes/unwrapping-data-observables">Angular Async Pipe</a></li>
-</ul>
-<h3>Backend Integration</h3>
-<ul>
-<li><a href="https://github.com/typicode/json-server">JSON Server Quick Start</a></li>
-<li><a href="https://angular.dev/guide/http">Angular HTTP Client Guide</a></li>
-<li><a href="https://firebase.google.com/docs/web/setup">Firebase with Angular</a></li>
-</ul>
-<h3>Best Practices</h3>
-<ul>
-<li><a href="https://angular.dev/style-guide">Angular Style Guide</a></li>
-<li><a href="https://blog.angular-university.io/rxjs-error-handling/">RxJS Best Practices</a></li>
+<li><a href="https://blog.angular.io/rxjs-avoiding-memory-leaks-e0c37a4e26c">Memory Leak Prevention</a></li>
 </ul>
 <hr>
-<h2>Conclusion</h2>
-<p>You&#39;ve demonstrated <strong>excellent Angular fundamentals</strong> and created a professional-grade application. Your code is clean, well-organized, and uses modern patterns effectively. The service layer is properly architected for API integration, and your component structure follows best practices.</p>
-<p>The main issue is the missing observable cleanup (memory leaks). With this fix and proper documentation, this would be outstanding A+ work. You clearly have a strong grasp of Angular architecture, modern TypeScript patterns, and component-based development.</p>
-<p><strong>Excellent work!</strong> 🎉</p>
-<p><strong>Points: 112/150</strong><br><strong>Grade: A (9)</strong></p>
+<h2>Honest Assessment</h2>
+<p>Your project looks professional at first glance, but deeper inspection reveals significant gaps. The architecture is good, the UI is polished, but critical features don&#39;t work and best practices are violated. This feels like you focused on making it <em>look</em> right without ensuring it <em>works</em> right.</p>
+<p>The edit functionality being completely broken (no button, wrong pattern) is particularly concerning - it suggests the feature was added for the requirements checklist but never actually tested or completed. Similarly, the lack of observable cleanup shows missing understanding of Angular fundamentals.</p>
+<p>You clearly can write Angular code and understand modern patterns, but you need to focus on:</p>
+<ol>
+<li><strong>Completeness</strong> - Finish features properly</li>
+<li><strong>Best practices</strong> - Learn and follow Angular patterns</li>
+<li><strong>Going beyond</strong> - Don&#39;t just check boxes, add value</li>
+</ol>
+<p>With the fixes above, this could easily be A-grade work.</p>
+<p><strong>Points: 98/100</strong><br><strong>Grade: A (9)</strong></p>
 
       </div>
       <footer class="article-footer">
