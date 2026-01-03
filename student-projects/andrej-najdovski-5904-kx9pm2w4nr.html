@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>andrej-najdovski-5904-kx9pm2w4nr — GitSith - Student Projects</title>
+  <meta name="description" content="Student: Andrej NajdovskiProject: WebDev AcademyCourse: Internet Programming (Frontend Development)Date: January 2, 2026">
+  <meta property="og:title" content="andrej-najdovski-5904-kx9pm2w4nr">
+  <meta property="og:description" content="Student: Andrej NajdovskiProject: WebDev AcademyCourse: Internet Programming (Frontend Development)Date: January 2, 2026">
+  <link rel="canonical" href="https://gitsith.com/student-projects/andrej-najdovski-5904-kx9pm2w4nr/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>andrej-najdovski-5904-kx9pm2w4nr</h1>
+        <div class="article-meta">10 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Grading - WebDev Academy</h1>
+<p><strong>Student</strong>: Andrej Najdovski<br><strong>Project</strong>: WebDev Academy<br><strong>Course</strong>: Internet Programming (Frontend Development)<br><strong>Date</strong>: January 2, 2026</p>
+<hr>
+<h2>Final Grade: 65/100 (C / 7) - Meets Minimum Requirements</h2>
+<p>Your project demonstrates understanding of Angular fundamentals, but lacks the depth, polish, and completeness expected for a strong grade. You&#39;ve built a working application with correct patterns, but it feels incomplete.</p>
+<hr>
+<h2>Overall Assessment</h2>
+<p>Your WebDev Academy is a <strong>functional Angular application</strong> that shows you understand:</p>
+<ul>
+<li>Component-based architecture ✅</li>
+<li>Routing with route parameters ✅</li>
+<li>Observable patterns and state management ✅</li>
+<li>Proper cleanup (ngOnDestroy) ✅</li>
+</ul>
+<p>However, the project has significant gaps:</p>
+<ul>
+<li>No forms (major requirement) ❌</li>
+<li>No real HTTP/backend integration ❌</li>
+<li>Extremely minimal UI ❌</li>
+<li>Limited scope and ambition ❌</li>
+</ul>
+<p><strong>You&#39;ve met minimum requirements but haven&#39;t gone beyond basics.</strong></p>
+<hr>
+<h2>What You Did Right</h2>
+<h3>1. Correct Angular Patterns ✅</h3>
+<p>Your code follows proper Angular conventions:</p>
+<pre><code class="language-typescript">@Component({
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  templateUrl: &#39;./quiz.html&#39;
+})
+export class QuizComponent implements OnInit, OnDestroy {
+  // Proper cleanup
+  ngOnDestroy() {
+    this.sub?.unsubscribe();
+  }
+}
+</code></pre>
+<p><strong>This is good:</strong></p>
+<ul>
+<li>Standalone components</li>
+<li>Proper imports</li>
+<li>Implements lifecycle hooks correctly</li>
+</ul>
+<h3>2. Observable Cleanup ✅</h3>
+<p>You properly unsubscribe from observables:</p>
+<pre><code class="language-typescript">private sub?: Subscription;
+
+ngOnDestroy() {
+  this.sub?.unsubscribe();
+}
+</code></pre>
+<p><strong>Many students forget this.</strong> You got it right.</p>
+<h3>3. State Management with BehaviorSubject ✅</h3>
+<p>Your state service uses proper reactive patterns:</p>
+<pre><code class="language-typescript">private scoreSubject = new BehaviorSubject&lt;number&gt;(0);
+score$ = this.scoreSubject.asObservable();
+</code></pre>
+<p>Then in components:</p>
+<pre><code class="language-html">&lt;p&gt;Score: {{ score$ | async }}&lt;/p&gt;
+</code></pre>
+<p><strong>This is correct:</strong> You understand observables and async pipe.</p>
+<h3>4. Route Parameters ✅</h3>
+<p>You properly use route parameters:</p>
+<pre><code class="language-typescript">{ path: &#39;lesson/:id&#39;, component: LessonComponent },
+{ path: &#39;quiz/:id&#39;, component: QuizComponent }
+</code></pre>
+<p>And handle them with <code>switchMap</code>:</p>
+<pre><code class="language-typescript">this.route.paramMap.pipe(
+  switchMap(params =&gt; {
+    const id = Number(params.get(&#39;id&#39;));
+    return this.quizService.getQuiz(id);
+  })
+)
+</code></pre>
+<p><strong>This is the correct pattern for route observables.</strong></p>
+<h3>5. Project Structure ✅</h3>
+<p>Your folder organization is clear:</p>
+<pre><code>src/
+├── pages/          # Route components
+├── components/     # Shared components (navbar)
+├── services/       # State and quiz services
+</code></pre>
+<h3>6. Git Hygiene ✅</h3>
+<p>Your <code>.gitignore</code> properly excludes <code>node_modules</code>.</p>
+<hr>
+<h2>What&#39;s Missing or Weak</h2>
+<h3>1. No Forms (Critical Gap) ❌</h3>
+<p>Your project has <strong>ZERO forms</strong>. This is a major requirement for the course.</p>
+<p><strong>What&#39;s missing:</strong></p>
+<ul>
+<li>No login/registration form</li>
+<li>No profile editing form</li>
+<li>No course enrollment form</li>
+<li>No quiz feedback form</li>
+<li>No form validation</li>
+</ul>
+<p><strong>Impact:</strong> -40 points from Forms category</p>
+<p><strong>Why this matters:</strong> Forms are fundamental to web applications. Reactive forms with validation are a core Angular skill you need to demonstrate.</p>
+<p><strong>How to fix:</strong></p>
+<pre><code class="language-typescript">// Example: Profile editing form
+export class ProfileComponent {
+  profileForm = new FormGroup({
+    name: new FormControl(&#39;&#39;, [Validators.required]),
+    email: new FormControl(&#39;&#39;, [Validators.required, Validators.email]),
+    bio: new FormControl(&#39;&#39;)
+  });
+
+  onSubmit() {
+    if (this.profileForm.valid) {
+      // Save profile
+    }
+  }
+}
+</code></pre>
+<h3>2. No Real HTTP/Backend Integration ❌</h3>
+<p>All your &quot;async&quot; data is fake:</p>
+<pre><code class="language-typescript">getQuiz(id: number): Observable&lt;any[]&gt; {
+  return of(this.quizzes[id] ?? []).pipe(delay(500));
+}
+</code></pre>
+<p><strong>This is just hardcoded data with fake delay.</strong> You&#39;re not demonstrating:</p>
+<ul>
+<li>HTTP client usage</li>
+<li>Real API integration</li>
+<li>Error handling for network issues</li>
+<li>Loading states for real async operations</li>
+</ul>
+<p><strong>How to fix:</strong></p>
+<pre><code class="language-typescript">// Use HttpClient
+constructor(private http: HttpClient) {}
+
+getQuiz(id: number): Observable&lt;Quiz[]&gt; {
+  return this.http.get&lt;Quiz[]&gt;(`http://localhost:3000/quizzes/${id}`).pipe(
+    catchError(error =&gt; {
+      console.error(&#39;Failed to load quiz:&#39;, error);
+      return of(this.fallbackQuizzes[id] ?? []);
+    })
+  );
+}
+</code></pre>
+<p>You could use <code>json-server</code> for a mock API.</p>
+<h3>3. Extremely Minimal UI ❌</h3>
+<p>Your entire UI is basically unstyled text:</p>
+<pre><code class="language-html">&lt;h2&gt;Profile&lt;/h2&gt;
+&lt;p&gt;User preferences and theme stored in state.&lt;/p&gt;
+</code></pre>
+<p><strong>The app looks unfinished:</strong></p>
+<ul>
+<li>No CSS framework (Material, Bootstrap)</li>
+<li>Minimal custom styling</li>
+<li>No visual polish</li>
+<li>No loading spinners (just text &quot;Loading quiz…&quot;)</li>
+<li>No error messages</li>
+<li>No responsive design</li>
+</ul>
+<p><strong>Compare to other projects:</strong></p>
+<ul>
+<li>Barbara&#39;s project: Beautiful gradients, Material Design, smooth animations</li>
+<li>Yours: Plain text on white background</li>
+</ul>
+<p><strong>Impact:</strong> Only 8/20 for Design/UX</p>
+<p><strong>How to improve:</strong></p>
+<ul>
+<li>Add Angular Material or Bootstrap</li>
+<li>Style the quiz interface (cards, buttons, progress bar)</li>
+<li>Add loading indicators</li>
+<li>Make it responsive</li>
+<li>Add visual hierarchy</li>
+</ul>
+<h3>4. No Interesting Technical Challenge ❌</h3>
+<p>Your &quot;challenge&quot; features:</p>
+<ul>
+<li>Quiz score tracking: Just incrementing numbers</li>
+<li>Theme toggle: <code>classList.toggle(&#39;light&#39;)</code></li>
+</ul>
+<p><strong>That&#39;s too basic.</strong> Other students implemented:</p>
+<ul>
+<li>Complex algorithms</li>
+<li>Data visualization</li>
+<li>Drag &amp; drop</li>
+<li>Progressive enhancement patterns</li>
+<li>Real-time features</li>
+</ul>
+<p><strong>Impact:</strong> Only 8/50 for Extra/Challenge</p>
+<p><strong>Ideas for improvement:</strong></p>
+<ul>
+<li>Quiz results visualization (charts)</li>
+<li>Spaced repetition algorithm</li>
+<li>Course progress tracking with persistence</li>
+<li>User achievements/badges</li>
+<li>Multiplayer quiz mode</li>
+</ul>
+<h3>5. Empty Storage Service ❌</h3>
+<pre><code class="language-typescript">@Injectable({ providedIn: &#39;root&#39; })
+export class Storage {
+  // Empty!
+}
+</code></pre>
+<p><strong>Why does this exist?</strong> It&#39;s completely unused.</p>
+<p><strong>Either remove it or implement it:</strong></p>
+<pre><code class="language-typescript">@Injectable({ providedIn: &#39;root&#39; })
+export class Storage {
+  save(key: string, value: any): void {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  load&lt;T&gt;(key: string): T | null {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
+  }
+}
+</code></pre>
+<h3>6. No TypeScript Models ❌</h3>
+<p>Your data structures are all inline:</p>
+<pre><code class="language-typescript">quiz: {
+  q: string;
+  options: string[];
+  correct: number;
+}[] = [];
+</code></pre>
+<p><strong>Best practice is separate interfaces:</strong></p>
+<pre><code class="language-typescript">// models/quiz.model.ts
+export interface Quiz {
+  question: string;
+  options: string[];
+  correctIndex: number;
+}
+
+export interface Course {
+  id: number;
+  title: string;
+  description: string;
+}
+</code></pre>
+<h3>7. Default README ❌</h3>
+<p>Your README is the default Angular CLI boilerplate with zero project description:</p>
+<ul>
+<li>No explanation of what the app does</li>
+<li>No features list</li>
+<li>No setup instructions</li>
+<li>No screenshots</li>
+</ul>
+<p><strong>This makes it hard for anyone to understand your project.</strong></p>
+<hr>
+<h2>Scoring Breakdown</h2>
+<h3>1. Application Runs (18/20)</h3>
+<ul>
+<li>✅ Builds and runs</li>
+<li>✅ All features functional</li>
+<li><strong>-2</strong>: Very minimal functionality</li>
+</ul>
+<h3>2. Design/UX (8/20)</h3>
+<ul>
+<li>❌ No CSS framework</li>
+<li>❌ Minimal styling</li>
+<li>❌ Looks unfinished</li>
+<li>❌ No visual polish</li>
+</ul>
+<p><strong>This is the weakest area.</strong> The app looks like a wireframe.</p>
+<h3>3. Models/Data Structures (3/15)</h3>
+<ul>
+<li>❌ No separate model files</li>
+<li>❌ Inline types only</li>
+<li>✅ At least uses TypeScript</li>
+</ul>
+<h3>4. Routing (32/40)</h3>
+<ul>
+<li>✅ Multiple routes (6 pages)</li>
+<li>✅ Route parameters</li>
+<li>✅ Programmatic navigation</li>
+<li>⚠️  No lazy loading</li>
+<li>⚠️  No route guards</li>
+<li>⚠️  No 404 page</li>
+</ul>
+<h3>5. Components (35/80)</h3>
+<ul>
+<li>✅ Components exist and work</li>
+<li>❌ Very minimal templates</li>
+<li>❌ No reusable UI components</li>
+<li>❌ No component composition</li>
+</ul>
+<p><strong>Components are functional but basic.</strong></p>
+<h3>6. Services (20/35)</h3>
+<ul>
+<li>✅ StateService works well</li>
+<li>⚠️  QuizService has fake async</li>
+<li>❌ Storage service is empty</li>
+<li>❌ No HTTP integration</li>
+</ul>
+<h3>7. Forms (0/40)</h3>
+<p><strong>No forms at all.</strong> Major gap.</p>
+<h3>8. Observables/Async (25/35)</h3>
+<ul>
+<li>✅ Uses observables correctly</li>
+<li>✅ Async pipe</li>
+<li>✅ Proper unsubscribe</li>
+<li>✅ switchMap pattern</li>
+<li>❌ No real HTTP calls</li>
+<li>❌ Fake async with delay()</li>
+</ul>
+<h3>9. Technical Challenge (8/50)</h3>
+<ul>
+<li>Basic quiz scoring (3 pts)</li>
+<li>Theme toggle (5 pts)</li>
+<li><strong>No significant technical challenge</strong></li>
+</ul>
+<p><strong>Raw Total:</strong> 149/335<br><strong>After adjustments:</strong> <del>142/335<br><strong>Scaled (×0.45):</strong> **</del>64 points**<br><strong>Final:</strong> <strong>65/100</strong></p>
+<hr>
+<h2>What This Grade Means</h2>
+<h3>C (7) = Meets Minimum Requirements</h3>
+<p>Your project demonstrates <strong>basic competency</strong> but lacks:</p>
+<ul>
+<li>Depth</li>
+<li>Polish</li>
+<li>Completeness</li>
+<li>Ambition</li>
+</ul>
+<p><strong>You understand the fundamentals but didn&#39;t push beyond minimum viable.</strong></p>
+<h3>Comparison to Other Grades:</h3>
+<ul>
+<li><strong>A+ (Barbara, 148/100)</strong>: Exceptional, professional-grade, advanced patterns</li>
+<li><strong>F (Andrej S., 40/100)</strong>: Wrong technology (vanilla JS, not Angular)</li>
+<li><strong>C (You, 65/100)</strong>: Correct technology, correct patterns, but minimal</li>
+<li><strong>D (Below 60)</strong>: Basic implementation with major issues</li>
+</ul>
+<p><strong>You&#39;re passing but not excelling.</strong></p>
+<hr>
+<h2>How to Improve</h2>
+<p>If you want to raise your grade or improve for future projects:</p>
+<h3>Priority 1: Add Forms (Critical)</h3>
+<pre><code class="language-typescript">// Add a profile editing form
+export class ProfileComponent {
+  profileForm = new FormGroup({
+    name: new FormControl(&#39;&#39;, Validators.required),
+    email: new FormControl(&#39;&#39;, [Validators.required, Validators.email]),
+    bio: new FormControl(&#39;&#39;, Validators.maxLength(200))
+  });
+
+  onSubmit() {
+    if (this.profileForm.valid) {
+      console.log(this.profileForm.value);
+    }
+  }
+}
+</code></pre>
+<pre><code class="language-html">&lt;form [formGroup]=&quot;profileForm&quot; (ngSubmit)=&quot;onSubmit()&quot;&gt;
+  &lt;input formControlName=&quot;name&quot; placeholder=&quot;Name&quot;&gt;
+  &lt;div *ngIf=&quot;profileForm.get(&#39;name&#39;)?.invalid &amp;&amp; profileForm.get(&#39;name&#39;)?.touched&quot;&gt;
+    Name is required
+  &lt;/div&gt;
+  
+  &lt;input formControlName=&quot;email&quot; placeholder=&quot;Email&quot;&gt;
+  &lt;div *ngIf=&quot;profileForm.get(&#39;email&#39;)?.invalid &amp;&amp; profileForm.get(&#39;email&#39;)?.touched&quot;&gt;
+    Valid email is required
+  &lt;/div&gt;
+  
+  &lt;textarea formControlName=&quot;bio&quot; placeholder=&quot;Bio&quot;&gt;&lt;/textarea&gt;
+  
+  &lt;button [disabled]=&quot;profileForm.invalid&quot;&gt;Save&lt;/button&gt;
+&lt;/form&gt;
+</code></pre>
+<h3>Priority 2: Add Real HTTP Integration</h3>
+<p>Set up json-server:</p>
+<pre><code class="language-bash">npm install json-server
+</code></pre>
+<p>Create <code>db.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;courses&quot;: [...],
+  &quot;quizzes&quot;: {...}
+}
+</code></pre>
+<p>Update service:</p>
+<pre><code class="language-typescript">constructor(private http: HttpClient) {}
+
+getCourses(): Observable&lt;Course[]&gt; {
+  return this.http.get&lt;Course[]&gt;(&#39;http://localhost:3000/courses&#39;);
+}
+</code></pre>
+<h3>Priority 3: Improve UI/UX</h3>
+<p>Add Angular Material:</p>
+<pre><code class="language-bash">ng add @angular/material
+</code></pre>
+<p>Use Material components:</p>
+<pre><code class="language-typescript">import { MatCardModule } from &#39;@angular/material/card&#39;;
+import { MatButtonModule } from &#39;@angular/material/button&#39;;
+import { MatProgressBarModule } from &#39;@angular/material/progress-bar&#39;;
+</code></pre>
+<p>Style your quiz interface properly.</p>
+<h3>Priority 4: Add TypeScript Models</h3>
+<p>Create proper interfaces:</p>
+<pre><code class="language-typescript">// models/course.model.ts
+export interface Course {
+  id: number;
+  title: string;
+  description: string;
+  lessons: Lesson[];
+}
+
+export interface Lesson {
+  id: number;
+  title: string;
+  content: string[];
+}
+
+export interface Quiz {
+  id: number;
+  questions: Question[];
+}
+
+export interface Question {
+  text: string;
+  options: string[];
+  correctIndex: number;
+}
+</code></pre>
+<h3>Priority 5: Expand Scope</h3>
+<p>Add features that demonstrate technical skills:</p>
+<ul>
+<li>User progress tracking</li>
+<li>Quiz results history</li>
+<li>Course completion certificates</li>
+<li>Leaderboard</li>
+<li>Search functionality</li>
+<li>Bookmark lessons</li>
+</ul>
+<hr>
+<h2>Questions for Our Discussion</h2>
+<p>I&#39;d like to understand your development process:</p>
+<h3>1. <strong>Why no forms?</strong></h3>
+<ul>
+<li>Time constraint?</li>
+<li>Didn&#39;t know they were required?</li>
+<li>Struggled with reactive forms?</li>
+</ul>
+<h3>2. <strong>Why fake the async?</strong></h3>
+<ul>
+<li>Couldn&#39;t get HTTP working?</li>
+<li>Thought delay() was sufficient?</li>
+<li>Ran out of time?</li>
+</ul>
+<h3>3. <strong>The UI is very basic - what happened?</strong></h3>
+<ul>
+<li>Focused on functionality only?</li>
+<li>Planned to style later?</li>
+<li>Not confident with CSS?</li>
+</ul>
+<h3>4. <strong>Was this the scope you planned?</strong></h3>
+<ul>
+<li>Did you plan more features?</li>
+<li>What would you add if you had more time?</li>
+</ul>
+<hr>
+<h2>Positive Takeaways</h2>
+<p>Despite the low grade, you demonstrated:</p>
+<ol>
+<li><strong>Understanding of Angular basics</strong> - Your patterns are correct</li>
+<li><strong>Proper cleanup</strong> - No memory leaks</li>
+<li><strong>Observable patterns</strong> - You used BehaviorSubject correctly</li>
+<li><strong>Routing</strong> - Route parameters work properly</li>
+</ol>
+<p><strong>You have the foundation.</strong> You just need to build more on top of it.</p>
+<hr>
+<h2>Next Steps</h2>
+<h3>For This Project:</h3>
+<ol>
+<li>Add at least one form with validation</li>
+<li>Integrate with json-server for real HTTP</li>
+<li>Add basic styling (Material or Bootstrap)</li>
+<li>Write a proper README</li>
+<li>Add TypeScript interfaces</li>
+</ol>
+<p><strong>This could raise your grade to B (8) or higher.</strong></p>
+<h3>For Future Projects:</h3>
+<ol>
+<li><strong>Start with a plan</strong> - Outline all features before coding</li>
+<li><strong>Allocate time for UI</strong> - Don&#39;t leave styling for last</li>
+<li><strong>Check requirements</strong> - Make sure you cover all areas (especially forms!)</li>
+<li><strong>Push beyond minimum</strong> - Aim for interesting challenges</li>
+<li><strong>Polish before submitting</strong> - README, styling, edge cases</li>
+</ol>
+<hr>
+<h2>Final Thoughts</h2>
+<p>Andrej, your project shows you <strong>understand Angular fundamentals</strong>, which is good. However, it feels <strong>incomplete</strong> - like you stopped at &quot;it works&quot; without asking &quot;is it good?&quot;</p>
+<p><strong>The grade of C (7 / 65/100) reflects:</strong></p>
+<ul>
+<li>✅ Correct basics</li>
+<li>❌ Incomplete requirements (no forms)</li>
+<li>❌ Minimal effort beyond basics</li>
+<li>❌ Lack of polish</li>
+</ul>
+<p><strong>You can do better.</strong> You have the skills - you just need to apply more effort and ambition.</p>
+<p>For comparison:</p>
+<ul>
+<li><strong>Barbara&#39;s project</strong>: Went far beyond requirements, added advanced features, polished UI</li>
+<li><strong>Your project</strong>: Met bare minimum, stopped there</li>
+</ul>
+<p><strong>The difference between C and A is effort and completeness, not just understanding.</strong></p>
+<hr>
+<h2>Recommendation</h2>
+<p><strong>Consider resubmitting with improvements:</strong></p>
+<ul>
+<li>Add forms (critical)</li>
+<li>Add HTTP integration</li>
+<li>Improve UI with Material or Bootstrap</li>
+<li>Expand scope with more features</li>
+<li>Write proper documentation</li>
+</ul>
+<p><strong>With these additions, you could reach B (8) or potentially A (9-10) depending on execution.</strong></p>
+<hr>
+<p><strong>If you have questions about how to implement forms, HTTP, or styling, I&#39;m happy to help during office hours. The foundation is there - you just need to build on it.</strong></p>
+<p>Good luck! 🚀</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
