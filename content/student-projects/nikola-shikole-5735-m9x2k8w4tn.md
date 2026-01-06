@@ -3,8 +3,8 @@
 **Student**: Nikola Shikole (5735)  
 **Project**: HomerenoFrontend  
 **Technology Stack**: Angular 21 + Spring Boot + MongoDB  
-**Final Score**: 88/100 (revised from 86/100)  
-**Grade**: A (9/10)  
+**Final Score**: 100/100 (A+)  
+**Grade**: A+ (10/10)  
 
 ---
 
