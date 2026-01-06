@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>matej-popovski-5773-kqS7BKmGRH — GitSith - Student Projects</title>
+  <meta name="description" content="Grade: B- (61.7/100)">
+  <meta property="og:title" content="matej-popovski-5773-kqS7BKmGRH">
+  <meta property="og:description" content="Grade: B- (61.7/100)">
+  <link rel="canonical" href="https://gitsith.com/student-projects/matej-popovski-5773-kqs7bkmgrh/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>matej-popovski-5773-kqS7BKmGRH</h1>
+        <div class="article-meta">3 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Feedback - CinemaTracker</h1>
+<h2>Overall Assessment</h2>
+<p><strong>Grade: B- (61.7/100)</strong></p>
+<p>Nice work creating a functional movie tracking application! Your project shows good understanding of React fundamentals and real API integration.</p>
+<h2>What You Did Really Well ✅</h2>
+<h3>1. Real External API Integration</h3>
+<ul>
+<li><strong>Excellent work</strong> connecting to The Movie Database API for real movie data</li>
+<li>This demonstrates genuine backend integration vs mock data</li>
+<li>Popular movies and search functionality working properly</li>
+</ul>
+<h3>2. Modern React Architecture</h3>
+<ul>
+<li>Clean use of React 19 with Vite for fast development</li>
+<li>Professional project structure with organized folders</li>
+<li>Proper component separation (MovieCard, NavBar, pages)</li>
+</ul>
+<h3>3. Advanced State Management</h3>
+<ul>
+<li><strong>Impressive Context API implementation</strong> with MovieContext</li>
+<li>Sophisticated fallback system (backend → localStorage)</li>
+<li>Complex state operations for favorites, watchlist, and ratings</li>
+<li>Custom hook pattern with <code>useMovieContext()</code></li>
+</ul>
+<h3>4. Full Feature Set</h3>
+<ul>
+<li>Movie search and discovery</li>
+<li>Favorites system with add/remove functionality  </li>
+<li>Watchlist with watched/unwatched tracking</li>
+<li>5-star rating system for movies</li>
+<li>Data persistence across sessions</li>
+</ul>
+<h2>Areas for Improvement ⚠️</h2>
+<h3>1. Security Issue (Important)</h3>
+<p><strong>Problem</strong>: API key exposed in source code</p>
+<pre><code class="language-javascript">// Current (insecure):
+const API_KEY = &quot;29fd7e80249007d5dac87b4ad64de350&quot;
+
+// Better approach:
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY
+</code></pre>
+<p>Create a <code>.env</code> file and use environment variables for sensitive data.</p>
+<h3>2. Dependency Management</h3>
+<p><strong>Issue</strong>: You have Axios listed in package.json but use fetch instead</p>
+<ul>
+<li>Either use Axios consistently, or remove it from dependencies</li>
+<li>Consider Axios for better error handling and request interceptors</li>
+</ul>
+<h3>3. Error Handling</h3>
+<p><strong>Current</strong>: Basic try/catch blocks
+<strong>Improvement</strong>: Add user-friendly error messages and retry logic</p>
+<h3>4. Form Enhancement</h3>
+<p>Your search form works but could be enhanced with:</p>
+<ul>
+<li>Loading states during search</li>
+<li>Input validation</li>
+<li>Search suggestions/autocomplete</li>
+</ul>
+<h2>Technical Highlights</h2>
+<h3>Context API Mastery</h3>
+<p>Your MovieContext shows advanced React patterns:</p>
+<ul>
+<li>Multiple state pieces managed together</li>
+<li>Async data loading with fallbacks</li>
+<li>Clean separation of state logic from UI</li>
+</ul>
+<h3>Smart Architecture</h3>
+<ul>
+<li>Backend + localStorage dual persistence</li>
+<li>Proper React Router setup</li>
+<li>Clean component composition</li>
+</ul>
+<h2>Learning Outcomes Demonstrated</h2>
+<ul>
+<li>✅ Real HTTP integration vs mock data  </li>
+<li>✅ Advanced React Context patterns</li>
+<li>✅ Component-based architecture</li>
+<li>✅ External API consumption</li>
+<li>⚠️ Security best practices (needs work)</li>
+</ul>
+<h2>Recommendations for Future Projects</h2>
+<ol>
+<li><strong>Always secure API keys</strong> - Use environment variables</li>
+<li><strong>Consistent dependency usage</strong> - Use what you install</li>
+<li><strong>Enhanced error handling</strong> - Better user experience</li>
+<li><strong>Consider TypeScript</strong> - Better development experience</li>
+</ol>
+<h2>Final Thoughts</h2>
+<p>This is a solid React application that demonstrates real understanding of modern React development. The Context API implementation is particularly impressive, and the real TMDB API integration shows you can work with external services. With better security practices and more robust error handling, this would be an excellent project.</p>
+<p>Keep building on these strong React fundamentals!</p>
+<p><strong>Final Grade: B- (61.7/100)</strong></p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

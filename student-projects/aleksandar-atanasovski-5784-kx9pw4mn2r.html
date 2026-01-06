@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>aleksandar-atanasovski-5784-kx9pw4mn2r — GitSith - Student Projects</title>
+  <meta name="description" content="Project: Endangered Species ExplorerCourse: Internet Programming (Frontend Development)Date: January 4, 2026">
+  <meta property="og:title" content="aleksandar-atanasovski-5784-kx9pw4mn2r">
+  <meta property="og:description" content="Project: Endangered Species ExplorerCourse: Internet Programming (Frontend Development)Date: January 4, 2026">
+  <link rel="canonical" href="https://gitsith.com/student-projects/aleksandar-atanasovski-5784-kx9pw4mn2r/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>aleksandar-atanasovski-5784-kx9pw4mn2r</h1>
+        <div class="article-meta">3 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Evaluation - Aleksandar Atanasovski (5784)</h1>
+<p><strong>Project</strong>: Endangered Species Explorer<br><strong>Course</strong>: Internet Programming (Frontend Development)<br><strong>Date</strong>: January 4, 2026</p>
+<hr>
+<h2>🎉 Overall Result: A+ (10) - Exceptional Work</h2>
+<p><strong>Final Score</strong>: 138/100 (scaled from raw score)</p>
+<hr>
+<h2>📊 Score Breakdown</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Score</th>
+<th>Max</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Application Runs/Builds</td>
+<td>20</td>
+<td>20</td>
+<td>✅ Perfect build, lazy loading</td>
+</tr>
+<tr>
+<td>Design / UX</td>
+<td>18</td>
+<td>20</td>
+<td>✅ Responsive, loading states</td>
+</tr>
+<tr>
+<td>Models / Data Structures</td>
+<td>15</td>
+<td>15</td>
+<td>✅ Perfect TypeScript</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td>30</td>
+<td>40</td>
+<td>✅ Lazy loading, route params</td>
+</tr>
+<tr>
+<td>Components</td>
+<td>75</td>
+<td>80</td>
+<td>✅ 10+ components, good composition</td>
+</tr>
+<tr>
+<td>Services</td>
+<td>30</td>
+<td>35</td>
+<td>✅ Excellent HttpClient usage</td>
+</tr>
+<tr>
+<td>Forms</td>
+<td>24</td>
+<td>40</td>
+<td>⭕ Template-driven (works fine)</td>
+</tr>
+<tr>
+<td>Observables / Async</td>
+<td>35</td>
+<td>35</td>
+<td>✅ Good RxJS usage</td>
+</tr>
+<tr>
+<td>Signals (Bonus)</td>
+<td>+10</td>
+<td>-</td>
+<td>⭐ Modern Angular patterns</td>
+</tr>
+<tr>
+<td>Extra / Technical Challenge</td>
+<td>50</td>
+<td>50</td>
+<td>⭐ Interactive map, caching, tests</td>
+</tr>
+</tbody></table>
+<p><strong>Total Raw Score</strong>: 307 points<br><strong>Scaled Score</strong>: 138/100</p>
+<hr>
+<h2>🌟 What You Did Really Well</h2>
+<h3>1. Modern Angular Architecture</h3>
+<p>Your use of Angular 17 features is excellent:</p>
+<ul>
+<li><strong>Standalone components</strong> throughout</li>
+<li><strong>Lazy loading</strong> on all routes (great for performance)</li>
+<li><strong>Angular Signals</strong> for state management</li>
+</ul>
+<p>This shows you&#39;re up-to-date with modern Angular development.</p>
+<h3>2. Sophisticated Caching Strategy</h3>
+<p>Your stale-while-revalidate pattern in <code>SpeciesApiService</code> is production-quality:</p>
+<pre><code class="language-typescript">// Returns cached data immediately, refreshes in background
+if (this.memoryCache &amp;&amp; this.isCacheValid(this.memoryCacheTime)) {
+  this.fetchAndUpdateCache(); // Background refresh
+  return of(this.memoryCache);
+}
+</code></pre>
+<p>This provides a great user experience - fast loads with fresh data.</p>
+<h3>3. Interactive Map (Excellent Technical Challenge)</h3>
+<p>The Leaflet integration is a genuine interesting feature:</p>
+<ul>
+<li>Color-coded markers by conservation status</li>
+<li>Real-time filtering</li>
+<li>Proper cleanup to prevent memory leaks</li>
+</ul>
+<h3>4. Perfect TypeScript</h3>
+<p>Your use of interfaces and enums is exactly right:</p>
+<ul>
+<li>No <code>any</code> types</li>
+<li>Proper data modeling</li>
+<li>Enums for conservation status and categories</li>
+</ul>
+<h3>5. Unit Tests</h3>
+<p>Having meaningful tests in <code>species-store.service.spec.ts</code> shows professional development practices.</p>
+<hr>
+<h2>📈 Areas for Improvement</h2>
+<h3>1. Consider Reactive Forms for More Complex Scenarios</h3>
+<p>You used template-driven forms with <code>ngModel</code>, which works fine for your use case. For more complex forms, consider Angular&#39;s Reactive Forms:</p>
+<pre><code class="language-typescript">// Reactive Forms approach
+this.actionForm = this.fb.group({
+  title: [&#39;&#39;, [Validators.required, Validators.minLength(3)]],
+  description: [&#39;&#39;]
+});
+</code></pre>
+<p><strong>Why</strong>: Better control over validation, easier testing, more scalable.</p>
+<h3>2. Subscribe to Route Parameters</h3>
+<p>Currently you use <code>snapshot</code>:</p>
+<pre><code class="language-typescript">const id = this.route.snapshot.paramMap.get(&#39;id&#39;);
+</code></pre>
+<p>For reactive updates, subscribe to the observable:</p>
+<pre><code class="language-typescript">this.route.paramMap.subscribe(params =&gt; {
+  const id = params.get(&#39;id&#39;);
+  this.loadSpecies(id);
+});
+</code></pre>
+<p><strong>Why</strong>: If users navigate between species without leaving the page, the component will update.</p>
+<h3>3. Consider Adding Route Guards</h3>
+<p>For a larger application, you might add guards:</p>
+<pre><code class="language-typescript">// Example auth guard
+canActivate(): boolean {
+  return this.authService.isLoggedIn();
+}
+</code></pre>
+<hr>
+<h2>🎯 Technical Highlights</h2>
+<h3>What Sets This Project Apart:</h3>
+<ol>
+<li><strong>Production-ready caching</strong> - Not just basic HTTP calls</li>
+<li><strong>Real map integration</strong> - Not fake or placeholder</li>
+<li><strong>Signals state management</strong> - Modern Angular patterns</li>
+<li><strong>Clean architecture</strong> - Well-organized code structure</li>
+<li><strong>Comprehensive README</strong> - Professional documentation</li>
+</ol>
+<hr>
+<h2>💡 Recommendations for Future Projects</h2>
+<ol>
+<li><strong>Keep using modern patterns</strong> - Signals, standalone components are the future</li>
+<li><strong>Explore NgRx</strong> for larger applications with complex state</li>
+<li><strong>Add E2E tests</strong> with Cypress or Playwright</li>
+<li><strong>Consider SSR</strong> with Angular Universal for SEO</li>
+<li><strong>Deploy it!</strong> This project is portfolio-worthy</li>
+</ol>
+<hr>
+<h2>🏆 Final Assessment</h2>
+<p>This is <strong>exceptional work</strong> that goes significantly beyond course requirements. The combination of modern Angular patterns, sophisticated caching, interactive map visualization, and clean code makes this a portfolio-quality project.</p>
+<p><strong>Key Strengths</strong>:</p>
+<ul>
+<li>Technical excellence</li>
+<li>Modern patterns</li>
+<li>Real functionality (not just appearance)</li>
+<li>Professional code quality</li>
+</ul>
+<p><strong>Grade</strong>: <strong>A+ (10)</strong></p>
+<hr>
+<h2>📚 Resources for Further Learning</h2>
+<ul>
+<li><a href="https://angular.io/guide/signals">Angular Signals Deep Dive</a></li>
+<li><a href="https://rxjs.dev/guide/operators">RxJS Operators Guide</a></li>
+<li><a href="https://angular.io/guide/reactive-forms">Angular Reactive Forms</a></li>
+<li><a href="https://leafletjs.com/">Leaflet with Angular</a></li>
+</ul>
+<hr>
+<p><em>Keep up the excellent work! This project demonstrates strong frontend development skills.</em></p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

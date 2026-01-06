@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>maksim-spasevski-5938-r8x4k7n2m5 — GitSith - Student Projects</title>
+  <meta name="description" content="Project: FitLog - Fitness Tracker with Workout Logs &amp;amp; VisualizationsTechnology Stack: Angular 21 + NgRx + localStorage (Firebase claimed but not implemented)Final Grade: C+ (68/100)">
+  <meta property="og:title" content="maksim-spasevski-5938-r8x4k7n2m5">
+  <meta property="og:description" content="Project: FitLog - Fitness Tracker with Workout Logs &amp;amp; VisualizationsTechnology Stack: Angular 21 + NgRx + localStorage (Firebase claimed but not implemented)Final Grade: C+ (68/100)">
+  <link rel="canonical" href="https://gitsith.com/student-projects/maksim-spasevski-5938-r8x4k7n2m5/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>maksim-spasevski-5938-r8x4k7n2m5</h1>
+        <div class="article-meta">3 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Internet Programming Project Feedback - Maksim Spasevski</h1>
+<p><strong>Project</strong>: FitLog - Fitness Tracker with Workout Logs &amp; Visualizations<br><strong>Technology Stack</strong>: Angular 21 + NgRx + localStorage (Firebase claimed but not implemented)<br><strong>Final Grade</strong>: C+ (68/100)</p>
+<hr>
+<h2>Executive Summary</h2>
+<p>Your FitLog application demonstrates <strong>ambitious technical scope</strong> with NgRx state management and Chart.js integration. However, there are significant issues with the Firebase implementation and build configuration that impact the overall assessment.</p>
+<hr>
+<h2>Areas Requiring Immediate Attention ⚠️</h2>
+<h3><strong>Critical Issue: Firebase Configuration</strong></h3>
+<p>Your project claims Firebase integration but has fundamental implementation problems:</p>
+<p><strong>Problem</strong>: Firebase configuration uses placeholder values</p>
+<pre><code class="language-typescript">export const environment = {
+  firebase: {
+    apiKey: &quot;YOUR_API_KEY&quot;,        // Not configured
+    projectId: &quot;YOUR_PROJECT_ID&quot;    // Placeholder values
+  }
+};
+</code></pre>
+<p><strong>Impact</strong>: Build failures and non-functional authentication</p>
+<h3><strong>Build Configuration Issues</strong></h3>
+<p>Your project currently cannot run due to:</p>
+<ul>
+<li>Dependency version conflicts</li>
+<li>Unused Firebase packages causing build errors</li>
+<li>Missing proper environment configuration</li>
+</ul>
+<p><strong>Solution</strong>: Either implement Firebase properly or remove unused dependencies</p>
+<hr>
+<h2>Positive Aspects 🎯</h2>
+<h3><strong>NgRx State Management Attempt</strong></h3>
+<p>You attempted NgRx Store patterns, which shows ambition:</p>
+<ul>
+<li>Actions and reducers structure</li>
+<li>BehaviorSubject usage</li>
+<li>Store architecture patterns</li>
+</ul>
+<h3><strong>Chart.js Integration</strong></h3>
+<p>Your data visualization approach shows good planning:</p>
+<ul>
+<li>Multiple chart types configured</li>
+<li>Data processing for workout statistics</li>
+<li>Responsive chart setup</li>
+</ul>
+<h3><strong>Professional Project Structure</strong></h3>
+<p>Your component organization follows good practices:</p>
+<ul>
+<li>Separation of concerns with services and components</li>
+<li>TypeScript interface definitions</li>
+<li>Modular architecture approach</li>
+</ul>
+<hr>
+<h2>Grade Breakdown 📊</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Score</th>
+<th>Comments</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Application Functions</strong></td>
+<td>40%</td>
+<td>Build failure prevents testing functionality</td>
+</tr>
+<tr>
+<td><strong>Design/UX</strong></td>
+<td>90%</td>
+<td>Professional fitness app design concept</td>
+</tr>
+<tr>
+<td><strong>Routing</strong></td>
+<td>63%</td>
+<td>Basic routing structure, auth guards non-functional</td>
+</tr>
+<tr>
+<td><strong>Components</strong></td>
+<td>63%</td>
+<td>Good structure but limited real functionality</td>
+</tr>
+<tr>
+<td><strong>Services</strong></td>
+<td>43%</td>
+<td>Service patterns present but backend integration fake</td>
+</tr>
+<tr>
+<td><strong>Forms</strong></td>
+<td>63%</td>
+<td>Template-driven forms implementation</td>
+</tr>
+<tr>
+<td><strong>Async Handling</strong></td>
+<td>43%</td>
+<td>BehaviorSubject patterns but no real async data</td>
+</tr>
+<tr>
+<td><strong>Technical Challenge</strong></td>
+<td>40%</td>
+<td>Attempted advanced patterns but not functional</td>
+</tr>
+</tbody></table>
+<p><strong>Overall: C+ (68/100)</strong></p>
+<hr>
+<h2>Path Forward &amp; Learning Opportunities 🚀</h2>
+<h3><strong>Option 1: Implement Real Firebase (Recommended)</strong></h3>
+<ol>
+<li><strong>Set up Firebase project</strong>: Create actual Firebase project and get real config</li>
+<li><strong>Configure authentication</strong>: Implement working Firebase Auth</li>
+<li><strong>Firestore integration</strong>: Replace localStorage with real Firestore operations</li>
+<li><strong>Test thoroughly</strong>: Ensure build works and features function</li>
+</ol>
+<h3><strong>Option 2: Simplify to Working Implementation</strong></h3>
+<ol>
+<li><strong>Remove Firebase dependencies</strong>: Clean up unused packages</li>
+<li><strong>Focus on localStorage</strong>: Make localStorage implementation robust  </li>
+<li><strong>Fix build issues</strong>: Ensure application runs properly</li>
+<li><strong>Add real features</strong>: Implement working CRUD operations</li>
+</ol>
+<h3><strong>Immediate Priorities</strong></h3>
+<ol>
+<li><strong>Fix build configuration</strong> - Critical for demonstrating functionality</li>
+<li><strong>Choose real backend or localStorage</strong> - Don&#39;t mix fake and real patterns</li>
+<li><strong>Test your application</strong> - Ensure it actually runs and works</li>
+<li><strong>Implement working features</strong> - Focus on functionality over complexity</li>
+</ol>
+<hr>
+<h2>Learning Insights 📚</h2>
+<p><strong>Technical Ambition</strong>: You attempted advanced patterns like NgRx and Firebase integration, which shows good learning goals.</p>
+<p><strong>Implementation Gap</strong>: The challenge is ensuring that ambitious plans result in working code that can be tested and demonstrated.</p>
+<p><strong>Build Skills</strong>: Learning to manage dependencies and build configurations is crucial for any web development project.</p>
+<p><strong>Next Steps</strong>: Focus on getting a simpler version working first, then gradually add complexity as you master each layer.</p>
+<hr>
+<p><strong>Final Note</strong>: Your project shows good understanding of modern Angular patterns and ambition for advanced features. The key learning opportunity is ensuring that technical ambitions result in working, testable code. Focus on building a solid foundation first, then adding advanced features incrementally.</p>
+<p>Keep learning and building! 🚀</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

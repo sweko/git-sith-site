@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>danijel-gjorgjievski-5781-k8xt9w2mnp — GitSith - Student Projects</title>
+  <meta name="description" content="Final Grade: 94/100 (A / 9)">
+  <meta property="og:title" content="danijel-gjorgjievski-5781-k8xt9w2mnp">
+  <meta property="og:description" content="Final Grade: 94/100 (A / 9)">
+  <link rel="canonical" href="https://gitsith.com/student-projects/danijel-gjorgjievski-5781-k8xt9w2mnp/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>danijel-gjorgjievski-5781-k8xt9w2mnp</h1>
+        <div class="article-meta">9 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Evaluation - Smart Habit Tracker (REVISED)</h1>
+<h2>Danijel Gjorgjievski (5781)</h2>
+<p><strong>Final Grade: 94/100 (A / 9)</strong></p>
+<p><strong>Note</strong>: This is a revision from the original grade of 100/100 (A+). After careful review of async data management requirements, the grade has been adjusted to reflect that the project uses LocalStorage rather than real HTTP-based async operations.</p>
+<hr>
+<h2>Project Overview</h2>
+<p><strong>Smart Habit Tracker</strong> - A gamified habit tracking application that helps users build positive habits through XP rewards, achievements, streak tracking, and analytics visualization.</p>
+<p><strong>Technology Stack:</strong></p>
+<ul>
+<li>React 18 + TypeScript + Vite</li>
+<li>React Context API (Auth + Theme)</li>
+<li>Recharts (data visualization)</li>
+<li>Shadcn/UI components</li>
+<li>Tailwind CSS</li>
+<li>date-fns</li>
+</ul>
+<hr>
+<h2>Exceptional Strengths</h2>
+<p>Your project demonstrates excellent React development skills:</p>
+<h3>1. Perfect TypeScript (15/15 points) ⭐</h3>
+<p>Your TypeScript usage is outstanding:</p>
+<pre><code class="language-typescript">export interface Habit {
+  id: string;
+  userId: string;
+  name: string;
+  description?: string;
+  difficulty: &#39;Easy&#39; | &#39;Medium&#39; | &#39;Hard&#39;;  // Union types!
+  streak: number;
+  bestStreak: number;
+  completedDates: string[];
+  createdAt: string;
+}
+</code></pre>
+<ul>
+<li>Zero <code>any</code> types</li>
+<li>Proper union types for enums</li>
+<li>Generic custom hooks</li>
+<li>Well-defined interfaces</li>
+</ul>
+<h3>2. Creative Gamification System (50/50 bonus points) ⭐</h3>
+<p>Your XP and achievement system is genuinely creative:</p>
+<p><strong>XP Rewards:</strong></p>
+<ul>
+<li>Easy habits: 10 XP</li>
+<li>Medium habits: 25 XP</li>
+<li>Hard habits: 50 XP</li>
+</ul>
+<p><strong>Achievements:</strong></p>
+<ul>
+<li>First Steps (1 day streak)</li>
+<li>Week Warrior (7 days)</li>
+<li>Month Master (30 days)</li>
+<li>Century Club (100 days)</li>
+<li>Legendary (200 days)</li>
+<li>Mythical (365 days)</li>
+</ul>
+<p><strong>Streak Tracking:</strong></p>
+<ul>
+<li>Current streak counter</li>
+<li>Best streak records</li>
+<li>Visual progress bars</li>
+</ul>
+<p>This shows creativity and understanding beyond just implementing requirements!</p>
+<h3>3. React Context API (15/20 points)</h3>
+<p>Your Context implementation is well-structured:</p>
+<p><strong>AuthContext:</strong></p>
+<pre><code class="language-typescript">interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) =&gt; Promise&lt;void&gt;;
+  register: (email: string, username: string, password: string) =&gt; Promise&lt;void&gt;;
+  logout: () =&gt; void;
+}
+</code></pre>
+<ul>
+<li>Basic password hashing</li>
+<li>LocalStorage persistence</li>
+<li>Proper error handling</li>
+</ul>
+<p><strong>ThemeContext:</strong></p>
+<ul>
+<li>Dark/light mode toggle</li>
+<li>Document class manipulation</li>
+<li>LocalStorage persistence</li>
+</ul>
+<p><strong>However</strong>: Both contexts use LocalStorage only, not real HTTP backend.</p>
+<h3>4. Custom Hooks with Generics ⭐</h3>
+<p>Your <code>useLocalStorage</code> hook shows advanced TypeScript:</p>
+<pre><code class="language-typescript">export function useLocalStorage&lt;T&gt;(
+  key: string, 
+  initialValue: T
+): [T, (value: T | ((prev: T) =&gt; T)) =&gt; void] {
+  // Implementation with generics
+}
+</code></pre>
+<p>This is production-quality code!</p>
+<h3>5. Performance Optimization (bonus points) ⭐</h3>
+<p>You use <code>useMemo</code> appropriately:</p>
+<pre><code class="language-typescript">const userHabits = useMemo(() =&gt; 
+  habits.filter(h =&gt; h.userId === user?.id), 
+  [habits, user?.id]
+);
+
+const totalXP = useMemo(() =&gt; 
+  userHabits.reduce((acc, habit) =&gt; 
+    acc + habit.completedDates.length * getDifficultyXP(habit.difficulty), 0
+  ), [userHabits]
+);
+</code></pre>
+<p>This prevents unnecessary recalculations!</p>
+<h3>6. Data Visualization with Recharts ⭐</h3>
+<p>Your analytics dashboard shows:</p>
+<ul>
+<li>Weekly habit completion (LineChart)</li>
+<li>Monthly statistics (BarChart)</li>
+<li>Proper data transformation</li>
+<li>Responsive charts</li>
+</ul>
+<hr>
+<h2>Critical Gap: No Real Async Data Management</h2>
+<h3>The Issue</h3>
+<p>From your README:</p>
+<blockquote>
+<p>&quot;All data is stored locally in the browser using localStorage.&quot;</p>
+</blockquote>
+<p><strong>LocalStorage is synchronous</strong> - there are no HTTP requests, no real async operations. This is a significant gap for a modern web development course.</p>
+<h3>Your Current Implementation:</h3>
+<pre><code class="language-typescript">// useLocalStorage hook
+const [habits, setHabits] = useLocalStorage&lt;Habit[]&gt;(&#39;smart_habits&#39;, []);
+
+// Adding a habit - synchronous
+const addHabit = (habit: Habit) =&gt; {
+  setHabits(prev =&gt; [...prev, habit]);  // ← Updates localStorage immediately
+};
+</code></pre>
+<h3>What Real Async Looks Like:</h3>
+<pre><code class="language-typescript">const addHabit = async (habit: Habit) =&gt; {
+  try {
+    const response = await fetch(&#39;/api/habits&#39;, {
+      method: &#39;POST&#39;,
+      headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+      body: JSON.stringify(habit)
+    });
+    
+    if (!response.ok) {
+      throw new Error(&#39;Failed to add habit&#39;);
+    }
+    
+    const savedHabit = await response.json();
+    setHabits(prev =&gt; [...prev, savedHabit]);
+  } catch (error) {
+    console.error(&#39;API error:&#39;, error);
+    // Show user-friendly error message
+  }
+};
+</code></pre>
+<h3>Impact on Grade</h3>
+<p><strong>Deductions Applied:</strong></p>
+<ul>
+<li>Services/State Management: -15 points (no HTTP backend)</li>
+<li>Async Handling: -15 points (no real async I/O)</li>
+<li><strong>Total penalty: -30 points</strong></li>
+</ul>
+<p><strong>Your Score:</strong></p>
+<ul>
+<li>Raw: 254/335 (was 284)</li>
+<li>Scaled: 114/150 (was 128)</li>
+<li>Final: <strong>94/100</strong> (was 100/100)</li>
+<li>Grade: <strong>A (9)</strong> (was A+/10)</li>
+</ul>
+<hr>
+<h2>Score Breakdown</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Score</th>
+<th>Max</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Application Runs</strong></td>
+<td>20</td>
+<td>20</td>
+<td>Perfect Vite setup</td>
+</tr>
+<tr>
+<td><strong>Design/UX</strong></td>
+<td>20</td>
+<td>20</td>
+<td>Great Shadcn/UI integration</td>
+</tr>
+<tr>
+<td><strong>Models/Types</strong></td>
+<td>15</td>
+<td>15</td>
+<td>Perfect TypeScript</td>
+</tr>
+<tr>
+<td><strong>Routing</strong></td>
+<td>20</td>
+<td>25</td>
+<td>Simple routing (3-4 pages)</td>
+</tr>
+<tr>
+<td><strong>Components</strong></td>
+<td>60</td>
+<td>80</td>
+<td>Excellent but smaller scope</td>
+</tr>
+<tr>
+<td><strong>State Management</strong></td>
+<td>20</td>
+<td>35</td>
+<td><strong>Context excellent, no HTTP (-15)</strong></td>
+</tr>
+<tr>
+<td><strong>Forms</strong></td>
+<td>30</td>
+<td>40</td>
+<td>Habit creation form works well</td>
+</tr>
+<tr>
+<td><strong>Async Handling</strong></td>
+<td>20</td>
+<td>35</td>
+<td><strong>No real async I/O (-15)</strong></td>
+</tr>
+<tr>
+<td><strong>Extra Features</strong></td>
+<td>50</td>
+<td>50</td>
+<td>Gamification + Recharts</td>
+</tr>
+<tr>
+<td><strong>BONUS Points</strong></td>
+<td>+9</td>
+<td>—</td>
+<td>Code quality</td>
+</tr>
+<tr>
+<td><strong>RAW TOTAL</strong></td>
+<td><strong>254</strong></td>
+<td><strong>335</strong></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><strong>Final: 94/100 (A / 9)</strong></p>
+<hr>
+<h2>What Makes This Project Excellent Despite the Gap</h2>
+<p>You&#39;ve demonstrated mastery of:</p>
+<ol>
+<li>✅ <strong>React Patterns</strong> - Context, custom hooks, useMemo</li>
+<li>✅ <strong>TypeScript</strong> - Perfect interfaces, generics</li>
+<li>✅ <strong>Creativity</strong> - Gamification system is impressive</li>
+<li>✅ <strong>Data Visualization</strong> - Recharts integration</li>
+<li>✅ <strong>Performance</strong> - Proper optimization</li>
+<li>✅ <strong>Code Quality</strong> - Clean, maintainable</li>
+</ol>
+<p><strong>What&#39;s missing</strong>: Real backend with HTTP integration.</p>
+<hr>
+<h2>How to Get to A+ (100/100)</h2>
+<p><strong>Good news</strong>: Your architecture is perfect for adding real async! Here&#39;s how:</p>
+<h3>Option 1: json-server (Easiest - 30 minutes)</h3>
+<pre><code class="language-bash"># 1. Install json-server
+npm install json-server --save-dev
+
+# 2. Create db.json in project root
+{
+  &quot;habits&quot;: [],
+  &quot;users&quot;: [],
+  &quot;achievements&quot;: [
+    {
+      &quot;id&quot;: &quot;1&quot;,
+      &quot;title&quot;: &quot;First Steps&quot;,
+      &quot;description&quot;: &quot;Complete your first habit!&quot;,
+      &quot;icon&quot;: &quot;🎯&quot;,
+      &quot;minStreak&quot;: 1
+    },
+    {
+      &quot;id&quot;: &quot;2&quot;,
+      &quot;title&quot;: &quot;Week Warrior&quot;,
+      &quot;description&quot;: &quot;Maintain a 7-day streak&quot;,
+      &quot;icon&quot;: &quot;🔥&quot;,
+      &quot;minStreak&quot;: 7
+    }
+    // ... rest of your 6 achievements
+  ]
+}
+
+# 3. Update package.json
+&quot;scripts&quot;: {
+  &quot;dev&quot;: &quot;vite&quot;,
+  &quot;backend&quot;: &quot;json-server --watch db.json --port 3001&quot;,
+  &quot;dev:full&quot;: &quot;concurrently \&quot;npm run backend\&quot; \&quot;npm run dev\&quot;&quot;
+}
+
+# 4. Create API service (src/services/api.ts)
+const API_URL = &#39;http://localhost:3001&#39;;
+
+export const habitAPI = {
+  getAll: () =&gt; fetch(`${API_URL}/habits`).then(r =&gt; r.json()),
+  
+  create: (habit: Omit&lt;Habit, &#39;id&#39;&gt;) =&gt; 
+    fetch(`${API_URL}/habits`, {
+      method: &#39;POST&#39;,
+      headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+      body: JSON.stringify(habit)
+    }).then(r =&gt; r.json()),
+    
+  update: (id: string, habit: Partial&lt;Habit&gt;) =&gt;
+    fetch(`${API_URL}/habits/${id}`, {
+      method: &#39;PATCH&#39;,
+      headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+      body: JSON.stringify(habit)
+    }).then(r =&gt; r.json()),
+    
+  delete: (id: string) =&gt;
+    fetch(`${API_URL}/habits/${id}`, { method: &#39;DELETE&#39; })
+};
+
+# 5. Update Dashboard.tsx
+import { useEffect } from &#39;react&#39;;
+import { habitAPI } from &#39;@/services/api&#39;;
+
+const [habits, setHabits] = useState&lt;Habit[]&gt;([]);
+const [loading, setLoading] = useState(true);
+
+useEffect(() =&gt; {
+  const loadHabits = async () =&gt; {
+    try {
+      const data = await habitAPI.getAll();
+      setHabits(data.filter(h =&gt; h.userId === user?.id));
+    } catch (error) {
+      console.error(&#39;Failed to load habits:&#39;, error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  loadHabits();
+}, [user?.id]);
+
+const addHabit = async (habit: Habit) =&gt; {
+  try {
+    const saved = await habitAPI.create(habit);
+    setHabits(prev =&gt; [...prev, saved]);
+  } catch (error) {
+    console.error(&#39;Failed to add habit:&#39;, error);
+    // Show error toast
+  }
+};
+</code></pre>
+<h3>Option 2: Firebase (45 minutes)</h3>
+<pre><code class="language-bash">npm install firebase
+</code></pre>
+<pre><code class="language-typescript">import { getFirestore, collection, addDoc, getDocs, query, where } from &#39;firebase/firestore&#39;;
+
+const db = getFirestore();
+
+// Load user&#39;s habits
+const q = query(collection(db, &#39;habits&#39;), where(&#39;userId&#39;, &#39;==&#39;, user.id));
+const querySnapshot = await getDocs(q);
+const habits = querySnapshot.docs.map(doc =&gt; ({ id: doc.id, ...doc.data() }));
+
+// Add habit
+const docRef = await addDoc(collection(db, &#39;habits&#39;), habitData);
+</code></pre>
+<p><strong>Either option would raise your grade to 100/100 (A+).</strong></p>
+<hr>
+<h2>Why Real Async Matters</h2>
+<h3>In Real-World Development:</h3>
+<ol>
+<li><strong>Multi-Device Sync</strong>: Habits tracked on phone should show on laptop</li>
+<li><strong>Network Failures</strong>: What if user has spotty WiFi?</li>
+<li><strong>Data Persistence</strong>: Browser cache can be cleared</li>
+<li><strong>Collaboration</strong>: Multiple users might share habits</li>
+<li><strong>Analytics</strong>: Server-side tracking of usage patterns</li>
+</ol>
+<h3>In Job Interviews:</h3>
+<p>Employers will ask:</p>
+<ul>
+<li>&quot;How do you handle API errors?&quot;</li>
+<li>&quot;How do you manage loading states during network requests?&quot;</li>
+<li>&quot;Have you worked with REST APIs?&quot;</li>
+<li>&quot;How do you handle offline functionality?&quot;</li>
+</ul>
+<p><strong>LocalStorage experience doesn&#39;t answer these questions.</strong></p>
+<hr>
+<h2>Comparison with Other Projects</h2>
+<h3>Projects that got A+ (100/100):</h3>
+<p>All had <strong>real HTTP integration</strong>:</p>
+<ol>
+<li>Barbara Veljkova - json-server</li>
+<li>Danilo Mishevski - json-server</li>
+<li>David Stojchev - External APIs</li>
+<li>Dushan Lazarovski - Node.js backend</li>
+<li>Dushko Sofronievski - NestJS backend</li>
+<li>Fatlind Xhila - json-server</li>
+</ol>
+<h3>Projects with LocalStorage (got A / 94/100):</h3>
+<ul>
+<li><strong>Your project</strong> - Excellent React + gamification, LocalStorage only</li>
+<li>Andrej Stojovski (5690) - Excellent React architecture, LocalStorage only</li>
+</ul>
+<p><strong>The distinction is fair</strong> - real async is a core course requirement.</p>
+<hr>
+<h2>Learning Outcomes Demonstrated</h2>
+<p>✅ <strong>React Patterns</strong> - Context, custom hooks, useMemo<br>✅ <strong>TypeScript</strong> - Interfaces, generics, union types<br>✅ <strong>Creativity</strong> - Gamification system<br>✅ <strong>Data Visualization</strong> - Recharts integration<br>✅ <strong>Performance</strong> - Optimization with useMemo<br>✅ <strong>Code Quality</strong> - Clean, maintainable structure<br>⚠️ <strong>Async Data</strong> - LocalStorage only, not HTTP</p>
+<hr>
+<h2>Recommendations</h2>
+<h3>Immediate Action (30 minutes):</h3>
+<ol>
+<li><strong>Add json-server</strong> (easiest path to A+)</li>
+<li><strong>Create API service</strong> layer</li>
+<li><strong>Update Dashboard</strong> to use fetch</li>
+<li><strong>Test CRUD</strong> operations</li>
+<li><strong>Resubmit</strong> for re-evaluation</li>
+</ol>
+<h3>For Portfolio:</h3>
+<p><strong>Current</strong>: &quot;React habit tracker with gamification&quot;<br><strong>With backend</strong>: &quot;Full-stack React app with REST API and gamification&quot;</p>
+<p>The second statement is significantly stronger for job applications.</p>
+<h3>For Interviews:</h3>
+<p>With real async, you can discuss:</p>
+<ul>
+<li>Error handling strategies</li>
+<li>Loading state management</li>
+<li>Network retry logic</li>
+<li>Optimistic UI updates</li>
+<li>Data synchronization</li>
+</ul>
+<hr>
+<h2>Final Thoughts</h2>
+<p><strong>This is excellent work</strong> with creative features and strong React skills. The 94/100 (A) grade reflects that while your React implementation is professional, the project doesn&#39;t include real async data management.</p>
+<p><strong>You&#39;re 30 minutes away from A+.</strong> The architecture is perfect - you&#39;d just be:</p>
+<ul>
+<li>Adding json-server</li>
+<li>Creating an API service layer</li>
+<li>Replacing <code>useLocalStorage</code> with <code>fetch</code> calls</li>
+</ul>
+<h3>Next Steps</h3>
+<ol>
+<li><strong>Review</strong> the json-server setup above</li>
+<li><strong>Implement</strong> in 30 minutes</li>
+<li><strong>Test</strong> all CRUD operations</li>
+<li><strong>Deploy</strong> to Vercel (frontend + backend)</li>
+<li><strong>Update portfolio</strong> to highlight &quot;REST API integration&quot;</li>
+</ol>
+<hr>
+<h2>Resources</h2>
+<ul>
+<li><a href="https://github.com/typicode/json-server">json-server</a> - Zero-config REST API</li>
+<li><a href="https://tanstack.com/query">React Query</a> - Better API state management</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">Fetch API</a> - Native browser HTTP</li>
+</ul>
+<hr>
+<p><strong>Grade: A (9) - 94/100</strong></p>
+<p><strong>Excellent React work with creative gamification! Add real async for A+.</strong></p>
+<hr>
+<p><em>Evaluated: January 4, 2026</em><br><em>Revised: January 4, 2026</em><br><em>Instructor: Wekoslav</em></p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

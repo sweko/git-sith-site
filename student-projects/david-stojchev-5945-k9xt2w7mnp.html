@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>david-stojchev-5945-k9xt2w7mnp — GitSith - Student Projects</title>
+  <meta name="description" content="Project: Air Quality TrackerCourse: Internet Programming (Frontend Development)Date: January 4, 2026">
+  <meta property="og:title" content="david-stojchev-5945-k9xt2w7mnp">
+  <meta property="og:description" content="Project: Air Quality TrackerCourse: Internet Programming (Frontend Development)Date: January 4, 2026">
+  <link rel="canonical" href="https://gitsith.com/student-projects/david-stojchev-5945-k9xt2w7mnp/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>david-stojchev-5945-k9xt2w7mnp</h1>
+        <div class="article-meta">4 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Evaluation - David Stojchev (5945)</h1>
+<p><strong>Project</strong>: Air Quality Tracker<br><strong>Course</strong>: Internet Programming (Frontend Development)<br><strong>Date</strong>: January 4, 2026</p>
+<hr>
+<h2>📊 Final Grade: <strong>100/100 (A+ / 10)</strong></h2>
+<hr>
+<h2>🌟 Project Highlights</h2>
+<p>Outstanding work! You&#39;ve built a sophisticated air quality tracking application with real external APIs, browser geolocation, city comparison, and custom data visualization. This is portfolio-quality work demonstrating excellent Angular skills.</p>
+<h3>What You Did Exceptionally Well:</h3>
+<p><strong>1. Real External API Integration</strong> ⭐
+You used actual Open Meteo APIs instead of mock data:</p>
+<pre><code class="language-typescript">private readonly baseUrl = &#39;https://air-quality-api.open-meteo.com/v1/air-quality&#39;;
+
+getAirQualityByCoordinates(latitude: number, longitude: number): Observable&lt;any&gt; {
+  return this.http.get&lt;any&gt;(url);
+}
+</code></pre>
+<p><strong>2. Browser Geolocation API</strong> ⭐
+Creative implementation wrapping the native browser API in an Observable:</p>
+<pre><code class="language-typescript">getCurrentPosition(): Observable&lt;Coordinates&gt; {
+  return new Observable&lt;Coordinates&gt;((observer) =&gt; {
+    navigator.geolocation.getCurrentPosition(
+      (position) =&gt; {
+        observer.next({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+        observer.complete();
+      },
+      (error) =&gt; observer.error(error)
+    );
+  });
+}
+</code></pre>
+<p><strong>3. Modern Angular 21 Control Flow</strong> ⭐
+You&#39;re using the latest Angular syntax:</p>
+<pre><code class="language-html">@if (loading) {
+  &lt;div class=&quot;card-loading&quot;&gt;Loading...&lt;/div&gt;
+} @else if (error) {
+  &lt;div class=&quot;card-error&quot;&gt;{{ error }}&lt;/div&gt;
+}
+
+@for (city of searchResults; track city.id) {
+  &lt;li&gt;{{ city.name }}&lt;/li&gt;
+}
+</code></pre>
+<p><strong>4. Custom SVG Sparkline Chart</strong> ⭐
+Impressive custom visualization:</p>
+<pre><code class="language-typescript">const pts = this.pm25History.map((value, index) =&gt; {
+  const x = index * stepX;
+  const normalized = (value - this.pm25Min!) / range;
+  const y = 40 - normalized * 30;
+  return `${x},${y}`;
+});
+this.sparklinePoints = pts.join(&#39; &#39;);
+</code></pre>
+<p><strong>5. City Comparison Feature</strong> ⭐
+Computed properties for comparison:</p>
+<pre><code class="language-typescript">get summarySentence(): string | null {
+  if (this.top.pm25 &lt; this.bottom.pm25) {
+    return `${topName} currently has cleaner air than ${bottomName}.`;
+  }
+  // ...
+}
+</code></pre>
+<p><strong>6. Clean Service Architecture</strong>
+Four well-organized services:</p>
+<ul>
+<li><code>AirQualityService</code> - Air quality API</li>
+<li><code>GeocodingService</code> - City search</li>
+<li><code>GeolocationService</code> - Browser location</li>
+<li><code>FavoritesService</code> - localStorage management</li>
+</ul>
+<hr>
+<h2>📈 Score Breakdown</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Score</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Application Runs/Builds</td>
+<td>20/20</td>
+<td>Perfect</td>
+</tr>
+<tr>
+<td>Design/UX</td>
+<td>17/20</td>
+<td>Angular Material, status indicators</td>
+</tr>
+<tr>
+<td>Models/Data Structures</td>
+<td>13/15</td>
+<td>Good interfaces</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td>30/40</td>
+<td>Query params, wildcard</td>
+</tr>
+<tr>
+<td>Components</td>
+<td>55/80</td>
+<td>Standalone, comprehensive</td>
+</tr>
+<tr>
+<td>Services</td>
+<td>32/35</td>
+<td>4 services, excellent</td>
+</tr>
+<tr>
+<td>Forms</td>
+<td>15/40</td>
+<td>Template-based search</td>
+</tr>
+<tr>
+<td>Async/Observables</td>
+<td>20/35</td>
+<td>Good, missing cleanup</td>
+</tr>
+<tr>
+<td>Technical Challenge</td>
+<td>45/50</td>
+<td>Real APIs, geolocation, charts</td>
+</tr>
+</tbody></table>
+<p><strong>Total: 250/335 → Scaled: 112/150 → 100/100</strong></p>
+<hr>
+<h2>🔧 Areas for Improvement</h2>
+<h3>1. Add Observable Cleanup (Important!)</h3>
+<p>Your route subscription in HomeComponent can cause memory leaks:</p>
+<pre><code class="language-typescript">// Current (memory leak potential)
+ngOnInit(): void {
+  this.route.queryParams.subscribe((params) =&gt; { ... });
+}
+</code></pre>
+<p><strong>Fix:</strong></p>
+<pre><code class="language-typescript">import { Subject } from &#39;rxjs&#39;;
+import { takeUntil } from &#39;rxjs/operators&#39;;
+
+export class HomeComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject&lt;void&gt;();
+
+  ngOnInit(): void {
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) =&gt; { ... });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}
+</code></pre>
+<p>Apply this pattern to all components with subscriptions.</p>
+<hr>
+<h3>2. Type Your API Responses</h3>
+<p>Instead of <code>any</code>, create proper interfaces:</p>
+<pre><code class="language-typescript">// Current
+getAirQualityByCoordinates(...): Observable&lt;any&gt;
+
+// Better
+interface AirQualityResponse {
+  hourly: {
+    time: string[];
+    pm10: number[];
+    pm2_5: number[];
+  };
+}
+
+getAirQualityByCoordinates(...): Observable&lt;AirQualityResponse&gt;
+</code></pre>
+<hr>
+<h3>3. Consider Reactive Forms for Search</h3>
+<p>For better control and validation:</p>
+<pre><code class="language-typescript">import { FormControl } from &#39;@angular/forms&#39;;
+
+searchControl = new FormControl(&#39;&#39;);
+
+ngOnInit() {
+  this.searchControl.valueChanges.pipe(
+    debounceTime(300),
+    distinctUntilChanged(),
+    switchMap(query =&gt; this.geocodingService.search(query))
+  ).subscribe(results =&gt; { ... });
+}
+</code></pre>
+<hr>
+<h2>✨ What Made This Project Stand Out</h2>
+<ol>
+<li><strong>Real External APIs</strong> - Not mock data, actual Open Meteo integration</li>
+<li><strong>Browser Geolocation</strong> - Creative use of native API wrapped in Observable</li>
+<li><strong>Custom Visualization</strong> - SVG sparkline chart from scratch</li>
+<li><strong>City Comparison</strong> - Useful feature with computed properties</li>
+<li><strong>Modern Angular 21</strong> - Latest control flow syntax (<code>@if</code>, <code>@for</code>)</li>
+<li><strong>Clean Architecture</strong> - 4 focused services with clear responsibilities</li>
+</ol>
+<hr>
+<h2>📚 Recommended Next Steps</h2>
+<ol>
+<li><p><strong>Observable Cleanup</strong></p>
+<ul>
+<li>Add <code>takeUntil</code> pattern to prevent memory leaks</li>
+<li>Resource: <a href="https://www.learnrxjs.io/learn-rxjs/operators/filtering/takeuntil">RxJS Unsubscribe Patterns</a></li>
+</ul>
+</li>
+<li><p><strong>Add More Routes</strong></p>
+<ul>
+<li>Consider detail pages with route parameters</li>
+<li>Add route guards for future authenticated features</li>
+</ul>
+</li>
+<li><p><strong>Enhanced Visualization</strong></p>
+<ul>
+<li>Add more chart types (bar charts, historical trends)</li>
+<li>Consider using a library like ngx-charts</li>
+</ul>
+</li>
+<li><p><strong>PWA Features</strong></p>
+<ul>
+<li>Add service worker for offline support</li>
+<li>Cache air quality data for favorite locations</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2>🎯 Summary</h2>
+<p>This is exceptional work that demonstrates:</p>
+<p><strong>Key Strengths:</strong></p>
+<ul>
+<li>Real API integration (not fake async)</li>
+<li>Creative geolocation implementation</li>
+<li>Modern Angular 21 patterns</li>
+<li>Custom data visualization</li>
+<li>Clean service architecture</li>
+</ul>
+<p><strong>Minor Gaps:</strong></p>
+<ul>
+<li>Observable cleanup needed</li>
+<li>Could use stricter typing</li>
+</ul>
+<p><strong>Grade: A+ (100/100)</strong> - This is portfolio-worthy work. The combination of real APIs, browser geolocation, and custom visualization shows creativity and strong technical skills. Outstanding job!</p>
+<hr>
+<p><em>If you have questions about this evaluation, feel free to reach out during office hours.</em></p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>matej-mitevski-5827-mzGoZiE7dV — GitSith - Student Projects</title>
+  <meta name="description" content="Grade: A+ (100/100)">
+  <meta property="og:title" content="matej-mitevski-5827-mzGoZiE7dV">
+  <meta property="og:description" content="Grade: A+ (100/100)">
+  <link rel="canonical" href="https://gitsith.com/student-projects/matej-mitevski-5827-mzgozie7dv/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>matej-mitevski-5827-mzGoZiE7dV</h1>
+        <div class="article-meta">2 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Feedback - FPL Manager</h1>
+<h2>Overall Assessment</h2>
+<p><strong>Grade: A+ (100/100)</strong></p>
+<p>Congratulations on creating an impressive full-stack Fantasy Premier League management system! Your project demonstrates excellent technical skills and real-world application development.</p>
+<h2>What You Did Really Well ✅</h2>
+<h3>1. Real Backend Integration</h3>
+<ul>
+<li><strong>Outstanding work</strong> implementing a Python Flask backend that connects to the actual Fantasy Premier League API</li>
+<li>This sets your project apart from mock-data implementations</li>
+<li>Proper proxy server architecture shows advanced understanding</li>
+</ul>
+<h3>2. Professional Angular Architecture</h3>
+<ul>
+<li>Clean service layer with dependency injection</li>
+<li>Well-structured components and routing</li>
+<li>Proper TypeScript implementation throughout</li>
+<li>Complex data transformation and processing</li>
+</ul>
+<h3>3. Advanced Features</h3>
+<ul>
+<li>Comprehensive squad management with budget constraints</li>
+<li>Multiple formation support (3-4-3, 4-4-2, etc.)</li>
+<li>Real-time player statistics and fixture difficulty calculations</li>
+<li>Professional project documentation</li>
+</ul>
+<h3>4. Full-Stack Development</h3>
+<ul>
+<li>Successfully integrated frontend and backend components</li>
+<li>Multiple API endpoints properly structured</li>
+<li>Complex data relationships handled well</li>
+</ul>
+<h2>Areas for Improvement ⚠️</h2>
+<h3>1. Observable Management (Critical)</h3>
+<p><strong>Issue</strong>: No <code>ngOnDestroy</code> implementation found in components</p>
+<pre><code class="language-typescript">// Add to your components:
+export class YourComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject&lt;void&gt;();
+  
+  ngOnInit() {
+    this.someService.getData()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data =&gt; {
+        // handle data
+      });
+  }
+  
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}
+</code></pre>
+<h3>2. Production Build Optimization</h3>
+<ul>
+<li>CSS bundle sizes exceed Angular&#39;s default budgets</li>
+<li>Consider optimizing component stylesheets or adjusting build configuration</li>
+</ul>
+<h3>3. Form Implementation</h3>
+<ul>
+<li>Consider adding reactive forms for squad management</li>
+<li>Input validation would enhance user experience</li>
+</ul>
+<h2>Technical Highlights</h2>
+<h3>Excellent Service Design</h3>
+<p>Your <code>FplDataService</code> demonstrates professional patterns:</p>
+<ul>
+<li>Proper HTTP error handling</li>
+<li>Complex data transformation</li>
+<li>Observable composition with RxJS operators</li>
+</ul>
+<h3>Smart Architecture Choices</h3>
+<ul>
+<li>Flask proxy server prevents CORS issues</li>
+<li>Clean separation between frontend and backend</li>
+<li>Professional project structure</li>
+</ul>
+<h2>Learning Outcomes Demonstrated</h2>
+<ul>
+<li>✅ Real HTTP integration vs mock data</li>
+<li>✅ Full-stack development skills</li>
+<li>✅ Complex state management</li>
+<li>✅ External API integration</li>
+<li>⚠️ Observable cleanup patterns (needs work)</li>
+</ul>
+<h2>Recommendations for Future Projects</h2>
+<ol>
+<li>Always implement <code>ngOnDestroy</code> for subscription cleanup</li>
+<li>Consider using Angular&#39;s reactive forms for complex inputs</li>
+<li>Add unit tests for your services</li>
+<li>Implement proper error handling UI components</li>
+</ol>
+<h2>Final Thoughts</h2>
+<p>This is an exceptional project that shows real understanding of full-stack development. The actual Fantasy Premier League API integration and complex squad management features demonstrate advanced technical skills. With proper observable cleanup, this would be a perfect implementation.</p>
+<p>Keep up the excellent work!</p>
+<p><strong>Final Grade: A+ (100/100)</strong></p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

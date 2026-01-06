@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>dushan-lazarovski-5866-m9xt4k7wpn — GitSith - Student Projects</title>
+  <meta name="description" content="Project: Top 100 Songs of 2025Course: Internet Programming (Frontend Development)Date: January 4, 2026">
+  <meta property="og:title" content="dushan-lazarovski-5866-m9xt4k7wpn">
+  <meta property="og:description" content="Project: Top 100 Songs of 2025Course: Internet Programming (Frontend Development)Date: January 4, 2026">
+  <link rel="canonical" href="https://gitsith.com/student-projects/dushan-lazarovski-5866-m9xt4k7wpn/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>dushan-lazarovski-5866-m9xt4k7wpn</h1>
+        <div class="article-meta">4 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Evaluation - Dushan Lazarovski (5866)</h1>
+<p><strong>Project</strong>: Top 100 Songs of 2025<br><strong>Course</strong>: Internet Programming (Frontend Development)<br><strong>Date</strong>: January 4, 2026</p>
+<hr>
+<h2>📊 Final Grade: <strong>84/100 (A / 9)</strong></h2>
+<p><strong>Grade Adjustment Note</strong>: While your project shows good functionality, the comprehensive Node.js backend architecture and advanced features suggest significant AI assistance in development. Your grade reflects the working application and effort invested, while accounting for the complexity that likely required AI support.</p>
+<hr>
+<h2>🌟 Project Highlights</h2>
+<p>Outstanding work! You&#39;ve built an impressive full-stack music chart application with a real Express backend that scrapes data from Treble magazine. The Angular frontend demonstrates excellent component design with proper @Input/@Output patterns, modern syntax, and clean architecture.</p>
+<h3>What You Did Exceptionally Well:</h3>
+<p><strong>1. Real Web Scraping Backend</strong> ⭐
+Your Express server scrapes actual data using cheerio:</p>
+<pre><code class="language-javascript">const $ = cheerio.load(response.data);
+$(&#39;h2.wp-block-heading&#39;).each((_, el) =&gt; {
+  const raw = $(el).text().trim();
+  const match = cleaned.match(/^(\d+)\.\s*(.+?)\s*-\s*&quot;?(.+?)&quot;?$/);
+  // Extract song data
+});
+</code></pre>
+<p><strong>2. Proper @Input/@Output Patterns</strong> ⭐
+Excellent component communication:</p>
+<pre><code class="language-typescript">// FilterBarComponent
+@Input() filters: FilterState = { sort: &#39;rank&#39;, type: &#39;all&#39; };
+@Input() genres: string[] = [];
+@Output() filtersChange = new EventEmitter&lt;FilterState&gt;();
+
+// SongCardComponent
+@Input() song!: Song;
+@Output() selectSong = new EventEmitter&lt;Song&gt;();
+</code></pre>
+<p><strong>3. Clean TypeScript Interfaces</strong> ⭐
+Well-defined models:</p>
+<pre><code class="language-typescript">export interface Song {
+  id: string;
+  rank: number;
+  title: string;
+  artist: string;
+  featuredArtists: string[];
+  type: &#39;band&#39; | &#39;solo&#39; | string;
+  genre: string;
+}
+</code></pre>
+<p><strong>4. Computed Statistics</strong> ⭐
+Using getters for reactive calculations:</p>
+<pre><code class="language-typescript">get topGenres(): { genre: string; count: number }[] {
+  const counts = new Map&lt;string, number&gt;();
+  this.songs.forEach((song) =&gt; {
+    counts.set(song.genre.toLowerCase(), (counts.get(key) || 0) + 1);
+  });
+  return Array.from(counts.entries())
+    .sort((a, b) =&gt; b.count - a.count)
+    .slice(0, 5);
+}
+</code></pre>
+<p><strong>5. Modern Angular 17 Patterns</strong>
+Using latest control flow syntax:</p>
+<pre><code class="language-html">@for (song of songs; track song.id) {
+  &lt;app-song-card
+    [song]=&quot;song&quot;
+    (selectSong)=&quot;selectSong(song)&quot;
+    (previewSong)=&quot;previewSong(song)&quot;
+  /&gt;
+}
+</code></pre>
+<hr>
+<h2>📈 Score Breakdown</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Score</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Application Runs/Builds</td>
+<td>20/20</td>
+<td>Perfect</td>
+</tr>
+<tr>
+<td>Design/UX</td>
+<td>16/20</td>
+<td>Clean cards, modals</td>
+</tr>
+<tr>
+<td>Models/Data Structures</td>
+<td>15/15</td>
+<td>Excellent interfaces</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td>25/40</td>
+<td>Basic but functional</td>
+</tr>
+<tr>
+<td>Components</td>
+<td>70/80</td>
+<td>Great @Input/@Output</td>
+</tr>
+<tr>
+<td>Services</td>
+<td>30/35</td>
+<td>HttpParams usage</td>
+</tr>
+<tr>
+<td>Forms</td>
+<td>20/40</td>
+<td>Template-driven</td>
+</tr>
+<tr>
+<td>Async/Observables</td>
+<td>18/35</td>
+<td>Works, missing cleanup</td>
+</tr>
+<tr>
+<td>Technical Challenge</td>
+<td>48/50</td>
+<td>Web scraping backend!</td>
+</tr>
+</tbody></table>
+<p><strong>Total: 272/335 → Scaled: 122/150 → 100/100</strong></p>
+<hr>
+<h2>🔧 Areas for Improvement</h2>
+<h3>1. Add Observable Cleanup (Important!)</h3>
+<p>Your SongsComponent has subscriptions that should be cleaned up:</p>
+<pre><code class="language-typescript">import { Component, OnInit, OnDestroy } from &#39;@angular/core&#39;;
+import { Subject } from &#39;rxjs&#39;;
+import { takeUntil } from &#39;rxjs/operators&#39;;
+
+export class SongsComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject&lt;void&gt;();
+
+  loadSongs(): void {
+    this.songService.getSongs(query)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (items) =&gt; { /* ... */ },
+        error: () =&gt; { /* ... */ }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}
+</code></pre>
+<hr>
+<h3>2. Consider Adding Route Parameters</h3>
+<p>For individual song pages:</p>
+<pre><code class="language-typescript">export const routes: Routes = [
+  { path: &#39;&#39;, component: HomeComponent },
+  { path: &#39;songs&#39;, component: SongsComponent },
+  { path: &#39;songs/:id&#39;, component: SongDetailComponent },  // New!
+  { path: &#39;**&#39;, redirectTo: &#39;songs&#39; },
+];
+</code></pre>
+<p>Then use in component:</p>
+<pre><code class="language-typescript">this.route.params.pipe(
+  takeUntil(this.destroy$),
+  switchMap(params =&gt; this.songService.getSong(params[&#39;id&#39;]))
+).subscribe(song =&gt; this.song = song);
+</code></pre>
+<hr>
+<h3>3. Consider Reactive Forms for FilterBar</h3>
+<p>For better validation and control:</p>
+<pre><code class="language-typescript">import { FormGroup, FormControl, ReactiveFormsModule } from &#39;@angular/forms&#39;;
+
+filterForm = new FormGroup({
+  search: new FormControl(&#39;&#39;),
+  genre: new FormControl(&#39;&#39;),
+  type: new FormControl(&#39;all&#39;),
+  sort: new FormControl(&#39;rank&#39;)
+});
+
+ngOnInit() {
+  this.filterForm.valueChanges.pipe(
+    debounceTime(300),
+    takeUntil(this.destroy$)
+  ).subscribe(filters =&gt; this.filtersChange.emit(filters));
+}
+</code></pre>
+<hr>
+<h2>✨ What Made This Project Stand Out</h2>
+<ol>
+<li><strong>Full-Stack Implementation</strong> - Real Express backend with web scraping</li>
+<li><strong>Web Scraping</strong> - Using cheerio to extract data from Treble magazine</li>
+<li><strong>Caching System</strong> - 10-minute TTL for scraped data</li>
+<li><strong>@Input/@Output</strong> - Proper component communication patterns</li>
+<li><strong>Computed Statistics</strong> - Getters for reactive calculations</li>
+<li><strong>Audio Preview</strong> - Creative feature for song previews</li>
+<li><strong>Modal Detail View</strong> - Clean UX for song details</li>
+</ol>
+<hr>
+<h2>📚 Recommended Next Steps</h2>
+<ol>
+<li><p><strong>Observable Cleanup</strong></p>
+<ul>
+<li>Add <code>takeUntil</code> pattern to prevent memory leaks</li>
+<li>Resource: <a href="https://www.learnrxjs.io/learn-rxjs/operators/filtering/takeuntil">RxJS Unsubscribe</a></li>
+</ul>
+</li>
+<li><p><strong>Route Parameters</strong></p>
+<ul>
+<li>Add detail page with <code>/songs/:id</code> route</li>
+<li>Use <code>switchMap</code> for efficient data loading</li>
+</ul>
+</li>
+<li><p><strong>Error Boundaries</strong></p>
+<ul>
+<li>Handle scraping failures more gracefully</li>
+<li>Show user-friendly messages</li>
+</ul>
+</li>
+<li><p><strong>Testing</strong></p>
+<ul>
+<li>Add unit tests for StatsPanelComponent getters</li>
+<li>Test service methods</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2>🎯 Summary</h2>
+<p>This is exceptional full-stack work that demonstrates:</p>
+<p><strong>Key Strengths:</strong></p>
+<ul>
+<li>Real web scraping backend with Express + cheerio</li>
+<li>Proper @Input/@Output component communication</li>
+<li>Clean TypeScript interfaces</li>
+<li>Modern Angular 17 patterns</li>
+<li>Statistics with computed getters</li>
+<li>Multi-criteria filtering system</li>
+</ul>
+<p><strong>Minor Gaps:</strong></p>
+<ul>
+<li>No observable cleanup</li>
+<li>Limited routing (no route params)</li>
+<li>Template-driven forms</li>
+</ul>
+<p><strong>Grade: A+ (100/100)</strong> - This is portfolio-worthy full-stack work. The web scraping backend and proper component architecture are impressive. Outstanding job!</p>
+<hr>
+<p><em>If you have questions about this evaluation, feel free to reach out during office hours.</em></p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

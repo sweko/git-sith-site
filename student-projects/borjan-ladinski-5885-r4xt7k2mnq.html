@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>borjan-ladinski-5885-r4xt7k2mnq — GitSith - Student Projects</title>
+  <meta name="description" content="Project: EverBloom - Flower ShopCourse: Internet Programming (Frontend Development)Date: January 4, 2026">
+  <meta property="og:title" content="borjan-ladinski-5885-r4xt7k2mnq">
+  <meta property="og:description" content="Project: EverBloom - Flower ShopCourse: Internet Programming (Frontend Development)Date: January 4, 2026">
+  <link rel="canonical" href="https://gitsith.com/student-projects/borjan-ladinski-5885-r4xt7k2mnq/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>borjan-ladinski-5885-r4xt7k2mnq</h1>
+        <div class="article-meta">5 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Evaluation - Borjan Ladinski (5885)</h1>
+<p><strong>Project</strong>: EverBloom - Flower Shop<br><strong>Course</strong>: Internet Programming (Frontend Development)<br><strong>Date</strong>: January 4, 2026</p>
+<hr>
+<h2>📊 Final Grade: <strong>76/100 (B / 8)</strong></h2>
+<hr>
+<h2>🌟 Project Highlights</h2>
+<p>You&#39;ve built a flower shop website with Angular 21 and Django backend integration. The visual design is professional and the basic functionality works.</p>
+<h3>What You Did Well:</h3>
+<p><strong>1. Real Backend Integration</strong> ⭐
+Your proxy configuration for Django shows understanding of full-stack development:</p>
+<pre><code class="language-json">{
+  &quot;/api&quot;: {
+    &quot;target&quot;: &quot;http://127.0.0.1:8000&quot;,
+    &quot;secure&quot;: false,
+    &quot;changeOrigin&quot;: true
+  }
+}
+</code></pre>
+<p><strong>2. TypeScript Interfaces</strong>
+You defined proper interfaces for your data:</p>
+<pre><code class="language-typescript">export interface Flower {
+  id: number;
+  name: string;
+  price: number;
+  image_url: string;
+  // ...
+}
+</code></pre>
+<p><strong>3. Search and Filter Functionality</strong>
+Your catalog filtering works well:</p>
+<pre><code class="language-typescript">get filteredFlowers(): Flower[] {
+  return this.flowers.filter(flower =&gt; {
+    const matchesCategory = this.selectedCategory === &#39;all&#39; || flower.category === this.selectedCategory;
+    const matchesSearch = flower.name.toLowerCase().includes(term);
+    return matchesCategory &amp;&amp; matchesSearch;
+  });
+}
+</code></pre>
+<p><strong>4. Modern Angular Configuration</strong>
+Good use of <code>provideHttpClient()</code> in app config - this is the correct modern pattern.</p>
+<p><strong>5. Contact Form with Error Handling</strong>
+Your contact form handles both success and error states:</p>
+<pre><code class="language-typescript">this.contactService.submitContactMessage(formData).subscribe({
+  next: (response) =&gt; { this.submitSuccess = true; },
+  error: (err) =&gt; { this.submitError = &#39;Failed to submit message.&#39;; }
+});
+</code></pre>
+<hr>
+<h2>📈 Score Breakdown</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Score</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Application Runs/Builds</td>
+<td>17/20</td>
+<td>Works with Django backend</td>
+</tr>
+<tr>
+<td>Design/UX</td>
+<td>16/20</td>
+<td>Professional Bootstrap theme</td>
+</tr>
+<tr>
+<td>Models/Data Structures</td>
+<td>12/15</td>
+<td>Good interfaces</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td>25/40</td>
+<td>Missing wildcard route</td>
+</tr>
+<tr>
+<td>Components</td>
+<td>40/80</td>
+<td>Basic structure, minimal depth</td>
+</tr>
+<tr>
+<td>Services</td>
+<td>25/35</td>
+<td>Clean service pattern</td>
+</tr>
+<tr>
+<td>Forms</td>
+<td>18/40</td>
+<td>Template-driven only</td>
+</tr>
+<tr>
+<td>Async/Observables</td>
+<td>10/35</td>
+<td>No cleanup patterns</td>
+</tr>
+<tr>
+<td>Technical Challenge</td>
+<td>20/50</td>
+<td>Search/filter, contact form</td>
+</tr>
+</tbody></table>
+<p><strong>Total: 183/335 → Scaled: 68/100</strong></p>
+<hr>
+<h2>🔧 Areas for Improvement</h2>
+<h3>1. Add Observable Cleanup (Critical!)</h3>
+<p><strong>Current Issue</strong>: Your subscriptions never get cleaned up:</p>
+<pre><code class="language-typescript">// Current - memory leak
+ngOnInit(): void {
+  this.loadFlowers();
+}
+</code></pre>
+<p><strong>Solution</strong>: Add cleanup with <code>takeUntil</code>:</p>
+<pre><code class="language-typescript">import { Subject } from &#39;rxjs&#39;;
+import { takeUntil } from &#39;rxjs/operators&#39;;
+
+export class CatalogComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject&lt;void&gt;();
+
+  ngOnInit(): void {
+    this.flowerService.getFlowers()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(items =&gt; {
+        this.flowers = items.map(/* ... */);
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}
+</code></pre>
+<hr>
+<h3>2. Use Route Parameter Observable (Not Snapshot)</h3>
+<p><strong>Current Issue</strong>: Using snapshot won&#39;t react to parameter changes:</p>
+<pre><code class="language-typescript">// Current - anti-pattern
+const id = Number(this.route.snapshot.paramMap.get(&#39;id&#39;));
+</code></pre>
+<p><strong>Better Approach</strong>:</p>
+<pre><code class="language-typescript">import { switchMap } from &#39;rxjs/operators&#39;;
+
+ngOnInit(): void {
+  this.route.params.pipe(
+    takeUntil(this.destroy$),
+    switchMap(params =&gt; {
+      const id = Number(params[&#39;id&#39;]);
+      return this.flowerService.getFlower(id);
+    })
+  ).subscribe({
+    next: (flower) =&gt; this.flower = flower,
+    error: (err) =&gt; console.error(&#39;Error loading flower:&#39;, err)
+  });
+}
+</code></pre>
+<hr>
+<h3>3. Add a Wildcard Route</h3>
+<p><strong>Current Issue</strong>: Invalid URLs don&#39;t redirect:</p>
+<pre><code class="language-typescript">// Current routes - no 404 handling
+export const routes: Routes = [
+  { path: &#39;&#39;, component: HomeComponent },
+  { path: &#39;catalog&#39;, component: CatalogComponent },
+  // Missing wildcard!
+];
+</code></pre>
+<p><strong>Fix</strong>:</p>
+<pre><code class="language-typescript">export const routes: Routes = [
+  { path: &#39;&#39;, component: HomeComponent },
+  { path: &#39;catalog&#39;, component: CatalogComponent },
+  { path: &#39;flower/:id&#39;, component: ProductDetailComponent },
+  { path: &#39;about&#39;, component: AboutComponent },
+  { path: &#39;contact&#39;, component: ContactComponent },
+  { path: &#39;**&#39;, redirectTo: &#39;&#39; }  // Add this!
+];
+</code></pre>
+<hr>
+<h3>4. Add Error Handling to Catalog</h3>
+<p><strong>Current Issue</strong>: No error handling when flowers fail to load:</p>
+<pre><code class="language-typescript">// Current
+loadFlowers(): void {
+  this.flowerService.getFlowers().subscribe((items) =&gt; {
+    this.flowers = items.map(/* ... */);
+    // What if this fails?
+  });
+}
+</code></pre>
+<p><strong>Better</strong>:</p>
+<pre><code class="language-typescript">loadFlowers(): void {
+  this.isLoading = true;
+  this.error = null;
+  
+  this.flowerService.getFlowers().pipe(
+    takeUntil(this.destroy$)
+  ).subscribe({
+    next: (items) =&gt; {
+      this.flowers = items.map(/* ... */);
+      this.isLoading = false;
+    },
+    error: (err) =&gt; {
+      console.error(&#39;Error loading flowers:&#39;, err);
+      this.error = &#39;Failed to load flowers. Please try again.&#39;;
+      this.isLoading = false;
+    }
+  });
+}
+</code></pre>
+<hr>
+<h3>5. Consider Reactive Forms for Contact</h3>
+<p>For better validation control:</p>
+<pre><code class="language-typescript">import { FormBuilder, FormGroup, Validators } from &#39;@angular/forms&#39;;
+
+export class ContactComponent implements OnInit {
+  contactForm: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    this.contactForm = this.fb.group({
+      name: [&#39;&#39;, [Validators.required, Validators.minLength(2)]],
+      email: [&#39;&#39;, [Validators.required, Validators.email]],
+      message: [&#39;&#39;, [Validators.required, Validators.minLength(10)]]
+    });
+  }
+
+  onSubmit(): void {
+    if (this.contactForm.valid) {
+      this.contactService.submitContactMessage(this.contactForm.value).subscribe(/* ... */);
+    }
+  }
+}
+</code></pre>
+<hr>
+<h3>6. Type Your Category Properly</h3>
+<p><strong>Current</strong>: <code>category: any</code></p>
+<p><strong>Better</strong>:</p>
+<pre><code class="language-typescript">export interface Category {
+  id: number;
+  name: string;
+}
+
+export interface Flower {
+  id: number;
+  name: string;
+  category: Category | null;
+  // ...
+}
+</code></pre>
+<hr>
+<h2>✨ What Could Make This Project Stronger</h2>
+<ol>
+<li><strong>Shopping Cart</strong>: Add cart functionality with a service using BehaviorSubject</li>
+<li><strong>User Authentication</strong>: Login/register with Django JWT</li>
+<li><strong>Order History</strong>: Allow users to view past orders</li>
+<li><strong>Admin Panel</strong>: CRUD operations for flowers</li>
+<li><strong>Image Upload</strong>: Allow adding new flowers with images</li>
+</ol>
+<hr>
+<h2>📚 Recommended Learning</h2>
+<ol>
+<li><p><strong>RxJS Lifecycle Management</strong></p>
+<ul>
+<li>Learn <code>takeUntil</code>, <code>async</code> pipe patterns</li>
+<li>Resource: <a href="https://rxjs.dev/guide/overview">RxJS Documentation</a></li>
+</ul>
+</li>
+<li><p><strong>Reactive Forms</strong></p>
+<ul>
+<li>FormBuilder, custom validators</li>
+<li>Resource: <a href="https://angular.dev/guide/forms/reactive-forms">Angular Reactive Forms Guide</a></li>
+</ul>
+</li>
+<li><p><strong>Route Guards</strong></p>
+<ul>
+<li>Protect routes based on authentication</li>
+<li>Resource: <a href="https://angular.dev/guide/routing/route-guards">Angular Route Guards</a></li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2>🎯 Summary</h2>
+<p>Your project demonstrates basic Angular and Django integration with a professional visual theme. The search/filter functionality and contact form work well.</p>
+<p><strong>To improve to a B grade</strong>, focus on:</p>
+<ol>
+<li>Adding observable cleanup (ngOnDestroy)</li>
+<li>Using route parameter observables</li>
+<li>Adding error handling throughout</li>
+<li>Implementing more interactive features</li>
+</ol>
+<p>The core Angular patterns need strengthening, particularly around RxJS lifecycle management.</p>
+<p><strong>Grade: B (76/100)</strong> - Solid work with room for improvement in Angular-specific patterns.</p>
+<hr>
+<p><em>If you have questions about this evaluation, feel free to reach out during office hours.</em></p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>aleksandar-smilanovski-5902-x8km3w9pnr — GitSith - Student Projects</title>
+  <meta name="description" content="Grade: B (8) - 76/100">
+  <meta property="og:title" content="aleksandar-smilanovski-5902-x8km3w9pnr">
+  <meta property="og:description" content="Grade: B (8) - 76/100">
+  <link rel="canonical" href="https://gitsith.com/student-projects/aleksandar-smilanovski-5902-x8km3w9pnr/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>aleksandar-smilanovski-5902-x8km3w9pnr</h1>
+        <div class="article-meta">4 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Feedback - Museum Audio Exhibit Library Dashboard</h1>
+<p><strong>Student</strong>: Aleksandar Smilanovski (5902)<br><strong>Project Type</strong>: Full-Stack Angular/Spring Boot Application
+<strong>Course</strong>: Internet Programming (Frontend Development)<br><strong>Date</strong>: January 4, 2026 (Updated Assessment)</p>
+<hr>
+<h2>🎯 Overall Assessment</h2>
+<p><strong>Grade: B (8) - 76/100</strong></p>
+<p>Your project demonstrates solid full-stack development skills with a working Angular frontend and Spring Boot backend. You&#39;ve built a functional dashboard application that successfully integrates with a real API. However, there are some important Angular patterns and user experience considerations that need attention.</p>
+<hr>
+<h2>✅ Strengths</h2>
+<h3>1. <strong>Excellent Full-Stack Architecture</strong></h3>
+<ul>
+<li>Complete Angular 21 frontend with proper standalone components</li>
+<li>Well-structured Spring Boot backend with JPA/Hibernate</li>
+<li>Real HTTP integration (not mock data)</li>
+<li>Proper routing and navigation</li>
+<li>Clean separation between frontend and backend</li>
+</ul>
+<h3>2. <strong>Solid Backend Implementation</strong></h3>
+<ul>
+<li>Professional Spring Boot structure with controllers, services, repositories</li>
+<li>Proper CORS configuration for frontend integration  </li>
+<li>API key authentication middleware</li>
+<li>H2 database with proper JPA entities</li>
+<li>Complete CRUD operations for all entities</li>
+</ul>
+<h3>3. <strong>Good Angular Patterns</strong></h3>
+<ul>
+<li>Standalone components with proper dependency injection</li>
+<li>Centralized API service abstraction (in most components)</li>
+<li>Error handling with user-friendly messages</li>
+<li>TypeScript interfaces for type safety</li>
+</ul>
+<h3>4. <strong>Functional Features</strong></h3>
+<ul>
+<li>Dashboard with statistics overview</li>
+<li>Full CRUD operations for exhibits, users, bookmarks, and logs</li>
+<li>Search/filter functionality</li>
+<li>Responsive UI with clear navigation</li>
+</ul>
+<hr>
+<h2>⚠️ Areas for Improvement</h2>
+<h3>1. <strong>Critical: Observable Memory Leaks</strong></h3>
+<p><strong>Issue</strong>: Your HTTP subscriptions are not being cleaned up when components are destroyed, which causes memory leaks.</p>
+<p><strong>Current Pattern</strong>:</p>
+<pre><code class="language-typescript">ngOnInit() {
+  this.api.get&lt;Exhibit[]&gt;(&#39;/exhibits&#39;).subscribe({
+    next: (v) =&gt; (this.exhibits = v),
+    error: (e) =&gt; (this.error = `LOAD FAILED`)
+  });
+}
+</code></pre>
+<p><strong>Fix Option 1 - OnDestroy Pattern</strong>:</p>
+<pre><code class="language-typescript">import { Component, OnInit, OnDestroy } from &#39;@angular/core&#39;;
+import { Subscription } from &#39;rxjs&#39;;
+
+export class ExhibitsPageComponent implements OnInit, OnDestroy {
+  private subscriptions = new Subscription();
+
+  ngOnInit() {
+    const sub = this.api.get&lt;Exhibit[]&gt;(&#39;/exhibits&#39;).subscribe({
+      next: (v) =&gt; (this.exhibits = v),
+      error: (e) =&gt; (this.error = `LOAD FAILED`)
+    });
+    this.subscriptions.add(sub);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+  }
+}
+</code></pre>
+<p><strong>Fix Option 2 - Modern takeUntilDestroyed</strong>:</p>
+<pre><code class="language-typescript">import { takeUntilDestroyed } from &#39;@angular/core/rxjs-interop&#39;;
+
+export class ExhibitsPageComponent {
+  private destroyRef = inject(DestroyRef);
+
+  ngOnInit() {
+    this.api.get&lt;Exhibit[]&gt;(&#39;/exhibits&#39;)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (v) =&gt; (this.exhibits = v),
+        error: (e) =&gt; (this.error = `LOAD FAILED`)
+      });
+  }
+}
+</code></pre>
+<h3>2. <strong>Form Validation Missing</strong></h3>
+<p><strong>Issue</strong>: Your forms accept any input without validation, leading to poor user experience.</p>
+<p><strong>Current Pattern</strong>:</p>
+<pre><code class="language-html">&lt;input class=&quot;input&quot; placeholder=&quot;name&quot; [(ngModel)]=&quot;form.name&quot; /&gt;
+&lt;button (click)=&quot;save()&quot;&gt;Create&lt;/button&gt;
+</code></pre>
+<p><strong>Improved Pattern</strong>:</p>
+<pre><code class="language-html">&lt;form #exhibitForm=&quot;ngForm&quot; (ngSubmit)=&quot;save()&quot;&gt;
+  &lt;input 
+    name=&quot;exhibitName&quot;
+    class=&quot;input&quot; 
+    placeholder=&quot;name*&quot; 
+    [(ngModel)]=&quot;form.name&quot; 
+    required 
+    minlength=&quot;2&quot;
+    #nameField=&quot;ngModel&quot; /&gt;
+  
+  &lt;div *ngIf=&quot;nameField.invalid &amp;&amp; nameField.touched&quot; class=&quot;error&quot;&gt;
+    &lt;span *ngIf=&quot;nameField.errors?.[&#39;required&#39;]&quot;&gt;Name is required&lt;/span&gt;
+    &lt;span *ngIf=&quot;nameField.errors?.[&#39;minlength&#39;]&quot;&gt;Name must be at least 2 characters&lt;/span&gt;
+  &lt;/div&gt;
+  
+  &lt;button 
+    type=&quot;submit&quot; 
+    [disabled]=&quot;!exhibitForm.valid&quot;
+    class=&quot;btn&quot;&gt;Create&lt;/button&gt;
+&lt;/form&gt;
+</code></pre>
+<h3>3. <strong>Architectural Consistency</strong></h3>
+<p><strong>Issue</strong>: Some components use <code>ApiService</code> while others use <code>HttpClient</code> directly.</p>
+<p><strong>Current Mixed Pattern</strong>:</p>
+<pre><code class="language-typescript">// ExhibitsPageComponent - Good
+constructor(private api: ApiService) {}
+
+// BookmarksPageComponent - Inconsistent  
+constructor(private http: HttpClient) {}
+</code></pre>
+<p><strong>Recommendation</strong>: Use <code>ApiService</code> consistently across all components for better maintainability.</p>
+<hr>
+<h2>🚀 Recommendations for Enhancement</h2>
+<h3>Immediate Fixes (High Priority):</h3>
+<ol>
+<li><strong>Add OnDestroy lifecycle</strong> to all components with subscriptions</li>
+<li><strong>Implement form validation</strong> with error messages</li>
+<li><strong>Standardize on ApiService</strong> usage across components</li>
+</ol>
+<h3>Future Enhancements:</h3>
+<ol>
+<li><strong>Loading States</strong>: Show spinners during API calls</li>
+<li><strong>Confirmation Dialogs</strong>: Better UX for delete operations  </li>
+<li><strong>Form Reset</strong>: Clear forms after successful operations</li>
+<li><strong>Input Sanitization</strong>: Validate audio URLs, email formats</li>
+<li><strong>Responsive Design</strong>: Improve mobile layout</li>
+</ol>
+<hr>
+<h2>📚 Learning Resources</h2>
+<ul>
+<li><strong>Observable Management</strong>: <a href="https://angular.dev/guide/rx-library">Angular RxJS Best Practices</a></li>
+<li><strong>Form Validation</strong>: <a href="https://angular.dev/guide/forms/template-driven-forms">Angular Template-Driven Forms</a></li>
+<li><strong>Memory Leaks</strong>: <a href="https://blog.angular.io/rxjs-avoiding-takeuntil-leaks-fb5182d047ef">Avoiding Memory Leaks in Angular</a></li>
+</ul>
+<hr>
+<h2>🎉 Final Thoughts</h2>
+<p>You&#39;ve built a genuinely impressive full-stack application that demonstrates strong development fundamentals. Your Spring Boot backend is professionally structured, and your Angular frontend successfully integrates with it using real HTTP calls rather than mock data.</p>
+<p>The main areas for improvement focus on Angular best practices around memory management and user experience through form validation. These are common patterns that every Angular developer needs to master, but they don&#39;t diminish the solid foundation you&#39;ve established.</p>
+<p>Keep building on this strong architectural foundation while incorporating these Angular lifecycle and UX patterns, and you&#39;ll be creating production-ready applications.</p>
+<p><strong>Well done on creating a functional full-stack application!</strong> 🎊</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

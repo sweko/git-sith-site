@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>eva-karamanovska-5780-p8xt3m9rwn — GitSith - Student Projects</title>
+  <meta name="description" content="Project: Customer Loyalty &amp;amp; Rewards Management SystemCourse: Internet Programming (Frontend Development)Date: January 4, 2026">
+  <meta property="og:title" content="eva-karamanovska-5780-p8xt3m9rwn">
+  <meta property="og:description" content="Project: Customer Loyalty &amp;amp; Rewards Management SystemCourse: Internet Programming (Frontend Development)Date: January 4, 2026">
+  <link rel="canonical" href="https://gitsith.com/student-projects/eva-karamanovska-5780-p8xt3m9rwn/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>eva-karamanovska-5780-p8xt3m9rwn</h1>
+        <div class="article-meta">4 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Evaluation - Eva Karamanovska (5780)</h1>
+<p><strong>Project</strong>: Customer Loyalty &amp; Rewards Management System<br><strong>Course</strong>: Internet Programming (Frontend Development)<br><strong>Date</strong>: January 4, 2026</p>
+<hr>
+<h2>📊 Final Grade: <strong>92/100 (A / 10)</strong></h2>
+<hr>
+<h2>🌟 Project Highlights</h2>
+<p>Excellent work! You&#39;ve built a comprehensive full-stack customer loyalty management system with Angular 21 and Spring Boot. The project demonstrates strong understanding of frontend-backend integration, data visualization, and modern Angular patterns like HTTP interceptors.</p>
+<h3>What You Did Exceptionally Well:</h3>
+<p><strong>1. HTTP Interceptor for API Authentication</strong> ⭐
+Modern functional interceptor pattern:</p>
+<pre><code class="language-typescript">const apiKeyInterceptor: HttpInterceptorFn = (req, next) =&gt; {
+  return next(req.clone({ setHeaders: { &#39;X-API-Key&#39;: environment.apiKey } }));
+};
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes),
+    provideHttpClient(withInterceptors([apiKeyInterceptor]))
+  ]
+};
+</code></pre>
+<p><strong>2. Clean TypeScript Interfaces</strong> ⭐
+Well-defined models:</p>
+<pre><code class="language-typescript">export interface Customer {
+  customerId: string;
+  name: string;
+  email: string;
+  tier?: string;
+  pointsBalance?: number;
+}
+</code></pre>
+<p><strong>3. Route Parameters</strong> ⭐
+Customer detail page with dynamic routing:</p>
+<pre><code class="language-typescript">{ path: &#39;customers/:id&#39;, component: CustomerDetailComponent }
+
+ngOnInit() {
+  this.id = this.route.snapshot.paramMap.get(&#39;id&#39;) || &#39;&#39;;
+  this.loadAll();
+}
+</code></pre>
+<p><strong>4. Chart.js Visualizations</strong> ⭐
+Bar chart and pie chart with proper cleanup:</p>
+<pre><code class="language-typescript">private renderPointsBarChart(customers: Customer[]) {
+  if (this.barChart) this.barChart.destroy();
+  this.barChart = new Chart(canvas, {
+    type: &#39;bar&#39;,
+    data: { labels, datasets: [{ label: &#39;Points Balance&#39;, data }] }
+  });
+}
+</code></pre>
+<p><strong>5. Multi-Criteria Filtering &amp; Sorting</strong> ⭐
+Comprehensive data manipulation:</p>
+<pre><code class="language-typescript">applyFilters() {
+  // Search by id/name/email
+  // Filter by tier
+  // Filter by min points
+  // Sort by points or name
+}
+</code></pre>
+<hr>
+<h2>📈 Score Breakdown</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Score</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Application Runs/Builds</td>
+<td>20/20</td>
+<td>Perfect</td>
+</tr>
+<tr>
+<td>Design/UX</td>
+<td>17/20</td>
+<td>Dashboard KPIs, charts</td>
+</tr>
+<tr>
+<td>Models/Data Structures</td>
+<td>15/15</td>
+<td>Clean interfaces</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td>35/40</td>
+<td>Route params used</td>
+</tr>
+<tr>
+<td>Components</td>
+<td>65/80</td>
+<td>Good CRUD, dashboard</td>
+</tr>
+<tr>
+<td>Services</td>
+<td>35/35</td>
+<td>HTTP interceptor</td>
+</tr>
+<tr>
+<td>Forms</td>
+<td>25/40</td>
+<td>Template-driven</td>
+</tr>
+<tr>
+<td>Async/Observables</td>
+<td>15/35</td>
+<td>Missing cleanup</td>
+</tr>
+<tr>
+<td>Technical Challenge</td>
+<td>35/50</td>
+<td>Spring Boot + Charts</td>
+</tr>
+</tbody></table>
+<p><strong>Total: 252/335 → Scaled: 92/100</strong></p>
+<hr>
+<h2>🔧 Areas for Improvement</h2>
+<h3>1. Add Observable Cleanup (Important!)</h3>
+<p>Your components have subscriptions that should be cleaned up to prevent memory leaks:</p>
+<pre><code class="language-typescript">import { Component, OnInit, OnDestroy } from &#39;@angular/core&#39;;
+import { Subject } from &#39;rxjs&#39;;
+import { takeUntil } from &#39;rxjs/operators&#39;;
+
+export class CustomersComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject&lt;void&gt;();
+
+  load() {
+    this.service.getAll()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) =&gt; { ... },
+        error: (err) =&gt; { ... }
+      });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}
+</code></pre>
+<hr>
+<h3>2. Consider Lazy Loading Routes</h3>
+<p>For better performance, use dynamic imports:</p>
+<pre><code class="language-typescript">export const routes: Routes = [
+  { path: &#39;&#39;, component: HomeComponent },
+  { 
+    path: &#39;dashboard&#39;, 
+    loadComponent: () =&gt; import(&#39;./pages/dashboard/dashboard&#39;)
+      .then(m =&gt; m.DashboardComponent) 
+  },
+  { 
+    path: &#39;customers&#39;, 
+    loadComponent: () =&gt; import(&#39;./pages/customers/customers&#39;)
+      .then(m =&gt; m.CustomersComponent) 
+  },
+  // ...
+];
+</code></pre>
+<hr>
+<h3>3. Use Observable Route Params</h3>
+<p>Instead of snapshot, subscribe to param changes:</p>
+<pre><code class="language-typescript">// Current (snapshot - only reads once)
+this.id = this.route.snapshot.paramMap.get(&#39;id&#39;) || &#39;&#39;;
+
+// Better (reactive - responds to changes)
+this.route.paramMap
+  .pipe(takeUntil(this.destroy$))
+  .subscribe(params =&gt; {
+    this.id = params.get(&#39;id&#39;) || &#39;&#39;;
+    this.loadAll();
+  });
+</code></pre>
+<hr>
+<h3>4. Consider Reactive Forms</h3>
+<p>For better validation control:</p>
+<pre><code class="language-typescript">import { FormBuilder, FormGroup, Validators } from &#39;@angular/forms&#39;;
+
+customerForm = this.fb.group({
+  customerId: [&#39;&#39;, Validators.required],
+  name: [&#39;&#39;, Validators.required],
+  email: [&#39;&#39;, [Validators.required, Validators.email]],
+  tier: [&#39;BRONZE&#39;]
+});
+</code></pre>
+<hr>
+<h2>✨ What Made This Project Stand Out</h2>
+<ol>
+<li><strong>HTTP Interceptor</strong> - Professional authentication pattern</li>
+<li><strong>Full CRUD</strong> - Complete operations on all entities</li>
+<li><strong>Chart.js Dashboard</strong> - Both bar and pie charts</li>
+<li><strong>Multi-Filter System</strong> - Search, tier, min points, sorting</li>
+<li><strong>Route Parameters</strong> - Customer detail with <code>:id</code></li>
+<li><strong>Spring Boot Backend</strong> - Complete Java API</li>
+<li><strong>Flexible Data Parsing</strong> - Handles multiple response formats</li>
+</ol>
+<hr>
+<h2>📚 Recommended Next Steps</h2>
+<ol>
+<li><p><strong>Observable Cleanup</strong></p>
+<ul>
+<li>Add <code>takeUntil</code> pattern to all subscriptions</li>
+<li>Resource: <a href="https://www.learnrxjs.io/learn-rxjs/operators/filtering/takeuntil">RxJS Unsubscribe</a></li>
+</ul>
+</li>
+<li><p><strong>OnPush Change Detection</strong></p>
+<ul>
+<li>Replace <code>ChangeDetectorRef</code> with OnPush strategy</li>
+<li>Use async pipe in templates</li>
+</ul>
+</li>
+<li><p><strong>Reactive Forms</strong></p>
+<ul>
+<li>Better validation and form state management</li>
+<li>Resource: <a href="https://angular.dev/guide/forms/reactive-forms">Angular Reactive Forms</a></li>
+</ul>
+</li>
+<li><p><strong>Unit Tests</strong></p>
+<ul>
+<li>Test your filtering logic</li>
+<li>Test service methods</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2>🎯 Summary</h2>
+<p><strong>Grade: A (92/100)</strong> - This is strong work that demonstrates solid full-stack development skills.</p>
+<p><strong>Key Strengths:</strong></p>
+<ul>
+<li>✅ HTTP interceptor implementation</li>
+<li>✅ Complete CRUD operations</li>
+<li>✅ Route parameters</li>
+<li>✅ Chart.js visualizations</li>
+<li>✅ Multi-criteria filtering</li>
+</ul>
+<p><strong>Areas to Improve:</strong></p>
+<ul>
+<li>❌ Add observable cleanup</li>
+<li>❌ Consider lazy loading</li>
+<li>❌ Use reactive forms</li>
+</ul>
+<p>You&#39;ve built a functional, well-structured application. The HTTP interceptor and filtering system show good understanding of Angular patterns. Well done!</p>
+<hr>
+<p><em>If you have questions about this evaluation, feel free to reach out during office hours.</em></p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

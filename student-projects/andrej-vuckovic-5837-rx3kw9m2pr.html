@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>andrej-vuckovic-5837-rx3kw9m2pr — GitSith - Student Projects</title>
+  <meta name="description" content="Student: Andrej Vuckovic (5837)Project: Relationship TreeCourse: Internet Programming (Frontend Development)Date: January 3, 2026">
+  <meta property="og:title" content="andrej-vuckovic-5837-rx3kw9m2pr">
+  <meta property="og:description" content="Student: Andrej Vuckovic (5837)Project: Relationship TreeCourse: Internet Programming (Frontend Development)Date: January 3, 2026">
+  <link rel="canonical" href="https://gitsith.com/student-projects/andrej-vuckovic-5837-rx3kw9m2pr/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>andrej-vuckovic-5837-rx3kw9m2pr</h1>
+        <div class="article-meta">5 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Grading - Relationship Tree</h1>
+<p><strong>Student</strong>: Andrej Vuckovic (5837)<br><strong>Project</strong>: Relationship Tree<br><strong>Course</strong>: Internet Programming (Frontend Development)<br><strong>Date</strong>: January 3, 2026</p>
+<hr>
+<h2>Final Grade: 82/100 (A / 9) - Creative Angular Project! 🎨</h2>
+<hr>
+<h2>Overall Assessment</h2>
+<p>Your Relationship Tree is a <strong>creative and well-executed Angular project</strong> with interesting canvas visualization and interactive features. The fractal tree that grows with relationship duration is genuinely creative, and your use of Angular CDK drag &amp; drop shows good technical skills.</p>
+<p><strong>What you built well:</strong></p>
+<ul>
+<li>⭐ Canvas-based fractal tree visualization</li>
+<li>⭐ Angular CDK drag &amp; drop (milestones + characters)</li>
+<li>⭐ <strong>Proper observable cleanup</strong> (OnDestroy implemented)</li>
+<li>⭐ BehaviorSubject for state management</li>
+<li>⭐ Seasonal animations (falling particles)</li>
+<li>⭐ Creative concept</li>
+</ul>
+<p><strong>What limits the grade:</strong></p>
+<ul>
+<li>⚠️ Limited scope (personal relationship tracker)</li>
+<li>⚠️ No HTTP integration (localStorage only)</li>
+<li>⚠️ No forms (just alerts/prompts)</li>
+<li>⚠️ Only 2 routes</li>
+</ul>
+<hr>
+<h2>What Makes This Creative</h2>
+<h3>1. Fractal Tree Visualization ⭐⭐</h3>
+<p>You implemented a canvas-based fractal tree that grows based on relationship duration. This is genuinely creative!</p>
+<p><strong>Technical skills demonstrated:</strong></p>
+<ul>
+<li>HTML5 Canvas API</li>
+<li>Fractal algorithms</li>
+<li>Animation with RequestAnimationFrame</li>
+<li>Dynamic rendering based on state</li>
+</ul>
+<h3>2. Angular CDK Drag &amp; Drop ⭐⭐</h3>
+<pre><code class="language-typescript">handleMilestoneDragEnd(event: CdkDragEnd, milestoneId: string) {
+  const position = event.source.getFreeDragPosition();
+  // Collision detection logic
+  milestone.position = proposedPosition;
+  this.saveMilestones();
+}
+</code></pre>
+<p><strong>Advanced Angular CDK usage:</strong></p>
+<ul>
+<li>Free-form dragging</li>
+<li>Collision detection</li>
+<li>Position persistence</li>
+</ul>
+<h3>3. Proper Observable Cleanup ⭐⭐</h3>
+<pre><code class="language-typescript">ngOnDestroy(): void {
+  this.timerSubscription?.unsubscribe();
+  this.dateSubscription?.unsubscribe();
+}
+</code></pre>
+<p><strong>You got this right!</strong> Many students miss observable cleanup. Well done.</p>
+<h3>4. BehaviorSubject Patterns ⭐</h3>
+<pre><code class="language-typescript">private startDateSubject = new BehaviorSubject&lt;Date&gt;(this.startDate);
+public startDate$: Observable&lt;Date&gt; = this.startDateSubject.asObservable();
+</code></pre>
+<p><strong>Professional reactive state management.</strong></p>
+<h3>5. Seasonal Features ⭐</h3>
+<p>Particles fall in summer/fall seasons. Shows attention to detail and polish.</p>
+<hr>
+<h2>What Limits the Grade</h2>
+<h3>1. No HTTP Integration</h3>
+<p>Everything uses localStorage:</p>
+<pre><code class="language-typescript">localStorage.setItem(this.STORAGE_KEY, this.startDate.getTime().toString());
+localStorage.setItem(&#39;milestones&#39;, JSON.stringify(this.milestones));
+</code></pre>
+<p><strong>No HTTP calls anywhere</strong> (no fetch, no HttpClient).</p>
+<p><strong>For &quot;Internet Programming&quot;</strong>, HTTP integration is expected.</p>
+<h3>2. Very Limited Scope</h3>
+<p>This is a <strong>personal relationship tracker</strong> for one specific use case.</p>
+<p>Other students built:</p>
+<ul>
+<li>Team/player management systems</li>
+<li>Lesson management platforms</li>
+<li>Basketball statistics browsers</li>
+</ul>
+<p><strong>Your project is creative but narrow in scope.</strong></p>
+<h3>3. No Forms</h3>
+<p>You use alerts and prompts instead of proper forms:</p>
+<pre><code class="language-typescript">if (!this.newMilestoneName.trim()) {
+  alert(&#39;Please enter a milestone name&#39;);
+  return;
+}
+</code></pre>
+<p><strong>Expected</strong>: Angular reactive forms with validation.</p>
+<h3>4. Only 2 Routes</h3>
+<ul>
+<li><code>/tree</code> - Tree view</li>
+<li><code>/roadmap</code> - Roadmap view</li>
+</ul>
+<p><strong>Expected</strong>: 5+ routes with parameters, guards, etc.</p>
+<hr>
+<h2>Scoring Breakdown</h2>
+<ol>
+<li><strong>Application Runs</strong>: 18/20 - Works well</li>
+<li><strong>Design/UX</strong>: 15/20 - Functional but basic CSS</li>
+<li><strong>Models</strong>: 10/15 - Limited data structures</li>
+<li><strong>Routing</strong>: 25/40 - Only 2 routes, no guards/params</li>
+<li><strong>Components</strong>: 55/80 - Good but limited variety</li>
+<li><strong>Services</strong>: 15/35 - BehaviorSubject good, no HTTP</li>
+<li><strong>Forms</strong>: 0/40 - No forms (uses alerts)</li>
+<li><strong>Observables</strong>: 20/35 - Good cleanup, no HTTP</li>
+<li><strong>Technical Challenge</strong>: 25/50 - Creative but narrow scope</li>
+</ol>
+<p><strong>Final: 82/100</strong></p>
+<hr>
+<h2>How This Compares</h2>
+<p><strong>Top Projects:</strong></p>
+<ol>
+<li>Barbara (148/100) - A+ Angular with HTTP</li>
+<li>Angela (142/100) - A+ Angular with complete CRUD + HTTP</li>
+<li>Andrej S. (98/100) - A React with modern stack (no HTTP)</li>
+<li>Teona (98/100) - A Angular (no cleanup)</li>
+<li><strong>Your project (82/100)</strong> - A Angular (creative but narrow)</li>
+</ol>
+<p><strong>What separates you:</strong></p>
+<ul>
+<li>Others have HTTP integration</li>
+<li>Others have broader scope</li>
+<li>Others have forms</li>
+</ul>
+<p><strong>What makes yours unique:</strong></p>
+<ul>
+<li>Most creative visualization!</li>
+<li>Canvas fractal tree (no one else did this)</li>
+<li>Proper observable cleanup (better than some higher scores)</li>
+</ul>
+<hr>
+<h2>What You Proved</h2>
+<p>Despite the limitations, you demonstrated:</p>
+<ul>
+<li>✅ Canvas API skills (fractal tree)</li>
+<li>✅ Angular CDK knowledge (drag &amp; drop)</li>
+<li>✅ Observable patterns (BehaviorSubject)</li>
+<li>✅ <strong>Proper cleanup</strong> (ngOnDestroy)</li>
+<li>✅ Creativity and personal investment</li>
+<li>✅ TypeScript with interfaces</li>
+</ul>
+<p><strong>These are valuable skills!</strong></p>
+<hr>
+<h2>How to Improve to A+ (95-100)</h2>
+<h3>1. Add HTTP Integration</h3>
+<p><strong>Use json-server</strong> for a backend:</p>
+<pre><code class="language-bash">npm install -D json-server
+</code></pre>
+<p>Create <code>db.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;relationships&quot;: [...],
+  &quot;milestones&quot;: [...],
+  &quot;notes&quot;: [...]
+}
+</code></pre>
+<p>Replace localStorage with HttpClient:</p>
+<pre><code class="language-typescript">getMilestones(): Observable&lt;Milestone[]&gt; {
+  return this.http.get&lt;Milestone[]&gt;(&#39;http://localhost:3001/milestones&#39;);
+}
+</code></pre>
+<h3>2. Expand Scope</h3>
+<p>Make it <strong>multi-user</strong>:</p>
+<ul>
+<li>User accounts</li>
+<li>Multiple relationships per user</li>
+<li>Shared roadmaps</li>
+<li>Social features</li>
+</ul>
+<h3>3. Add Proper Forms</h3>
+<pre><code class="language-typescript">milestoneForm = this.fb.group({
+  name: [&#39;&#39;, [Validators.required, Validators.minLength(3)]],
+  emoji: [&#39;📍&#39;, Validators.required],
+  date: [&#39;&#39;, Validators.required]
+});
+</code></pre>
+<h3>4. More Routes</h3>
+<ul>
+<li><code>/login</code> - User authentication</li>
+<li><code>/relationships</code> - List all relationships</li>
+<li><code>/relationships/:id</code> - Specific relationship</li>
+<li><code>/relationships/:id/milestones</code> - Milestone list</li>
+<li><code>/profile</code> - User profile</li>
+</ul>
+<p><strong>With these changes: 82/100 → 95-100/100</strong></p>
+<hr>
+<h2>The Personal Project Question</h2>
+<p>This feels like a <strong>passion project</strong> - something you built for personal use that happens to use Angular.</p>
+<p><strong>That&#39;s actually great!</strong> Personal projects show:</p>
+<ul>
+<li>Real motivation</li>
+<li>Creative thinking</li>
+<li>Going beyond requirements</li>
+</ul>
+<p><strong>But for a course assignment</strong>, we expect:</p>
+<ul>
+<li>Broader application scope</li>
+<li>Demonstrating full stack (HTTP integration)</li>
+<li>Multiple features</li>
+<li>General-purpose application</li>
+</ul>
+<p><strong>Your project is too specific</strong> (tracks one relationship with specific hardcoded features).</p>
+<hr>
+<h2>Final Thoughts</h2>
+<p>Andrej, your <strong>fractal tree visualization is the most creative</strong> in the cohort. The canvas work and Angular CDK drag &amp; drop show technical depth. Your observable cleanup is better than some higher-scored projects.</p>
+<p><strong>The grade limitations come from:</strong></p>
+<ul>
+<li>Very narrow scope (personal tracker)</li>
+<li>No HTTP layer</li>
+<li>No forms</li>
+<li>Limited routes</li>
+</ul>
+<p><strong>This is good technical work on a creative idea</strong>, but it&#39;s held back by being a personal project rather than a general-purpose application.</p>
+<p><strong>Your grade of 82/100 (A / 9)</strong> reflects:</p>
+<ul>
+<li>Creative execution</li>
+<li>Good Angular patterns</li>
+<li>Limited scope and features</li>
+<li>Missing HTTP requirement</li>
+</ul>
+<p><strong>If you expand this into a multi-user platform with HTTP integration, it could easily be A+ work!</strong></p>
+<hr>
+<p><strong>Nice creative work! Consider expanding the scope for a higher grade.</strong> 🎨🌳</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

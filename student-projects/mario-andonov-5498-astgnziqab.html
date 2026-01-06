@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mario-andonov-5498-astgnziqab — GitSith - Student Projects</title>
+  <meta name="description" content="Student: Mario Andonov (5498)Project: Expense TrackerGrade: F (27/100)">
+  <meta property="og:title" content="mario-andonov-5498-astgnziqab">
+  <meta property="og:description" content="Student: Mario Andonov (5498)Project: Expense TrackerGrade: F (27/100)">
+  <link rel="canonical" href="https://gitsith.com/student-projects/mario-andonov-5498-astgnziqab/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>mario-andonov-5498-astgnziqab</h1>
+        <div class="article-meta">3 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Expense Tracker - Project Feedback</h1>
+<p><strong>Student</strong>: Mario Andonov (5498)<br><strong>Project</strong>: Expense Tracker<br><strong>Grade</strong>: F (27/100)</p>
+<h2>Project Overview</h2>
+<p>Your expense tracker application demonstrates ambitious technical goals with some impressive features, particularly the mathematical implementation of linear regression for spending trend prediction. However, the project faces critical technical issues that prevent it from running successfully.</p>
+<h2>Strengths</h2>
+<h3>🎯 Advanced Features</h3>
+<ul>
+<li><strong>Linear Regression</strong>: Your implementation of mathematical trend prediction with 5-day forecasting is genuinely impressive and shows strong analytical thinking</li>
+<li><strong>Export Functionality</strong>: Both CSV and PDF export features demonstrate practical utility</li>
+<li><strong>Data Visualization</strong>: Integration of Chart.js for both pie charts and trend analysis shows good tool selection</li>
+</ul>
+<h3>🏗️ Architecture</h3>
+<ul>
+<li><strong>Component Organization</strong>: Clean separation into 4 focused components (expense-form, budget, expense-chart, spending-trend)</li>
+<li><strong>Bootstrap Integration</strong>: Professional responsive layout with proper grid system usage</li>
+</ul>
+<h2>Critical Issues Requiring Attention</h2>
+<h3>❌ Build Failures (Major Issue)</h3>
+<p>Your application cannot run due to several build errors:</p>
+<ul>
+<li>Missing <code>CommonModule</code> imports for <code>*ngIf</code> and <code>*ngFor</code> directives</li>
+<li>Bundle size exceeds the 1MB budget limit</li>
+<li>Multiple dependency optimization warnings</li>
+</ul>
+<p><strong>Fix</strong>: Add <code>CommonModule</code> to component imports or migrate to Angular 17+ <code>@if</code>/<code>@for</code> syntax.</p>
+<h3>📱 Missing Core Angular Patterns</h3>
+<ol>
+<li><p><strong>No Service Layer</strong>: All business logic is embedded in components. Create services for data management and business logic separation.</p>
+</li>
+<li><p><strong>No Routing</strong>: Single-page application limits scalability. Implement Angular routing for different views.</p>
+</li>
+<li><p><strong>Template-Driven Forms Only</strong>: Consider implementing reactive forms with FormBuilder for better validation and control.</p>
+</li>
+<li><p><strong>No Observable Management</strong>: While your localStorage implementation works, learning RxJS patterns is essential for real Angular development.</p>
+</li>
+</ol>
+<h2>Technical Recommendations</h2>
+<h3>Immediate Fixes (Required)</h3>
+<pre><code class="language-typescript">// Add to component imports
+import { CommonModule } from &#39;@angular/common&#39;;
+
+@Component({
+  // ...
+  imports: [FormsModule, CommonModule], // Add CommonModule
+})
+</code></pre>
+<h3>Modern Angular Patterns</h3>
+<p>Consider updating to Angular 17+ control flow:</p>
+<pre><code class="language-html">&lt;!-- Instead of *ngIf --&gt;
+@if (overBudget) {
+  &lt;div class=&quot;alert&quot;&gt;⚠️ You are over budget!&lt;/div&gt;
+}
+
+&lt;!-- Instead of *ngFor --&gt;
+@for (expense of expenses; track expense.date) {
+  &lt;li class=&quot;list-group-item&quot;&gt;
+    {{ expense.category }} - ${{ expense.amount }}
+  &lt;/li&gt;
+}
+</code></pre>
+<h3>Architecture Improvements</h3>
+<ol>
+<li><strong>Create ExpenseService</strong>: Move data operations to a dedicated service</li>
+<li><strong>Implement Routing</strong>: Add navigation between expense entry, reports, and settings</li>
+<li><strong>Add Form Validation</strong>: Implement comprehensive input validation</li>
+</ol>
+<h2>Learning Opportunities</h2>
+<p>Your mathematical implementation shows strong problem-solving skills. Focus on:</p>
+<ul>
+<li>Angular fundamentals (services, dependency injection, routing)</li>
+<li>Modern Angular patterns and best practices</li>
+<li>Build configuration and optimization</li>
+<li>Testing and debugging techniques</li>
+</ul>
+<p>The core idea and mathematical implementation are solid foundations - with proper Angular architecture, this could be an excellent application.</p>
+<h2>Next Steps</h2>
+<ol>
+<li>Fix build errors to make the application runnable</li>
+<li>Refactor into proper service-based architecture</li>
+<li>Add routing for scalable navigation</li>
+<li>Implement comprehensive form validation</li>
+</ol>
+<p>Your mathematical skills are evident - now apply that same analytical approach to mastering Angular&#39;s architectural patterns!</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
