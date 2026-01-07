@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>petar-bogoevski-5928-p8k4w9m2x — GitSith - Student Projects</title>
+  <meta name="description" content="Student: Petar Bogoevski (5928)Project: StepStyleTechnology Stack: React 18 + TypeScript + Vite + Express.jsFinal Score: 72/100Grade: C (7/10)">
+  <meta property="og:title" content="petar-bogoevski-5928-p8k4w9m2x">
+  <meta property="og:description" content="Student: Petar Bogoevski (5928)Project: StepStyleTechnology Stack: React 18 + TypeScript + Vite + Express.jsFinal Score: 72/100Grade: C (7/10)">
+  <link rel="canonical" href="https://gitsith.com/student-projects/petar-bogoevski-5928-p8k4w9m2x/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>petar-bogoevski-5928-p8k4w9m2x</h1>
+        <div class="article-meta">4 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Feedback: StepStyle Shoe Store</h1>
+<p><strong>Student</strong>: Petar Bogoevski (5928)<br><strong>Project</strong>: StepStyle<br><strong>Technology Stack</strong>: React 18 + TypeScript + Vite + Express.js<br><strong>Final Score</strong>: 72/100<br><strong>Grade</strong>: C (7/10)  </p>
+<hr>
+<h2>Overall Assessment</h2>
+<p>Your StepStyle project demonstrates ambitious planning and solid coding fundamentals, but unfortunately encounters critical technical issues that prevent successful deployment. The codebase shows sophisticated understanding of React patterns, TypeScript usage, and full-stack architecture, but build system failures significantly impact the final evaluation.</p>
+<h2>What You Did Well ⭐</h2>
+<h3>1. <strong>Comprehensive Feature Set</strong> 🏆</h3>
+<p>Your application scope is impressive:</p>
+<ul>
+<li>Complete user authentication (login/registration) </li>
+<li>Shopping cart and wishlist functionality</li>
+<li>Admin panel with inventory management</li>
+<li>Order processing and history</li>
+<li>Customer support chat widget</li>
+<li>Role-based access control (admin/user)</li>
+</ul>
+<h3>2. <strong>Professional Code Architecture</strong></h3>
+<pre><code>src/
+├── components/
+│   ├── admin/          ← Clean separation of concerns
+│   ├── auth/           ← Authentication components
+│   ├── common/         ← Reusable UI components
+│   ├── store/          ← Shopping features
+│   └── support/        ← Customer service
+├── data/               ← Data management
+├── lib/                ← Utility functions
+└── types.ts            ← Comprehensive TypeScript types
+</code></pre>
+<h3>3. <strong>Excellent TypeScript Implementation</strong></h3>
+<ul>
+<li>Comprehensive interface definitions for all data structures</li>
+<li>Proper typing throughout component props</li>
+<li>Clean type definitions for complex data like orders, users, and products</li>
+</ul>
+<h3>4. <strong>Modern Styling &amp; UX</strong></h3>
+<ul>
+<li>Professional use of Tailwind CSS</li>
+<li>Responsive design considerations  </li>
+<li>Good use of icons (Lucide React) and hover effects</li>
+<li>Clean component layouts with cards, modals, and sidebars</li>
+</ul>
+<h3>5. <strong>Full-Stack Architecture</strong></h3>
+<ul>
+<li>Express.js backend with API endpoints</li>
+<li>Data persistence layer with async operations</li>
+<li>Proper separation between frontend and backend concerns</li>
+</ul>
+<h2>Critical Issues That Need Attention 🚨</h2>
+<h3>1. <strong>Build System Failure</strong> (Major Issue)</h3>
+<ul>
+<li><strong>npm install</strong> consistently fails to complete</li>
+<li>Cannot run development server or build for production</li>
+<li>This prevents testing any of your implemented features</li>
+</ul>
+<h3>2. <strong>Missing Navigation System</strong></h3>
+<ul>
+<li>No React Router implementation</li>
+<li>Views switched via state instead of URL-based routing</li>
+<li>No browser back/forward button support</li>
+<li>Missing protected routes for admin functionality</li>
+</ul>
+<h3>3. <strong>State Management Approach</strong></h3>
+<ul>
+<li>Relies heavily on prop drilling instead of Context API or state management libraries</li>
+<li>480-line App.tsx component handles too much responsibility</li>
+<li>Could benefit from state management patterns like Redux or Zustand</li>
+</ul>
+<h3>4. <strong>Basic Form Handling</strong></h3>
+<ul>
+<li>Manual form validation without form libraries</li>
+<li>Could benefit from React Hook Form or Formik for better form management</li>
+</ul>
+<h2>Specific Recommendations for Improvement</h2>
+<h3>1. <strong>Fix Build Issues</strong> (Priority #1)</h3>
+<pre><code class="language-bash"># Try these steps:
+npm cache clean --force
+rm -rf node_modules package-lock.json  
+npm install
+</code></pre>
+<p>Consider updating dependencies or checking for Node.js version compatibility.</p>
+<h3>2. <strong>Implement React Router</strong> (Priority #2)</h3>
+<pre><code class="language-tsx">// Add routing structure
+import { BrowserRouter, Routes, Route } from &#39;react-router-dom&#39;;
+
+&lt;BrowserRouter&gt;
+  &lt;Routes&gt;
+    &lt;Route path=&quot;/&quot; element={&lt;StorePage /&gt;} /&gt;
+    &lt;Route path=&quot;/admin&quot; element={&lt;AdminPanel /&gt;} /&gt;
+    &lt;Route path=&quot;/orders&quot; element={&lt;OrderHistory /&gt;} /&gt;
+  &lt;/Routes&gt;
+&lt;/BrowserRouter&gt;
+</code></pre>
+<h3>3. <strong>Component Refactoring</strong></h3>
+<ul>
+<li>Break down the large App.tsx component into smaller, focused components</li>
+<li>Extract business logic into custom hooks</li>
+<li>Implement Context API for global state management</li>
+</ul>
+<h3>4. <strong>Enhanced Form Handling</strong></h3>
+<pre><code class="language-tsx">// Consider using React Hook Form
+import { useForm } from &#39;react-hook-form&#39;;
+
+const LoginForm = () =&gt; {
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  // More robust form management
+};
+</code></pre>
+<h2>Technical Strengths to Build On</h2>
+<p>✅ <strong>TypeScript Mastery</strong>: Your type definitions are comprehensive and professional<br>✅ <strong>Component Structure</strong>: Good separation of concerns across component directories<br>✅ <strong>Feature Completeness</strong>: You&#39;ve thought through the entire e-commerce workflow<br>✅ <strong>Modern Tech Stack</strong>: Good choice of React 18, Vite, and TypeScript<br>✅ <strong>Full-Stack Thinking</strong>: Understanding of both frontend and backend concerns  </p>
+<h2>Final Thoughts</h2>
+<p>This project shows excellent <strong>planning and code organization</strong> - you clearly understand modern React development patterns and have implemented a comprehensive feature set. The TypeScript usage is particularly impressive and shows professional-level type safety awareness.</p>
+<p>However, the <strong>build system issues are critical</strong> and prevent demonstration of your hard work. Once these technical hurdles are overcome, this project has the potential for much higher grades.</p>
+<p>Your architectural thinking is solid - you understand component design, state management, and full-stack integration. With the build issues resolved and proper routing implemented, this could easily become an A-level project.</p>
+<p><strong>Keep building on your strong foundation - the technical understanding is clearly there!</strong> 🚀</p>
+<hr>
+<p><strong>Score</strong>: 72/100 (C)<br><strong>Key Strengths</strong>: TypeScript mastery, comprehensive features, professional architecture<br><strong>Growth Areas</strong>: Build system fixes, routing implementation, component refactoring</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>petar-ivanovski-5877-k9w7x4m3z — GitSith - Student Projects</title>
+  <meta name="description" content="Student: Petar Ivanovski (5877)Project: SkyWays Airlines Booking SystemTechnology Stack: Angular 21 + JSON ServerFinal Score: 100/100Grade: A+ (10/10)">
+  <meta property="og:title" content="petar-ivanovski-5877-k9w7x4m3z">
+  <meta property="og:description" content="Student: Petar Ivanovski (5877)Project: SkyWays Airlines Booking SystemTechnology Stack: Angular 21 + JSON ServerFinal Score: 100/100Grade: A+ (10/10)">
+  <link rel="canonical" href="https://gitsith.com/student-projects/petar-ivanovski-5877-k9w7x4m3z/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>petar-ivanovski-5877-k9w7x4m3z</h1>
+        <div class="article-meta">4 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Feedback: SkyWays Airlines Booking System</h1>
+<p><strong>Student</strong>: Petar Ivanovski (5877)<br><strong>Project</strong>: SkyWays Airlines Booking System<br><strong>Technology Stack</strong>: Angular 21 + JSON Server<br><strong>Final Score</strong>: 100/100<br><strong>Grade</strong>: A+ (10/10)  </p>
+<hr>
+<h2>Overall Assessment</h2>
+<p>Exceptional work creating a comprehensive airline booking system! Your project demonstrates outstanding mastery of Angular 21 patterns, full-stack architecture, and real-world application development. The complete booking workflow from flight selection to confirmation shows professional-level planning and execution.</p>
+<h2>What You Did Excellently ⭐</h2>
+<h3>1. <strong>Professional Project Architecture</strong> 🏆</h3>
+<p>Your project structure is exemplary:</p>
+<pre><code>airline-booking/src/app/
+├── core/
+│   ├── models/        ← Clean TypeScript interfaces
+│   └── services/      ← HTTP services with dependency injection
+├── features/
+│   ├── flights/       ← Flight browsing and selection
+│   ├── seat-selection/← Interactive seat mapping
+│   ├── booking/       ← Passenger and payment forms
+│   ├── confirmation/  ← Booking summary
+│   ├── about/         ← Company information
+│   └── contact/       ← Contact page
+</code></pre>
+<h3>2. <strong>Outstanding Full-Stack Integration</strong></h3>
+<ul>
+<li><strong>Real Backend</strong>: JSON Server providing RESTful API endpoints</li>
+<li><strong>HTTP Communication</strong>: Proper Angular HttpClient usage throughout</li>
+<li><strong>Data Flow</strong>: Clean service layer with Observable patterns</li>
+<li><strong>API Design</strong>: Well-structured endpoints for flights and bookings</li>
+</ul>
+<h3>3. <strong>Modern Angular Excellence</strong></h3>
+<ul>
+<li><strong>Angular 21</strong>: Latest version with standalone components</li>
+<li><strong>Perfect Routing</strong>: Complete router setup with dynamic parameters</li>
+<li><strong>TypeScript Mastery</strong>: Strong typing with comprehensive interfaces</li>
+<li><strong>Component Architecture</strong>: Feature-based organization with proper separation</li>
+</ul>
+<h3>4. <strong>Complete Booking Workflow</strong> 🎯</h3>
+<p>Your implementation covers the entire airline booking process:</p>
+<ol>
+<li><strong>Flight Selection</strong> with dynamic city images from Unsplash</li>
+<li><strong>Interactive Seat Selection</strong> with real-time availability</li>
+<li><strong>Comprehensive Booking Form</strong> (passenger, contact, payment info)</li>
+<li><strong>Professional Confirmation Page</strong> with booking summary</li>
+</ol>
+<h3>5. <strong>Technical Implementation Excellence</strong></h3>
+<pre><code class="language-typescript">// Outstanding service implementation
+@Injectable({ providedIn: &#39;root&#39; })
+export class FlightService {
+  private API = &#39;http://localhost:3000/flights&#39;;
+  
+  getFlights(): Observable&lt;Flight[]&gt; {
+    return this.http.get&lt;Flight[]&gt;(this.API);
+  }
+  
+  getFlightById(id: number): Observable&lt;Flight&gt; {
+    return this.http.get&lt;Flight&gt;(`${this.API}/${id}`);
+  }
+}
+</code></pre>
+<h3>6. <strong>Professional User Experience</strong></h3>
+<ul>
+<li><strong>Visual Design</strong>: Clean airline theme with proper branding</li>
+<li><strong>Interactive Elements</strong>: Seat selection with visual feedback</li>
+<li><strong>Dynamic Content</strong>: City-specific background images</li>
+<li><strong>Navigation</strong>: Smooth routing with active link states</li>
+</ul>
+<h2>Minor Areas for Enhancement</h2>
+<h3>1. <strong>Observable Subscription Management</strong> (Advanced Pattern)</h3>
+<p>Consider implementing subscription cleanup to prevent memory leaks:</p>
+<pre><code class="language-typescript">export class Component implements OnInit, OnDestroy {
+  private destroy$ = new Subject&lt;void&gt;();
+  
+  ngOnInit(): void {
+    this.flightService.getFlights()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(flights =&gt; this.flights = flights);
+  }
+  
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}
+</code></pre>
+<h3>2. <strong>Enhanced Form Validation</strong> (Professional Touch)</h3>
+<p>Your forms work great! Consider reactive forms for even more robust validation:</p>
+<pre><code class="language-typescript">this.bookingForm = this.fb.group({
+  fullName: [&#39;&#39;, [Validators.required, Validators.minLength(2)]],
+  email: [&#39;&#39;, [Validators.required, Validators.email]],
+  passportNumber: [&#39;&#39;, [Validators.required, Validators.pattern(/^[A-Z0-9]+$/)]]
+});
+</code></pre>
+<h3>3. <strong>Security Update</strong></h3>
+<p>Run <code>npm audit fix</code> to address the high severity vulnerability mentioned during installation.</p>
+<h2>What Sets This Project Apart</h2>
+<p>✅ <strong>Real-World Complexity</strong>: Complete booking system workflow<br>✅ <strong>Professional Architecture</strong>: Feature-based module organization<br>✅ <strong>Modern Patterns</strong>: Angular 21 standalone components<br>✅ <strong>Full-Stack Integration</strong>: Working backend with real HTTP calls<br>✅ <strong>TypeScript Excellence</strong>: Comprehensive type safety<br>✅ <strong>User Experience</strong>: Intuitive airline booking interface  </p>
+<h2>Technical Achievements Recognized</h2>
+<p>🎯 <strong>Perfect Routing</strong>: Dynamic routes with parameters (<code>/seats/:id</code>)<br>🎯 <strong>Service Architecture</strong>: Clean dependency injection patterns<br>🎯 <strong>Component Design</strong>: Proper standalone component implementation<br>🎯 <strong>Backend Integration</strong>: Functional JSON Server API<br>🎯 <strong>Data Models</strong>: Well-defined TypeScript interfaces<br>🎯 <strong>Visual Polish</strong>: Professional airline booking theme  </p>
+<h2>Final Thoughts</h2>
+<p>This is <strong>exceptional work</strong> that demonstrates mastery of modern Angular development and full-stack thinking. Your airline booking system rivals professional applications in terms of:</p>
+<ul>
+<li><strong>Technical Architecture</strong>: Clean, scalable, and maintainable code</li>
+<li><strong>Feature Completeness</strong>: End-to-end booking workflow</li>
+<li><strong>User Experience</strong>: Professional interface design</li>
+<li><strong>Code Quality</strong>: Strong TypeScript usage and component patterns</li>
+</ul>
+<p>The project successfully implements complex business logic (seat selection, booking management) while maintaining clean architecture principles. Your understanding of Angular patterns, routing, and backend integration is clearly at an advanced level.</p>
+<p><strong>This project sets the standard for what A+ full-stack development looks like!</strong> 🚀✈️</p>
+<p>The attention to real-world details (different seat classes, passenger information, payment processing) combined with solid technical implementation makes this a standout project that demonstrates both technical skills and product thinking.</p>
+<hr>
+<p><strong>Score</strong>: 100/100 (A+)<br><strong>Key Strengths</strong>: Full-stack mastery, professional architecture, complete feature implementation, modern Angular patterns<br><strong>Growth Areas</strong>: Observable cleanup patterns, reactive forms (advanced optimizations)</p>
+<p><strong>Outstanding work - you&#39;ve created a production-quality application!</strong> 🏆</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>

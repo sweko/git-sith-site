@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>petar-zdraveski-5761-x9k4m7w2 — GitSith - Student Projects</title>
+  <meta name="description" content="Student: Petar Zdraveski (5761)Project: Fitness Progress TrackerTechnology Stack: Angular 15 + JSON ServerFinal Score: 88/100Grade: A (9/10)">
+  <meta property="og:title" content="petar-zdraveski-5761-x9k4m7w2">
+  <meta property="og:description" content="Student: Petar Zdraveski (5761)Project: Fitness Progress TrackerTechnology Stack: Angular 15 + JSON ServerFinal Score: 88/100Grade: A (9/10)">
+  <link rel="canonical" href="https://gitsith.com/student-projects/petar-zdraveski-5761-x9k4m7w2/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>petar-zdraveski-5761-x9k4m7w2</h1>
+        <div class="article-meta">4 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Project Feedback: Fitness Progress Tracker</h1>
+<p><strong>Student</strong>: Petar Zdraveski (5761)<br><strong>Project</strong>: Fitness Progress Tracker<br><strong>Technology Stack</strong>: Angular 15 + JSON Server<br><strong>Final Score</strong>: 88/100<br><strong>Grade</strong>: A (9/10)  </p>
+<hr>
+<h2>Overall Assessment</h2>
+<p>Excellent work creating a comprehensive fitness tracking application! Your project demonstrates strong technical skills, particularly in custom data visualization and professional Angular architecture. The HTML5 Canvas charts and comprehensive feature set show advanced development understanding.</p>
+<h2>What You Did Excellently ⭐</h2>
+<h3>1. <strong>Outstanding Technical Innovation</strong> 🏆</h3>
+<p>Your custom HTML5 Canvas implementation is impressive:</p>
+<ul>
+<li><strong>Weight Tracking Chart</strong>: Line chart showing weight changes over time</li>
+<li><strong>Steps Visualization</strong>: Bar chart for daily step tracking</li>
+<li><strong>Custom Drawing Logic</strong>: Professional chart rendering without external libraries</li>
+<li><strong>Trend Analysis</strong>: Automatic weekly trend calculation</li>
+</ul>
+<h3>2. <strong>Professional Angular Architecture</strong></h3>
+<pre><code>src/
+├── app.module.ts           ← Clean module structure
+├── fitness.service.ts      ← Well-designed service layer
+├── api-key.interceptor.ts  ← Security implementation
+├── add-progress.component  ← Form handling
+└── stats.component        ← Data visualization
+</code></pre>
+<h3>3. <strong>Comprehensive Feature Set</strong></h3>
+<ul>
+<li><strong>Complete Data Entry</strong>: Steps, weight, calories, workout types, duration</li>
+<li><strong>Real-time Visualization</strong>: Dynamic charts updating with new data</li>
+<li><strong>Data Persistence</strong>: JSON Server backend integration</li>
+<li><strong>Professional UX</strong>: Clean fitness-themed interface with emojis and intuitive navigation</li>
+</ul>
+<h3>4. <strong>Advanced Technical Implementation</strong></h3>
+<pre><code class="language-typescript">// Outstanding canvas chart implementation
+@ViewChild(&#39;weightCanvas&#39;) weightCanvas!: ElementRef&lt;HTMLCanvasElement&gt;;
+
+drawWeightChart() {
+  const canvas = this.weightCanvas?.nativeElement;
+  const ctx = canvas.getContext(&#39;2d&#39;);
+  // Complex drawing logic for data visualization
+}
+</code></pre>
+<h3>5. <strong>Security-Conscious Development</strong></h3>
+<pre><code class="language-typescript">// Professional HTTP interceptor
+@Injectable()
+export class ApiKeyInterceptor implements HttpInterceptor {
+  intercept(req: HttpRequest&lt;any&gt;, next: HttpHandler) {
+    const securedReq = req.clone({
+      setHeaders: { &#39;X-API-KEY&#39;: &#39;FITNESS_TRACKER_KEY&#39; }
+    });
+    return next.handle(securedReq);
+  }
+}
+</code></pre>
+<h3>6. <strong>Strong TypeScript Usage</strong></h3>
+<pre><code class="language-typescript">export interface FitnessEntry {
+  id?: number;
+  date: string;
+  steps: number | null;
+  weight: number | null;
+  calories: number | null;
+  workoutType: string | null;
+  duration: number | null;
+}
+</code></pre>
+<h2>Areas for Enhancement</h2>
+<h3>1. <strong>Build System Optimization</strong> (Technical Issue)</h3>
+<p>Your CSS file exceeded the budget limit:</p>
+<pre><code class="language-bash"># Current: 6.80 kB vs 4.00 kB limit
+# Consider optimizing:
+- Remove unused CSS rules
+- Use CSS minification
+- Split large stylesheets
+</code></pre>
+<h3>2. <strong>Form Validation Enhancement</strong></h3>
+<p>Your forms work great but could benefit from validation:</p>
+<pre><code class="language-typescript">// Consider adding:
+validateEntry() {
+  if (!this.entry.date) {
+    this.showError(&#39;Date is required&#39;);
+    return false;
+  }
+  if (this.entry.weight &amp;&amp; this.entry.weight &lt; 0) {
+    this.showError(&#39;Weight must be positive&#39;);
+    return false;
+  }
+  return true;
+}
+</code></pre>
+<h3>3. <strong>Observable Subscription Management</strong></h3>
+<p>Add subscription cleanup to prevent memory leaks:</p>
+<pre><code class="language-typescript">export class StatsComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject&lt;void&gt;();
+  
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}
+</code></pre>
+<h2>Technical Achievements Recognized</h2>
+<p>🎯 <strong>Custom Data Visualization</strong>: HTML5 Canvas charts without external dependencies<br>🎯 <strong>Professional Security</strong>: HTTP interceptor for API authentication<br>🎯 <strong>Advanced TypeScript</strong>: Comprehensive interfaces and type safety<br>🎯 <strong>Full-Stack Integration</strong>: Working Angular + JSON Server architecture<br>🎯 <strong>Complex Business Logic</strong>: Trend analysis and data aggregation<br>🎯 <strong>Component Architecture</strong>: Clean separation of concerns  </p>
+<h2>What Makes This Project Special</h2>
+<p>✅ <strong>Technical Innovation</strong>: Custom canvas charts show advanced skill<br>✅ <strong>Professional Patterns</strong>: HTTP interceptors and service architecture<br>✅ <strong>Complete Workflow</strong>: Full fitness tracking from entry to visualization<br>✅ <strong>User Experience</strong>: Intuitive interface with proper navigation<br>✅ <strong>Real Backend</strong>: Functional API with data persistence<br>✅ <strong>Type Safety</strong>: Strong TypeScript usage throughout  </p>
+<h2>Final Thoughts</h2>
+<p>This is <strong>exceptional technical work</strong> that demonstrates mastery of advanced Angular concepts. Your custom HTML5 Canvas implementation for data visualization is particularly impressive and shows understanding well beyond basic coursework requirements.</p>
+<p>The combination of:</p>
+<ul>
+<li><strong>Professional architecture</strong> (services, interceptors, routing)</li>
+<li><strong>Advanced visualization</strong> (custom canvas charts)</li>
+<li><strong>Complete feature set</strong> (data entry, analysis, trends)</li>
+<li><strong>Security implementation</strong> (API key interceptor)</li>
+</ul>
+<p>...makes this a standout project that demonstrates real-world development skills.</p>
+<p>The build system issues are minor technical hurdles that don&#39;t detract from the excellent code architecture and innovative features you&#39;ve implemented.</p>
+<p><strong>This project showcases advanced Angular development skills and creative problem-solving!</strong> 🚀💪</p>
+<p>Your approach to data visualization without external chart libraries shows both technical competence and resourcefulness. The fitness tracking domain is well-executed with thoughtful features like trend analysis and comprehensive data entry.</p>
+<hr>
+<p><strong>Score</strong>: 88/100 (A)<br><strong>Key Strengths</strong>: Custom canvas charts, professional architecture, security implementation, comprehensive features<br><strong>Growth Areas</strong>: Build optimization, form validation, subscription management</p>
+<p><strong>Outstanding work on a technically sophisticated application!</strong> 🏆</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
