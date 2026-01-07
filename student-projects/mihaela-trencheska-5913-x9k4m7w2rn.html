@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mihaela-trencheska-5913-x9k4m7w2rn — GitSith - Student Projects</title>
+  <meta name="description" content="Great improvement! You&amp;#39;ve submitted a comprehensive Angular application that shows significant technical skills and understanding of modern web development.">
+  <meta property="og:title" content="mihaela-trencheska-5913-x9k4m7w2rn">
+  <meta property="og:description" content="Great improvement! You&amp;#39;ve submitted a comprehensive Angular application that shows significant technical skills and understanding of modern web development.">
+  <link rel="canonical" href="https://gitsith.com/student-projects/mihaela-trencheska-5913-x9k4m7w2rn/">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/article.css">
+  <script src="/assets/js/theme-switcher.js" defer></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico">
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  <meta name="theme-color" content="#764ba2">
+  <script src="/assets/js/collapsible-code.js" defer></script>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/articles/">Articles</a>
+    <a href="/aoc/">Advent Of Code</a>
+    <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
+  </nav>
+  <main>
+    <div class="article-container container">
+      <header class="article-header">
+        <h1>mihaela-trencheska-5913-x9k4m7w2rn</h1>
+        <div class="article-meta">3 min read</div>
+        
+      </header>
+      <div class="article-content">
+        <h1>Student Feedback: Mihaela Trencheska (5913)</h1>
+<h2>Project: Group Trip Website - Travel Booking Platform</h2>
+<p><strong>Great improvement!</strong> You&#39;ve submitted a comprehensive Angular application that shows significant technical skills and understanding of modern web development.</p>
+<h3>What You Did Well</h3>
+<h4>🚀 Modern Technology Stack</h4>
+<p>Your use of <strong>Angular 21</strong> with standalone components demonstrates you&#39;re working with cutting-edge technology. The project structure is professional and well-organized.</p>
+<h4>🏗️ Comprehensive Application Architecture</h4>
+<ul>
+<li><strong>Multiple Pages</strong>: Home, destinations, flights, booking, authentication</li>
+<li><strong>Professional UI/UX</strong>: Clean, responsive design with travel industry standards</li>
+<li><strong>Component Organization</strong>: Proper separation between components, services, and models</li>
+<li><strong>Routing Implementation</strong>: Good use of lazy loading and dynamic routes</li>
+</ul>
+<h4>💻 Technical Implementation Strengths</h4>
+<ul>
+<li><strong>Reactive Forms</strong>: Proper FormGroup/FormControl usage with validation</li>
+<li><strong>TypeScript Models</strong>: Well-defined interfaces for Booking, Service, and related types</li>
+<li><strong>Service Architecture</strong>: Organized separation of concerns with AuthService and BookingService</li>
+<li><strong>Observable Patterns</strong>: Understanding of RxJS and reactive programming</li>
+</ul>
+<h4>🎨 User Experience Design</h4>
+<p>Your booking flow and travel interface show thoughtful planning. The comprehensive feature set (destinations, flights, tours, deals) demonstrates scope and ambition.</p>
+<h3>Critical Issue: Backend Integration</h3>
+<p>Unfortunately, your project has a <strong>fundamental problem</strong> that prevents it from meeting course requirements:</p>
+<h4>❌ Mock Data Instead of Real Backend</h4>
+<p>Your services use:</p>
+<pre><code class="language-typescript">// This creates fake async behavior
+return of(demoServices);
+
+// Instead of real HTTP calls
+return this.http.get&lt;Service[]&gt;(this.apiUrl);
+</code></pre>
+<h4>❌ LocalStorage Instead of HTTP APIs</h4>
+<p>The course specifically requires <strong>HTTP-based async operations</strong>, not browser storage:</p>
+<pre><code class="language-typescript">// This stores data in browser only
+localStorage.setItem(this.localStorageKey, JSON.stringify(data));
+
+// Should use HTTP for data persistence
+this.http.post(this.apiUrl, data)
+</code></pre>
+<h3>How This Compares</h3>
+<p>Your Angular skills are actually quite strong - better than many passing projects. However:</p>
+<ul>
+<li><strong>Passing Projects</strong>: Use json-server, Express.js, or Firebase for real HTTP calls</li>
+<li><strong>Your Project</strong>: Uses sophisticated mock data but no actual backend integration</li>
+<li><strong>Course Requirement</strong>: Real async data operations via HTTP protocols</li>
+</ul>
+<h3>Path to Success</h3>
+<p>You have <strong>90% of what&#39;s needed for a good grade</strong>. To convert this to a passing project:</p>
+<ol>
+<li><strong>Set up a backend</strong>: Use json-server, Express.js, or Firebase</li>
+<li><strong>Replace mock calls</strong>: Convert <code>of()</code> observables to real <code>http.get()</code> calls</li>
+<li><strong>Remove localStorage</strong>: Replace browser storage with API persistence</li>
+<li><strong>Test integration</strong>: Verify data flows between frontend and backend</li>
+</ol>
+<h3>Learning Outcomes Assessment</h3>
+<p>✅ <strong>Mastered</strong>: Angular framework, component architecture, routing, forms<br>✅ <strong>Demonstrated</strong>: TypeScript, RxJS, modern development practices<br>❌ <strong>Missing</strong>: Backend integration, HTTP client usage, async data operations  </p>
+<h3>Final Grade: F (45/100)</h3>
+<p>This grade reflects the <strong>significant improvement</strong> from no submission to a functional Angular application, but the failure to meet the core backend integration requirement.</p>
+<p><strong>You clearly have strong frontend development skills.</strong> With proper backend integration, this project could easily achieve a B+ or higher grade.</p>
+<h3>Encouragement</h3>
+<p>Don&#39;t be discouraged! Your Angular implementation is actually quite impressive and shows you understand modern web development patterns. The missing piece - backend integration - is learnable and would immediately elevate your project.</p>
+<p>Consider this a strong foundation that just needs the final piece of real data connectivity to succeed!</p>
+
+      </div>
+      <footer class="article-footer">
+        <p>Student project hosted on GitSith.</p>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
