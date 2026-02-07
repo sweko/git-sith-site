@@ -36,7 +36,7 @@ There's a new panel I've never seen before.
 ```
 ╔════════════════════════════════════════════════════════════════════╗
 ║ UNIVERSAL DEBUGGER v1.0                                            ║
-║ "Step through time. Debug your life. Fix the universe."           ║
+║ "Step through time. Debug your life. Fix the universe."            ║
 ╚════════════════════════════════════════════════════════════════════╝
 
 INITIALIZATION SEQUENCE
