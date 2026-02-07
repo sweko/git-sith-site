@@ -74,8 +74,23 @@ function build() {
   <meta name="description" content="${escapeHtml(description || excerpt)}">
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description || excerpt)}">
+  <meta property="og:image" content="${BASE_URL}/assets/icons/android-chrome-512x512.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${escapeHtml(title)}">
+  <meta name="twitter:description" content="${escapeHtml(description || excerpt)}">
+  <meta name="twitter:image" content="${BASE_URL}/assets/icons/android-chrome-512x512.png">
   <link rel="canonical" href="${BASE_URL}/articles/${slug}/">
   <link rel="stylesheet" href="${CSS_PATH}">
+  <script type="application/ld+json">${JSON.stringify({
+    "@context":"https://schema.org",
+    "@type":"Article",
+    "headline": title,
+    "description": description || excerpt,
+    "datePublished": date || undefined,
+    "author": {"@type":"Person","name":"GitSith"},
+    "mainEntityOfPage": { "@type":"WebPage", "@id": `${BASE_URL}/articles/${slug}/` },
+    "image": `${BASE_URL}/assets/icons/android-chrome-512x512.png`
+  })}</script>
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
   <script src="/assets/js/theme-switcher.js" defer></script>
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
