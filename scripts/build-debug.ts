@@ -4,20 +4,21 @@ import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 
-const CONTENT_DIR = path.join(__dirname, '..', 'content', 'articles');
-const OUTPUT_DIR = path.join(__dirname, '..', 'articles');
-const SITE_TITLE = 'GitSith - Articles';
+const CONTENT_DIR = path.join(__dirname, '..', 'content', 'debug');
+const OUTPUT_DIR = path.join(__dirname, '..', 'debug');
+const SITE_TITLE = 'GitSith - DEBUG: A Novel in Code';
 const CSS_PATH = '/assets/css/main.css';
 const ARTICLE_CSS_PATH = '/assets/css/article.css';
 
 const BASE_URL = (process.env.BASE_URL || 'https://gitsith.com').replace(/\/$/, '');
 
-type ArticleRecord = {
+type ChapterRecord = {
   title: string;
-  date?: string;
+  chapter?: string;
   description?: string;
   slug: string;
   filename: string;
+  order?: number;
 };
 
 function slugify(name: string): string {
@@ -35,7 +36,7 @@ function ensureOutDir(dir: string) {
 
 function build() {
   // Remove previous build output to avoid stale files
-  if (fs.existsSync(OUTPUT_DIR) && path.basename(OUTPUT_DIR) === 'articles') {
+  if (fs.existsSync(OUTPUT_DIR) && path.basename(OUTPUT_DIR) === 'debug') {
     fs.rmSync(OUTPUT_DIR, { recursive: true, force: true });
   }
 
@@ -43,12 +44,13 @@ function build() {
 
   const mdFiles: string[] = fs.readdirSync(CONTENT_DIR).filter((f: string) => f.endsWith('.md'));
 
-  const articles: ArticleRecord[] = mdFiles.map((file: string) => {
+  const chapters: ChapterRecord[] = mdFiles.map((file: string) => {
     const full = path.join(CONTENT_DIR, file);
     const raw = fs.readFileSync(full, 'utf8');
     const { data, content } = matter(raw);
     let html = marked(content);
-    // Remove leading H1 from markdown content if it matches the article title (prevents duplicated H1)
+
+    // Remove leading H1 from markdown content if it matches the chapter title (prevents duplicated H1)
     const title = (data && (data as any).title) ? String((data as any).title) : path.basename(file, '.md');
     const leadH1 = /^\s*<h1[^>]*>([\s\S]*?)<\/h1>\s*/i.exec(html);
     if (leadH1 && leadH1[1]) {
@@ -57,9 +59,11 @@ function build() {
         html = html.replace(leadH1[0], '');
       }
     }
+
     const slug = slugify(title);
-    const date = (data && (data as any).date) ? new Date(String((data as any).date)).toISOString().split('T')[0] : '';
+    const chapter = (data && (data as any).chapter) ? String((data as any).chapter) : '';
     const description = (data && (data as any).description) ? String((data as any).description) : '';
+    const order = (data && (data as any).order) ? Number((data as any).order) : 0;
     const outFile = path.join(OUTPUT_DIR, `${slug}.html`);
 
     const excerpt = getExcerpt(html, description);
@@ -74,7 +78,7 @@ function build() {
   <meta name="description" content="${escapeHtml(description || excerpt)}">
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description || excerpt)}">
-  <link rel="canonical" href="${BASE_URL}/articles/${slug}/">
+  <link rel="canonical" href="${BASE_URL}/debug/${slug}/">
   <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
   <script src="/assets/js/theme-switcher.js" defer></script>
@@ -98,14 +102,17 @@ function build() {
     <div class="article-container container">
       <header class="article-header">
         <h1>${escapeHtml(title)}</h1>
-        <div class="article-meta">${date ? `<time datetime="${date}">${date}</time> · ` : ''}${readingMinutes} min read</div>
+        <div class="article-meta">${chapter ? `${chapter} · ` : ''}${readingMinutes} min read</div>
         ${description ? `<p class="article-description">${escapeHtml(description)}</p>` : ''}
       </header>
       <div class="article-content">
         ${html}
       </div>
       <footer class="article-footer">
-        <p>Originally published on GitSith.</p>
+        <nav class="chapter-nav">
+          <p><a href="/debug/">← Back to Table of Contents</a></p>
+        </nav>
+        <p>Part of "DEBUG: A Novel in Code" — originally published on GitSith.</p>
       </footer>
     </div>
   </main>
@@ -114,17 +121,20 @@ function build() {
 
     fs.writeFileSync(outFile, page, 'utf8');
 
-    return { title, date, description, slug, filename: `${slug}.html` } as ArticleRecord;
+    return { title, chapter, description, slug, filename: `${slug}.html`, order } as ChapterRecord;
   });
 
-  const listHtml = `<!doctype html>
+  // Sort chapters by order for proper table of contents
+  chapters.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  const indexHtml = `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Articles — ${SITE_TITLE}</title>
-  <meta name="description" content="Latest articles from GitSith">
-  <link rel="canonical" href="${BASE_URL}/articles/">
+  <title>DEBUG: A Novel in Code — ${SITE_TITLE}</title>
+  <meta name="description" content="A tech thriller novel told through code">
+  <link rel="canonical" href="${BASE_URL}/debug/">
   <link rel="stylesheet" href="${CSS_PATH}">
   <link rel="stylesheet" href="${ARTICLE_CSS_PATH}">
   <script src="/assets/js/theme-switcher.js" defer></script>
@@ -146,20 +156,35 @@ function build() {
   </nav>
   <main>
     <div class="container">
-      <h1>Articles</h1>
-      <ul class="post-list">
-        ${articles.map(a => {
-          const excerpt = escapeHtml(getExcerptFromFile(path.join(OUTPUT_DIR, a.filename), a.description));
-          const readingMinutes = a.date ? '' : '';
-          return `<li class="post-card"><h3><a href="${a.filename}">${escapeHtml(a.title)}</a></h3><div class="article-meta">${a.date ? `<small style="opacity:0.8">${a.date}</small>` : ''}</div><p class="excerpt">${excerpt}</p></li>`
-        }).join('\n')}
-      </ul>
+      <header class="page-header">
+        <h1>DEBUG: A Novel in Code</h1>
+        <p class="subtitle">A tech thriller told through the language we live in</p>
+      </header>
+      
+      <div class="book-description">
+        <p>What if debugging wasn't just about fixing code, but fixing time itself? Follow our protagonist as they discover a mysterious debugging interface that allows them to step through their own life, set breakpoints in their past, and maybe—just maybe—fix the critical bugs that have led them to this moment.</p>
+        <p>A story told through terminal windows, code snippets, and the familiar desperation of a developer trying to understand why everything is broken.</p>
+      </div>
+
+      <nav class="table-of-contents">
+        <h2>Table of Contents</h2>
+        <ol class="chapter-list">
+          ${chapters.map(chapter => {
+            const excerpt = escapeHtml(getExcerptFromFile(path.join(OUTPUT_DIR, chapter.filename), chapter.description));
+            return `<li class="chapter-card">
+              <h3><a href="${chapter.filename}">${escapeHtml(chapter.title)}</a></h3>
+              ${chapter.chapter ? `<div class="chapter-meta"><small>${escapeHtml(chapter.chapter)}</small></div>` : ''}
+              ${excerpt ? `<p class="chapter-excerpt">${excerpt}</p>` : ''}
+            </li>`
+          }).join('\n')}
+        </ol>
+      </nav>
     </div>
   </main>
 </body>
 </html>`;
 
-  fs.writeFileSync(path.join(OUTPUT_DIR, 'index.html'), listHtml, 'utf8');
+  fs.writeFileSync(path.join(OUTPUT_DIR, 'index.html'), indexHtml, 'utf8');
 
   // Helper functions used during build
   function getExcerpt(htmlStr: string, fallback?: string) {
@@ -194,7 +219,7 @@ function build() {
     return fallback || '';
   }
 
-  console.log(`Built ${articles.length} articles to ${OUTPUT_DIR}`);
+  console.log(`Built ${chapters.length} chapters to ${OUTPUT_DIR}`);
 }
 
 function escapeHtml(s: string) {

@@ -102,6 +102,7 @@ const indexHtml = `<!doctype html>
     <a href="/">Home</a>
     <a href="/articles/">Articles</a>
     <a href="/aoc/">Advent Of Code</a>
+    <a href="/debug/">DEBUG</a>
     <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
   </nav>
   <main>
@@ -140,6 +141,7 @@ for (const y of Object.keys(years)) {
     <a href="/">Home</a>
     <a href="/articles/">Articles</a>
     <a href="/aoc/">Advent Of Code</a>
+    <a href="/debug/">DEBUG</a>
     <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
   </nav>
   <main>
@@ -210,6 +212,7 @@ for (const y of Object.keys(years)) {
     <a href="/">Home</a>
     <a href="/articles/">Articles</a>
     <a href="/aoc/">Advent Of Code</a>
+    <a href="/debug/">DEBUG</a>
     <button class="theme-toggle" aria-label="Toggle theme">Theme</button>
   </nav>
   <main>
